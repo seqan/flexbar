@@ -1,0 +1,26 @@
+>discarded, uncalled
+T00.30110022333302.00303331113120113
+>AA do nothing
+T00000000000000000000000000000000000
+>AB read should start with 1 in alignment
+T01000000003303011033000220000000330
+>AC both:right part remains
+T00000010230313120323001021310330101
+>AD right:5 bases match(end with 0201) - left:discarded
+T00000133023300002022321330201030313
+>AE right: map, empty read remains - left:removed
+T0303131332223233302010300133012011
+>AF right: adapter not aligned, reported - left: partyally maps
+T0031310002010202002010321110100233
+>AG right: adapter not aligned, reported - left: partyally maps,10bp
+T0031310020222221
+>AH right: adapter not aligned, reported - left: partyally maps,9bp/discarded
+T003131002022222
+>AI right: 10bp, left: empty read
+T02002110223303131
+>AJ right: 9bp, left: empty read
+T0230021220303131
+>AL right:match - left:match,(discarded, ends with 1)
+T000221211102210012233020130313101
+>AM right:match partly
+T000002222001101220112133020103031

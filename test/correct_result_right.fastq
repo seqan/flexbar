@@ -1,0 +1,40 @@
+@left_tail:shouldnt work - right_tail:shouldnt work - rigth:end with ATGC - left:discarded(C)
+TGAGATCGTTCAGTACGGCAATCGTATGC
++
+BSSMNXUTVX``[````\`___^_^_`_`
+@left_tail:shouldnt work - right_tail:end with ATGC - right:end_with_ATGC - left:discarded_empty_read(N)
+TGAGATCGTTCAGTACGGCAATTCGTATGC
++
+BSSMNXUTVX``[````\`___^_^_`_`_
+@left_tail:shouldnt work -  right_tail:shouldnt work - right:should_end_with_TGC-left:Discarded(T)
+TGAGATCGTTCAGTACGGCAATCGTATGC
++
+BSSMNXUTVX``[````\`___^_^_`_`
+@left_tail:shouldnt work - right_tail:end with CAC - right:end_with_A_left:discarded_empty_read(N)
+TCACCGGGTGGAAACTAGCCCCCCCCCCCAC
++
+BSSMNXUTVX``[````\`___^_^_`_`_`
+@left:begin_with_G-left_tail:should_work(begin with A) - right_tail:shouldnt work - right:discarded
+GTCTTAAAAAAACCCCCCCCCCTTTTTTTTTTTTTT
++
+BSSMNXUTVX``[````\`___^_^_`_`_``^_^X
+@left:begin_with_G, discarded - left_tail:should_work,but discarded! - right_tail:shouldnt work - right:discarded
+TCTTGAAAAAAAA
++
+BSSMNXUTVX``[
+@left_tail:sholdnt_work - right_tail:shouldnt work - right:10bp_remain
+AAAAAAAAAA
++
+BSSMNXUTVX
+@left_tail:shouldnt work - right_tail:shouldnt work - both:right_remains
+TGGAAGCCCCAG
++
+BSSMNXUTVX``
+@left_tail:shouldnt work - right_tail:shouldnt work - both:left_remains-left:10bp
+TGGAAAAAAAAAAGCCCCAG
++
+BSSMNXUTVX``[````\`_
+@left_tail:shouldnt work - right_tail:shouldnt work - both:left_remains-left:Discarded_9bp
+TGGAAAAAAAAAAAGCCCCAG
++
+BSSMNXUTVX``[````\`__

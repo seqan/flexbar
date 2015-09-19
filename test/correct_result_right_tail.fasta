@@ -1,0 +1,24 @@
+>left_tail:shouldnt work - right_tail:shouldnt work - rigth:end with ATGC - left:discarded(C)
+TGAGATCGTTCAGTACGGCAATCGTATGCCGTCTTC
+>left_tail:shouldnt work - right_tail:end with ATGC - right:end_with_ATGC - left:discarded_empty_read(N)
+TGAGATCGTTCAGTACGGCAATTCGTATGC
+>left_tail:shouldnt work -  right_tail:shouldnt work - right:should_end_with_TGC-left:Discarded(T)
+TGAGATCGTTCAGTACGGCAATCGTATGCCGTCTTT
+>left_tail:shouldnt work - right_tail:end with CAC - right:end_with_A_left:discarded_empty_read(N)
+TCACCGGGTGGAAACTAGCCCCCCCCCCCAC
+>left:begin_with_G-left_tail:should_work(begin with G) - right_tail:shouldnt work - right:discarded
+CGTCTTGAAAAAAACCCCCCCCCCTTTTTTTTTTTT
+>left:begin_with_G-left_tail:should_work(begin with A) - right_tail:shouldnt work - right:discarded
+GTCTTAAAAAAACCCCCCCCCCTTTTTTTTTTTTTT
+>left:begin_with_G, discarded - left_tail:should_work,but discarded! - right_tail:shouldnt work - right:discarded
+TCTTGAAAAAAAA
+>left_tail:sholdnt_work - right_tail:shouldnt work - right:10bp_remain
+AAAAAAAAAACGTCTTCATTATACAGAACACAGCAT
+>left_tail:shouldnt work - right_tail:shouldnt work - right:discarded
+AAAAAAAAACGTCTTCATTATACAGAACACAGCAT
+>left_tail:shouldnt work - right_tail:shouldnt work - both:right_remains
+TGGAAGCCCCAGCGTCTTAAAAAATTTTTTAAAAAA
+>left_tail:shouldnt work - right_tail:shouldnt work - both:left_remains-left:10bp
+TGGAAAAAAAAAAGCCCCAGCGTCTTAAAAAATTTT
+>left_tail:shouldnt work - right_tail:shouldnt work - both:left_remains-left:Discarded_9bp
+TGGAAAAAAAAAAAGCCCCAGCGTCTTAAAAATTTT
