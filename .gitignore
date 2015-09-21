@@ -7,4 +7,6 @@ cmake_install.cmake
 # misc
 flexbar
 .DS_Store
+include
+Snippets.txt
 
