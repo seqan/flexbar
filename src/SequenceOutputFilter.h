@@ -16,8 +16,6 @@
 #include "SequencingRead.h"
 
 
-// This class writes sequencing reads in specified format to a file.
-
 template <typename TString, typename TIDString, typename TStream>
 class SequenceOutputFilter {
 
@@ -34,25 +32,26 @@ private:
 	const flexbar::FileFormat m_format;
 	const flexbar::CompressionType m_cmprsType;
 	
-	tbb::atomic<unsigned long> m_countGood;
+	tbb::atomic<unsigned long> m_countGood, m_countGoodChars;
 	
 	tbb::concurrent_vector<unsigned long> *m_lengthDist;
 	
 public:
 	
-	SequenceOutputFilter(const std::string& filePath, const TIDString tagStr, const Options &o) :
+	SequenceOutputFilter(const std::string &filePath, const TIDString tagStr, const bool alwaysFile, const Options &o) :
 		m_format(o.format),
 		m_tagStr(tagStr),
 		m_minLength(o.min_readLen),
 		m_cutLen_read(o.cutLen_read),
 		m_writeLenDist(o.writeLengthDist),
-		m_useStdout(o.useStdout),
+		m_useStdout(o.useStdout && ! alwaysFile),
 		m_cmprsType(o.cmprsType),
 		m_filePath(filePath + o.outCompression){
 		
 		using namespace flexbar;
 		
-		m_countGood = 0;
+		m_countGood      = 0;
+		m_countGoodChars = 0;
 		
 		m_lengthDist = new tbb::concurrent_vector<unsigned long>(MAX_READLENGTH + 1, 0);
 		
@@ -111,7 +110,7 @@ public:
 				append(s, "@");
 				append(s, myRead.getSequenceTag());
 				
-				if(m_useStdout){
+				if(m_useStdout && m_tagStr != ""){
 					append(s, "_");
 					append(s, m_tagStr);
 				}
@@ -128,7 +127,7 @@ public:
 				append(s, ">");
 				append(s, myRead.getSequenceTag());
 				
-				if(m_useStdout){
+				if(m_useStdout && m_tagStr != ""){
 					append(s, "_");
 					append(s, m_tagStr);
 				}
@@ -154,6 +153,11 @@ public:
 	}
 	
 	
+	unsigned long getNrGoodChars() const {
+		return m_countGoodChars;
+	}
+	
+	
 	void *writeRead(void *item){
 		
 		using namespace std;
@@ -174,7 +178,11 @@ public:
 				else if(m_format == CSFASTQ){
 					myRead->setQuality(prefix(myRead->getQuality(), m_cutLen_read - 1));
 				}
+				
+				readLength = m_cutLen_read;
 			}
+			
+			m_countGoodChars += readLength;
 			
 			++m_countGood;
 			

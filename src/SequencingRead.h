@@ -7,11 +7,6 @@
 #ifndef FLEXBAR_SEQUENCINGREAD_H_
 #define FLEXBAR_SEQUENCINGREAD_H_
 
-#include <seqan/basic.h>
-
-
-/* A Sequencing read consists of a nucleotide sequence (color or basepair space),
-   a sequence name and optionally a quality string plus the quality scaling. */
 
 template <typename TString, typename TIDString>
 class SequencingRead {

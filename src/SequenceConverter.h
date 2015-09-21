@@ -8,8 +8,6 @@
 #define FLEXBAR_SEQUENCECONVERTER_H_
 
 
-// This class converts sequences from basepair space to colorspace.
-
 template <typename TString>
 class SequenceConverter {
 

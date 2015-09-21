@@ -21,8 +21,6 @@
 #include "SequenceConverter.h"
 
 
-// This class will store each processed read plus it's ID in a vector.
-
 template <typename TString, typename TIDString>
 class AdapterLoader : public tbb::filter{
 
@@ -32,13 +30,18 @@ private:
 	flexbar::FileFormat m_format;
 	tbb::concurrent_vector<TAdapter> adapters;
 	
+	bool m_revComp, m_isAdapter;
+	
 public:
 	
-	AdapterLoader(const Options &o) :
+	AdapterLoader(const Options &o, const bool isAdapter) :
 		
 		filter(serial),
+		out(o.out),
 		m_format(o.format),
-		out(o.out){
+		m_isAdapter(isAdapter){
+			
+			m_revComp = o.revCompAdapter && isAdapter;
 	};
 	
 	
@@ -47,9 +50,45 @@ public:
 	
 	void* operator()( void* item ){
 		
-		SequencingRead<TString, TIDString> *myRead = static_cast< SequencingRead<TString, TIDString>* >(item);
+		using namespace std;
+		using namespace flexbar;
 		
-		if(m_format == flexbar::CSFASTA || m_format == flexbar::CSFASTQ){
+		SequencingRead<TString, TIDString> *myRead = static_cast< SequencingRead<TString, TIDString>* >(item);
+		SequencingRead<TString, TIDString> *myReadRC;
+		
+		TIDString tag = myRead->getSequenceTag();
+		
+		if(adapters.size() < 1000){
+			for(int i = 0; i < adapters.size(); ++i){
+				
+				if(tag == adapters.at(i).first->getSequenceTag()){
+					cerr << "Two ";
+					
+					if(m_isAdapter) cerr << "adapters";
+					else            cerr << "barcodes";
+					
+					cerr << " have the same name.\n";
+					cerr << "Please use unique names and restart.\n" << endl;
+					
+					exit(1);
+				}
+			}
+		}
+		
+		if(m_revComp){
+			TString seq = myRead->getSequence();
+			seqan::reverseComplement(seq);
+			
+			if(m_format == CSFASTA || m_format == CSFASTQ){
+				seq = SequenceConverter<TString>::getInstance()->bpToColorSpace(seq);
+			}
+			
+			append(tag, " revcomp");
+			
+			myReadRC = new SequencingRead<TString, TIDString>(seq, tag);
+		}
+		
+		if(m_format == CSFASTA || m_format == CSFASTQ){
 			TString csRead = SequenceConverter<TString>::getInstance()->bpToColorSpace(myRead->getSequence());
 			myRead->setSequence(csRead);
 		}
@@ -57,6 +96,12 @@ public:
 		TAdapter adap;
 		adap.first = myRead;
 		adapters.push_back(adap);
+		
+		if(m_revComp){
+			TAdapter adapRC;
+			adapRC.first = myReadRC;
+			adapters.push_back(adapRC);
+		}
 		
 		return NULL;
 	};
@@ -77,7 +122,12 @@ public:
 		
 		const unsigned int maxSpaceLen = 23;
 		
-		*out << adapterName << ":" << string(maxSpaceLen - 8, ' ') << "Sequence:" << "\n";
+		stringstream s; s << adapterName;
+		int len = s.str().length() + 1;
+		
+		if(len + 2 > maxSpaceLen) len = maxSpaceLen - 2;
+		
+		*out << adapterName << ":" << string(maxSpaceLen - len, ' ') << "Sequence:" << "\n";
 		
 		for(unsigned int i=0; i < adapters.size(); ++i){
 			TString seqTag = adapters.at(i).first->getSequenceTag();

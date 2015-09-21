@@ -1,3 +1,4 @@
+#!/bin/sh -e
 
 echo ""
 
@@ -12,4 +13,7 @@ echo "Testing fastq:"
 
 echo "Testing csfastq:"
 ./flexbar_test_csfastq.sh
+
+echo "Testing decompression:"
+./flexbar_test_zip.sh
 

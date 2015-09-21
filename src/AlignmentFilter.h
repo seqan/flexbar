@@ -17,8 +17,6 @@
 #include "SequencingRead.h"
 #include "AdapterLoader.h"
 
-/* Performs alignment via passed Algorithm. Aligns each adapter or
-   barcode (queries) to read. The one with the highest score is used. */
 
 template <typename TString, typename TIDString, class TAlgorithm>
 class AlignmentFilter {
@@ -29,7 +27,7 @@ private:
 	const flexbar::LogLevel m_verb;
 	const flexbar::FileFormat m_format;
 	
-	const bool m_isBarcoding, m_writeTag, m_randTag;
+	const bool m_isBarcoding, m_writeTag, m_randTag, m_strictRegion;
 	const int m_minLength, m_minOverlap, m_tailLength;
 	const float m_threshold;
 	
@@ -55,6 +53,7 @@ public:
 			m_verb(o.logLevel),
 			m_format(o.format),
 			m_writeTag(o.useRemovalTag),
+			m_strictRegion(! o.relaxRegion),
 			m_out(o.out){
 		
 		m_queries = queries;
@@ -73,8 +72,6 @@ public:
 		delete m_rmOverlaps;
 	};
 	
-	
-	// aligns all query sequences to read and optionally removes best one
 	
 	int align(void* item, const bool performRemoval){
 		
@@ -139,7 +136,6 @@ public:
 			int tailLength  = (m_tailLength > 0) ? m_tailLength : queryLength;
 			
 			
-			// align only read tail in tail modes
 			if(m_trimEnd == LEFT_TAIL || m_trimEnd == RIGHT_TAIL){
 				
 				if(tailLength < readLength){
@@ -175,8 +171,8 @@ public:
 			
 			bool validAli = true;
 			
-			if(((m_trimEnd == RIGHT_TAIL || m_trimEnd == RIGHT) && startPosA < startPosS) ||
-			   ((m_trimEnd == LEFT_TAIL  || m_trimEnd == LEFT)  && endPosA > endPosS)     ||
+			if(((m_trimEnd == RIGHT_TAIL || m_trimEnd == RIGHT) && startPosA < startPosS && m_strictRegion) ||
+			   ((m_trimEnd == LEFT_TAIL  || m_trimEnd == LEFT)  && endPosA   > endPosS   && m_strictRegion) ||
 			     overlapLength < 1){
 				
 				validAli = false;
@@ -283,6 +279,9 @@ public:
 					case RIGHT:
 						rCutPos = fstartPos;
 						
+						// skipped restriction
+						if(rCutPos < 0) rCutPos = 0;
+						
 						if(m_format == FASTA || m_format == FASTQ){
 							erase(sequence, rCutPos, readLength);
 							myRead.setSequence(sequence);
@@ -292,7 +291,7 @@ public:
 								myRead.setQuality(quality);
 							}
 						}
-						else {  // colorspace
+						else {
 							if(rCutPos > 0) --rCutPos;
 							
 							erase(sequence, rCutPos, readLength);
@@ -396,10 +395,12 @@ public:
 	
 	std::string getOverlapStatsString(){
 		
+		using namespace flexbar;
+		
 		unsigned long nValues = 0, halfValues = 0, cumValues = 0, lenSum = 0;
 		int min = 1000000, max = 0, median = 0, mean = 0;
 		
-		for (int i = 0; i <= flexbar::MAX_READLENGTH; ++i){
+		for (int i = 0; i <= MAX_READLENGTH; ++i){
 			unsigned long lenCount = m_rmOverlaps->at(i);
 			
 			if(lenCount > 0 && i < min) min = i;
@@ -411,7 +412,7 @@ public:
 		
 		halfValues = nValues / 2;
 		
-		for (int i = 0; i <= flexbar::MAX_READLENGTH; ++i){
+		for (int i = 0; i <= MAX_READLENGTH; ++i){
 			cumValues += m_rmOverlaps->at(i);
 			
 			if(cumValues >= halfValues){

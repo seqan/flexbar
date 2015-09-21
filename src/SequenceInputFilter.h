@@ -24,8 +24,6 @@
 #include "SequencingRead.h"
 
 
-// This class reads a (CS)FASTA/Q file and builds instances for each SequencingRead.
-
 template <typename TString, typename TIDString, typename TStream>
 class SequenceInputFilter : public tbb::filter {
 
@@ -49,7 +47,7 @@ private:
 	const bool m_switch2Fasta, m_preProcess, m_useStdin;
 	const int m_maxUncalled, m_preTrimBegin, m_preTrimEnd, m_prePhredTrim;
 	
-	tbb::atomic<unsigned long> m_nrReads, m_nLowPhred;
+	tbb::atomic<unsigned long> m_nrReads, m_nrChars, m_nLowPhred;
 	
 public:
 	
@@ -68,6 +66,7 @@ public:
 		
 		m_nextTag   = "";
 		m_nrReads   = 0;
+		m_nrChars   = 0;
 		m_nLowPhred = 0;
 		
 		using namespace std;
@@ -115,16 +114,21 @@ public:
 	}
 	
 	
+	unsigned long getNrProcessedChars() const {
+		return m_nrChars;
+	}
+	
+	
 	bool atStreamEnd(){
 		if(m_useStdin) return atEnd(*readerCin);
 		else           return atEnd(*reader);
 	}
 	
 	
-	std::string readOneLine(){
+	void readOneLine(seqan::CharString &text){
 		using namespace std;
 		
-		string text;
+		text = "";
 		
 		if(! atStreamEnd()){
 			
@@ -141,14 +145,10 @@ public:
 				}
 			}
 		}
-		else{ text = ""; }
-		
-		return text;
 	}
 	
 	
-	// Core method for reading and parsing FASTA/FASTQ input files.
-	// @return: single SequencingRead<TString, TIDString> or NULL if no more reads in file or error.
+	// returns single SequencingRead or NULL if no more reads in file or error
 	
 	void* getRead(bool &isUncalled){
 		
@@ -169,11 +169,11 @@ public:
 			isUncalled = false;
 			
 			try{
-				// FastA parsing
+				// FastA
 				if(m_format == FASTA || m_format == CSFASTA){
 					
 					// tag line is read in previous iteration
-					if(m_nextTag == "") tag = readOneLine();
+					if(m_nextTag == "") readOneLine(tag);
 					else                tag = m_nextTag;
 					
 					if(length(tag) > 0){
@@ -193,7 +193,7 @@ public:
 					else return NULL;
 					
 					
-					source = readOneLine();
+					readOneLine(source);
 					
 					if(length(source) < 1){
 						stringstream error;
@@ -202,13 +202,16 @@ public:
 					}
 					
 					
-					m_nextTag = readOneLine();
+					readOneLine(m_nextTag);
 					
 					// fasta files with sequences splitted over several lines
 					while(! atStreamEnd() && length(m_nextTag) > 0 && getValue(m_nextTag, 0) != '>'){
 						append(source, m_nextTag);
-						m_nextTag = readOneLine();
+						readOneLine(m_nextTag);
 					}
+					
+					m_nrChars += length(source);
+					
 					
 					if(m_preProcess){
 						isUncalled = isUncalledSequence(source);
@@ -236,10 +239,10 @@ public:
 					++m_nrReads;
 				}
 				
-				// FastQ parsing
+				// FastQ
 				else{
 					
-					source = readOneLine();
+					readOneLine(source);
 					
 					if(length(source) > 0){
 						if(getValue(source, 0) != '@'){
@@ -257,7 +260,7 @@ public:
 					}
 					else return NULL;
 					
-					source = readOneLine();
+					readOneLine(source);
 					
 					if(length(source) < 1){
 						stringstream error;
@@ -266,16 +269,16 @@ public:
 					}
 					
 					
-					dummy = readOneLine();
+					readOneLine(dummy);
+					
 					if(length(dummy) == 0 || seqan::isNotEqual(getValue(dummy, 0), '+')){
 							stringstream error;
 							error << "Incorrect FASTQ entry, missing + line. Tag: " << tag << endl;
 							throw runtime_error(error.str());
 					}
 					
-					quality = readOneLine();
+					readOneLine(quality);
 					
-					// in case CSFASTQ format has same quality and read length it will be trimmed
 					if(m_format == CSFASTQ){
 						if(length(quality) == length(source)){
 							quality = suffix(quality, 1);
@@ -287,6 +290,8 @@ public:
 						error << "Empty FASTQ entry, found read without quality values! Tag: " << tag << endl;
 						throw runtime_error(error.str());
 					}
+					
+					m_nrChars += length(source);
 					
 					
 					if(m_preProcess){
@@ -370,7 +375,7 @@ public:
 	
 	
 	// returns TRUE if read contains too many uncalled bases
-	bool isUncalledSequence(TString source){
+	bool isUncalledSequence(TString &source){
 		int n = 0;
 		
 		typename seqan::Iterator<TString >::Type it, itEnd;
@@ -386,6 +391,36 @@ public:
 		return(n > m_maxUncalled);
 	}
  	
+	
+	bool qualityTrimming(TString &source, TString &quality){
+		
+		using namespace flexbar;
+		
+		typename seqan::Iterator<TString >::Type it    = seqan::begin(quality);
+		typename seqan::Iterator<TString >::Type itEnd = seqan::end(quality);
+		
+		--itEnd;
+		
+		unsigned int n = length(quality);
+		
+		bool nChanged = false;
+		
+		while(itEnd != it){
+			if(static_cast<int>(*itEnd) >= m_prePhredTrim) break;
+			--n;
+			--itEnd;
+			
+			if(! nChanged){
+				m_nLowPhred++;
+				nChanged = true;
+			}
+		}
+		source = prefix(source, n);
+		
+		if(m_format == CSFASTQ) --n;
+		quality = prefix(quality, n);
+	}
+	
 	
 	// override
 	void* operator()(void*){

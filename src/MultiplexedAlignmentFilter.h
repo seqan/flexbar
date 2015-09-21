@@ -1,6 +1,4 @@
 /*
- *   MultiplexedAlignmentFilter.h
- *
  *   Authors: mat and jtr
  */
 
@@ -20,14 +18,12 @@
 #include "AdapterLoader.h"
 
 
-// Processes MultiplexedRead and assigns barcode to read or removes adapters.
-
 template <typename TString, typename TIDString>
 class MultiplexedAlignmentFilter : public tbb::filter {
 
 private:
 	
-	const bool m_writeUnassigned;
+	const bool m_writeUnassigned, m_twoBarcodes;
 	
 	const flexbar::LogLevel       m_verb;
 	const flexbar::RunType        m_runType;
@@ -36,11 +32,11 @@ private:
 	
 	tbb::atomic<unsigned long> m_unassigned;
 	
-	tbb::concurrent_vector<TAdapter> *m_adapters;
-	tbb::concurrent_vector<TAdapter> *m_barcodes;
+	tbb::concurrent_vector<TAdapter> *m_adapters, *m_adapters2;
+	tbb::concurrent_vector<TAdapter> *m_barcodes, *m_barcodes2;
 	
 	typedef AlignmentFilter<TString, TIDString, AlignmentAlgorithm<TString> > AliFilter;
-	AliFilter *m_afilter, *m_bfilter;
+	AliFilter *m_afilter, *m_bfilter, *m_a2filter, *m_b2filter;
 	
 	std::ostream *out;
 	
@@ -50,19 +46,25 @@ public:
 		
 		filter(parallel),
 		m_verb(o.logLevel),
-		m_writeUnassigned(o.writeUnassigned),
 		m_runType(o.runType),
 		m_barType(o.barDetect),
 		m_adapRem(o.adapRm),
+		m_writeUnassigned(o.writeUnassigned),
+		m_twoBarcodes(o.barDetect == flexbar::WITHIN_READ_REMOVAL2 || o.barDetect == flexbar::WITHIN_READ2),
 		out(o.out){
-		
-		m_barcodes = &o.barcodes;
-		m_adapters = &o.adapters;
 		
 		m_unassigned = 0;
 		
-		m_afilter = new AliFilter(m_adapters, o, o.a_min_overlap, o.a_threshold, o.a_tail_len, o.match, o.mismatch, o.gapCost, o.end, false);
+		m_barcodes  = &o.barcodes;
+		m_adapters  = &o.adapters;
+		m_barcodes2 = &o.barcodes2;
+		m_adapters2 = &o.adapters2;
+		
 		m_bfilter = new AliFilter(m_barcodes, o, o.b_min_overlap, o.b_threshold, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, o.b_end, true);
+		m_afilter = new AliFilter(m_adapters, o, o.a_min_overlap, o.a_threshold, o.a_tail_len, o.match, o.mismatch, o.gapCost, o.end, false);
+		
+		m_b2filter = new AliFilter(m_barcodes2, o, o.b_min_overlap, o.b_threshold, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, o.b_end, true);
+		m_a2filter = new AliFilter(m_adapters2, o, o.a_min_overlap, o.a_threshold, o.a_tail_len, o.match, o.mismatch, o.gapCost, o.end, false);
 		
 		if(m_verb == flexbar::TAB)
 		*out << "ReadTag\tQueryTag\tQueryStart\tQueryEnd\tOverlapLength\tMismatches\tIndels\tAllowedErrors" << std::endl;
@@ -70,8 +72,10 @@ public:
 	
 	
 	virtual ~MultiplexedAlignmentFilter(){
-		delete m_afilter;
 		delete m_bfilter;
+		delete m_afilter;
+		delete m_b2filter;
+		delete m_a2filter;
 	};
 	
 	
@@ -87,13 +91,15 @@ public:
 			// barcode detection
 			if(m_barType != BOFF){
 				switch(m_barType){
-					case BARCODE_READ:         myRead->m_barcode_id = m_bfilter->align(myRead->m_b,  false); break;
-					case WITHIN_READ_REMOVAL:  myRead->m_barcode_id = m_bfilter->align(myRead->m_r1, true);  break;
-					case WITHIN_READ:          myRead->m_barcode_id = m_bfilter->align(myRead->m_r1, false); break;
-					case BOFF:                                                                               break;
+					case BARCODE_READ:         myRead->m_barcode_id  =  m_bfilter->align(myRead->m_b,   false); break;
+					case WITHIN_READ_REMOVAL2: myRead->m_barcode_id2 = m_b2filter->align(myRead->m_r2,  true);
+					case WITHIN_READ_REMOVAL:  myRead->m_barcode_id  =  m_bfilter->align(myRead->m_r1,  true);  break;
+					case WITHIN_READ2:         myRead->m_barcode_id2 = m_b2filter->align(myRead->m_r2,  false);
+					case WITHIN_READ:          myRead->m_barcode_id  =  m_bfilter->align(myRead->m_r1,  false); break;
+					case BOFF:                                                                                  break;
 				}
 				
-				if(myRead->m_barcode_id == 0){
+				if(myRead->m_barcode_id == 0 || (m_twoBarcodes && myRead->m_barcode_id2 == 0)){
 					m_unassigned++;
 					
 					if(! m_writeUnassigned) skipAdapRem = true;
@@ -105,8 +111,10 @@ public:
 				if(m_adapRem != ATWO)
 				m_afilter->align(myRead->m_r1, true);
 				
-				if(myRead->m_r2 != NULL && m_adapRem != AONE)
-				m_afilter->align(myRead->m_r2, true);
+				if(myRead->m_r2 != NULL && m_adapRem != AONE){
+					if(m_adapRem != NORMAL2) m_afilter->align(myRead->m_r2,  true);
+					else                     m_a2filter->align(myRead->m_r2, true);
+				}
 			}
 			return myRead;
 		}
@@ -115,20 +123,39 @@ public:
 	
 	
 	unsigned long getNrUnassignedReads() const {
-		if(m_runType == flexbar::PAIRED_BARCODED) return m_unassigned * 2;
-		else                                      return m_unassigned;
+		
+		using namespace flexbar;
+		
+		if(m_runType == PAIRED_BARCODED) return m_unassigned * 2;
+		else                             return m_unassigned;
 	}
 	
 	
 	unsigned long getNrPreShortReads() const {
-		return m_afilter->getNrPreShortReads();
+		
+		using namespace flexbar;
+		
+		if(m_adapRem != NORMAL2) return m_afilter->getNrPreShortReads();
+		else return m_afilter->getNrPreShortReads() + m_a2filter->getNrPreShortReads();
 	}
 	
 	
 	void printAdapterOverlapStats(){
 		
+		using namespace flexbar;
+		
 		if(m_afilter->getNrModifiedReads() > 0){
 			*out << m_afilter->getOverlapStatsString() << "\n\n";
+		}
+		
+		if(m_adapRem != NORMAL2) *out << std::endl;
+	}
+	
+	
+	void printAdapterOverlapStats2(){
+		
+		if(m_a2filter->getNrModifiedReads() > 0){
+			*out << m_a2filter->getOverlapStatsString() << "\n\n";
 		}
 		*out << std::endl;
 	}

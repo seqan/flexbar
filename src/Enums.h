@@ -8,8 +8,6 @@
 #define FLEXBAR_ENUMS_H_
 
 
-// These enums are used by almost every class.
-
 namespace flexbar{
 	
 	const unsigned int MAX_READLENGTH = 2048;
@@ -52,11 +50,14 @@ namespace flexbar{
 		BARCODE_READ,
 		WITHIN_READ,
 		WITHIN_READ_REMOVAL,
+		WITHIN_READ2,
+		WITHIN_READ_REMOVAL2,
 		BOFF
 	};
 	
 	enum AdapterRemoval {
 		NORMAL,
+		NORMAL2,
 		AONE,
 		ATWO,
 		AOFF

@@ -14,9 +14,6 @@
 #include "SequenceInputFilter.h"
 
 
-/* This class handles up to 3 file sources (paired and barcode reads)
-   and creates a MultiplexedRead depending on the run type. */
-
 template <typename TString, typename TIDString, typename TStreamR, typename TStreamP, typename TStreamB>
 class MultiplexedInputFilter : public tbb::filter {
 
@@ -72,7 +69,6 @@ public:
 		
 		bool uncalled = true, uncalled2 = true, uBR = true;
 		
-		// single read input
 		if(! m_isPaired){
 			
 			while(uncalled){
@@ -98,7 +94,6 @@ public:
 		// paired read input
 		else{
 			
-			// find paired read without uncalled bases
 			while(uncalled || uncalled2){
 				
 				myRead1 = static_cast< SequencingRead<TString, TIDString>* >(m_f1->getRead(uncalled));
@@ -157,6 +152,12 @@ public:
 	unsigned long getNrProcessedReads() const{
 		if(m_isPaired) return m_f1->getNrProcessedReads() + m_f2->getNrProcessedReads();
 		else           return m_f1->getNrProcessedReads();
+	}
+	
+	
+	unsigned long getNrProcessedChars() const{
+		if(m_isPaired) return m_f1->getNrProcessedChars() + m_f2->getNrProcessedChars();
+		else           return m_f1->getNrProcessedChars();
 	}
 	
 	

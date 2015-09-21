@@ -1,14 +1,16 @@
-/*=======================================================================
-   Name:         Flexbar.cpp
-   Authors:      Matthias Dodt and Johannes Roehr
+/*==================================================
+   
+   Flexbar - flexible barcode and adapter removal
+   
+   Version 2.5  (GPLv3)
+   
+   Uses seqan library release 1.4 or later
+    and tbb library 4.0 or later
+   
+   Authors: Matthias Dodt and Johannes Roehr
+   
+===================================================*/
 
-   Description:  Flexbar - flexible barcode and adapter removal
-   Version:      2.4
-   Copyright:    GPL version 3
-
-   SeqAn lib:    release 1.4.1, revision 14262 on July 11, 2013
-   TBB   lib:    version 4.0 update 5, stable release June 13, 2012
-========================================================================*/
 
 #include "Flexbar.h"
 #include "Options.h"
@@ -22,8 +24,8 @@ int main(int argc, const char* argv[]){
 	
 	using seqan::ArgumentParser;
 	
-	const string version = "2.4";
-	const string date    = "July 29, 2013";
+	const string version = "2.5";
+	const string date    = "June 30, 2014";
 	
 	ArgumentParser parser("flexbar");
 	
@@ -33,7 +35,7 @@ int main(int argc, const char* argv[]){
 	Options o;
 	initOptions(o, parser);
 	
-	loadProgramOptions(o, parser, version);
+	loadProgramOptions(o, parser);
 	loadBarcodesAndAdapters(o);
 	
 	startComputation(o);

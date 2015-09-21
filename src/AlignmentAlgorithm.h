@@ -55,8 +55,7 @@ public:
 		for (unsigned i = 0; i < ValueSize<TChar>::VALUE; ++i){
 			for (unsigned j = 0; j < ValueSize<TChar>::VALUE; ++j){
 				
-				if(i == j || TChar(i) == 'N' || TChar(j) == 'N'){
-					
+				if(i == j || TChar(j) == 'N'){
 					setScore(m_scoreDna5, TChar(i), TChar(j), match);
 				}
 				else{
@@ -125,7 +124,6 @@ public:
 		endPosS   = toViewPosition(row1, length(source(row1)));
 		endPosA   = toViewPosition(row2, length(source(row2)));
 		
-		// calculate overlap start and end
 		if(startPosA > startPosS) startPos = startPosA;
 		else                      startPos = startPosS;
 		
@@ -134,19 +132,15 @@ public:
 		
 		
 		// cout << endl << endl << startPosS << endl << startPosA << endl << endPosS << endl << endPosA;
-		
 		// int fstartPosS = toViewPosition(row1, 0);
 		// int fstartPosA = toViewPosition(row2, 0);
 		// int fendPosS   = toViewPosition(row1, length(source(row1)));
 		// int fendPosA   = toViewPosition(row2, length(source(row2)));
-		// cout << endl << endl << fstartPosS << endl << fstartPosA << endl << fendPosS << endl << fendPosA;
-		
 		// cout << align << endl << aliScore << endl;
 		
 		if(m_verb != flexbar::NONE) aliString << align;
 		
 		
-		// compute number of mismatches and gaps
 		TRowIterator it1 = begin(row1);
 		TRowIterator it2 = begin(row2);
 		
@@ -158,10 +152,10 @@ public:
 		for(; it1 != end(row1); ++it1){
 			
 			if(startPos <= aliPos && aliPos < endPos){
-				     if(isGap(it1))                                  ++gapsR;
-				else if(isGap(it2))                                  ++gapsA;
-				else if(*it1 != *it2 && *it1 != 'N' && *it2 != 'N')  ++mismatches;
-				else if(m_randTag    && *it2 == 'N')                 append(tagSeq, (TStringChar) *it1);
+				     if(isGap(it1))                   ++gapsR;
+				else if(isGap(it2))                   ++gapsA;
+				else if(*it1 != *it2 && *it2 != 'N')  ++mismatches;
+				else if(m_randTag    && *it2 == 'N')  append(tagSeq, (TStringChar) *it1);
 			}
 			++aliPos;
 			++it2;

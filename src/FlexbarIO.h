@@ -223,4 +223,18 @@ std::string toFormatString(flexbar::FileFormat format){
 }
 
 
+void runQualityCheck(std::string path){
+	
+	using namespace std;
+	
+	if(! system(NULL)) exit(EXIT_FAILURE);
+	
+	string call = "qcCommand " + path + " &> qc.out";
+	
+	if(system(call.c_str()) != 0){
+		cerr << "Error in quality control.\n" << endl;
+	}
+}
+
+
 #endif /* FLEXBAR_FLEXBARIO_H_ */

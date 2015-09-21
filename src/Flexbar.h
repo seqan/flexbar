@@ -32,7 +32,7 @@
 #include "MultiplexedAlignmentFilter.h"
 
 
-void loadBarcodesAndAdapters(Options &o){
+void loadBarcodes(Options &o, const bool secondSet){
 	
 	using namespace std;
 	using namespace flexbar;
@@ -43,61 +43,129 @@ void loadBarcodesAndAdapters(Options &o){
 		tbb::task_scheduler_init init_serial(1);
 		tbb::pipeline bpipeline;
 		
-		SequenceInputFilter<CharString, CharString, fstream> adapter_filter(o, o.barcodeFile, true, false, false);
+		string barFile = secondSet ? o.barcode2File : o.barcodeFile;
+		
+		SequenceInputFilter<CharString, CharString, fstream> adapter_filter(o, barFile, true, false, false);
 		bpipeline.add_filter(adapter_filter);
 		
-		AdapterLoader<CharString, CharString> adapterLoader(o);
+		AdapterLoader<CharString, CharString> adapterLoader(o, false);
 		bpipeline.add_filter(adapterLoader);
 		bpipeline.run(1);
 		
-		o.barcodes = adapterLoader.getAdapters();
-		adapterLoader.printAdapters("Barcode");
-		
-		if(o.barcodes.size() == 0){
-			cerr << "No barcodes found in file!\n" << endl;
-			exit(1);
-		}
-	}
-	
-	if(o.adapRm != AOFF){
-		
-		AdapterLoader<CharString, CharString> adapterLoader(o);
-		
-		if(o.useAdapterFile){
-			tbb::task_scheduler_init init_serial(1);
-			tbb::pipeline prepipeline;
-			
-			SequenceInputFilter<CharString, CharString, fstream> adapter_filter(o, o.adapterFile, true, false, false);
-			prepipeline.add_filter(adapter_filter);
-			prepipeline.add_filter(adapterLoader);
-			prepipeline.run(1);
-			
-			o.adapters = adapterLoader.getAdapters();
-			
-			if(o.adapters.size() == 0){
-				cerr << "No adapters found in file!\n" << endl;
+		if(secondSet){
+			o.barcodes2 = adapterLoader.getAdapters();
+			adapterLoader.printAdapters("Barcode2");
+
+			if(o.barcodes2.size() == 0){
+				cerr << "No barcodes found in file!\n" << endl;
 				exit(1);
 			}
 		}
-		else {
-			SequencingRead<CharString, CharString> *myRead;
+		else{
+			o.barcodes = adapterLoader.getAdapters();
+			adapterLoader.printAdapters("Barcode");
+
+			if(o.barcodes.size() == 0){
+				cerr << "No barcodes found in file!\n" << endl;
+				exit(1);
+			}
+		}
+	}
+}
+
+	
+void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
+	
+	using namespace std;
+	using namespace flexbar;
+	
+	using seqan::CharString;
+	
+	if(o.adapRm != AOFF){
+		
+		AdapterLoader<CharString, CharString> adapterLoader(o, true);
+		
+		if(useAdapterFile){
+			tbb::task_scheduler_init init_serial(1);
+			tbb::pipeline prepipe;
+			
+			string adapFile = secondSet ? o.adapter2File : o.adapterFile;
+			
+			SequenceInputFilter<CharString, CharString, fstream> adapter_filter(o, adapFile, true, false, false);
+			prepipe.add_filter(adapter_filter);
+			prepipe.add_filter(adapterLoader);
+			prepipe.run(1);
+			
+			if(secondSet){
+				o.adapters2 = adapterLoader.getAdapters();
+
+				if(o.adapters2.size() == 0){
+					cerr << "No adapters found in file!\n" << endl;
+					exit(1);
+				}
+			}
+			else{
+				o.adapters = adapterLoader.getAdapters();
+
+				if(o.adapters.size() == 0){
+					cerr << "No adapters found in file!\n" << endl;
+					exit(1);
+				}
+			}
+		}
+		else{
 			CharString adapterSeq = o.adapterSeq;
 			
-			if(o.format == flexbar::CSFASTA || o.format == flexbar::CSFASTQ){
+			if(o.format == CSFASTA || o.format == CSFASTQ){
 				adapterSeq = SequenceConverter<CharString>::getInstance()->bpToColorSpace(adapterSeq);
 			}
 			
+			SequencingRead<CharString, CharString> *myRead;
 			myRead = new SequencingRead<CharString, CharString>(adapterSeq, "cmdline");
 			
 			TAdapter adap;
 			adap.first = myRead;
 			o.adapters.push_back(adap);
 			
+			if(o.revCompAdapter){
+				CharString adapterSeqRC = o.adapterSeq;
+				seqan::reverseComplement(adapterSeqRC);
+				
+				if(o.format == CSFASTA || o.format == CSFASTQ){
+					adapterSeqRC = SequenceConverter<CharString>::getInstance()->bpToColorSpace(adapterSeqRC);
+				}
+				
+				SequencingRead<CharString, CharString> *myReadRC;
+				myReadRC = new SequencingRead<CharString, CharString>(adapterSeqRC, "cmdline revcomp");
+				
+				TAdapter adapRC;
+				adapRC.first = myReadRC;
+				o.adapters.push_back(adapRC);
+			}
+			
 			adapterLoader.setAdapters(o.adapters);
 		}
 		
-		adapterLoader.printAdapters("Adapter");
+		if(secondSet) adapterLoader.printAdapters("Adapter2");
+		else          adapterLoader.printAdapters("Adapter");
 	}
+}
+
+
+void loadBarcodesAndAdapters(Options &o){
+	
+	using namespace std;
+	using namespace flexbar;
+	
+	loadBarcodes(o, false);
+	
+	if(o.barDetect == WITHIN_READ2 || o.barDetect == WITHIN_READ_REMOVAL2)
+	loadBarcodes(o, true);
+	
+	loadAdapters(o, false, o.useAdapterFile);
+	
+	if(o.adapRm == NORMAL2)
+	loadAdapters(o, true, true);
 }
 
 
@@ -151,7 +219,7 @@ void printCompletedMessage(Options &o){
 	if(o.barDetect == BARCODE_READ)              s << " detection with separate reads";
 	if(o.barDetect != BOFF && o.adapRm != AOFF)  s << " and ";
 	if(o.barDetect == BOFF && o.adapRm == AOFF)  s << "basic processing";
-	if(o.adapRm != AOFF)                         s << "adapter removal";
+	if(o.adapRm    != AOFF)                      s << "adapter removal";
 	
 	*o.out << s.str() << ".\n" << endl;
 	
@@ -202,6 +270,11 @@ void startProcessing(Options &o){
 	if(o.adapRm != AOFF){
 		outputFilter.printAdapterRemovalStats();
 		alignFilter.printAdapterOverlapStats();
+		
+		if(o.adapRm == NORMAL2){
+			outputFilter.printAdapterRemovalStats2();
+			alignFilter.printAdapterOverlapStats2();
+		}
 	}
 	
 	outputFilter.printFileSummary();
@@ -209,6 +282,8 @@ void startProcessing(Options &o){
 	
 	const unsigned long nReads     = inputFilter.getNrProcessedReads();
 	const unsigned long nGoodReads = outputFilter.getNrGoodReads();
+	const unsigned long nChars     = inputFilter.getNrProcessedChars();
+	const unsigned long nGoodChars = outputFilter.getNrGoodChars();
 	const unsigned long uncalled   = inputFilter.getNrUncalledReads();
 	const unsigned long uPairs     = inputFilter.getNrUncalledPairedReads();
 	
@@ -247,7 +322,20 @@ void startProcessing(Options &o){
 	*out << "Remaining reads                   " << alignValue(len, nGoodReads);
 	
 	if(nReads > 0)
-	*out << "   (" << fixed << setprecision(2) << 100 * nGoodReads / nReads << "% of input reads)";
+	*out << "   (" << fixed << setprecision(2) << 100 * nGoodReads / nReads << "% of input)";
+	
+	if(! o.isColorSpace){
+		stringstream s; s << inputFilter.getNrProcessedChars();
+		int clen = s.str().length();
+		
+		*out << "\n" << endl;
+		
+		*out << "Processed bases:   " << alignValue(clen, nChars) << endl;
+		*out << "Remaining bases:   " << alignValue(clen, nGoodChars);
+		
+		if(nChars > 0)
+		*out << "   (" << fixed << setprecision(2) << 100 * nGoodChars / nChars << "% of input)";
+	}
 	
 	*out << "\n\n" << endl;
 }
@@ -373,14 +461,10 @@ void initOptions(Options &o, seqan::ArgumentParser &parser){
 	
 	using namespace std;
 	
-	bool stdout = isSet(parser, "stdout-reads");
-	bool paired = isSet(parser, "reads2");
-	
-	if(stdout && ! paired){
+	if(isSet(parser, "stdout-reads")){
 		
 		string s;
 		getOptionValue(s, parser, "target");
-		
 		openOutputFile(o.fstrmOut, s + ".out");
 		
 		o.out = &o.fstrmOut;
@@ -389,7 +473,6 @@ void initOptions(Options &o, seqan::ArgumentParser &parser){
 	}
 	else{
 		o.out = &cout;
-		if(stdout) *o.out << endl;
 	}
 	
 	getOptionValue(o.readsFile, parser, "reads");
@@ -419,7 +502,7 @@ void performTest(){
 	// readLine(text2, mmReader);
 	// cout << text2 << endl;
 	
-	// CharString haystack = "ATGGATTGCG", needle   = "ATGCAT";
+	// CharString haystack = "ATGGATTGCG", needle = "ATGCAT";
 	// 
 	// seqan::Finder<CharString> finder(haystack);
 	// seqan::Pattern<CharString, seqan::DPSearch<seqan::SimpleScore, seqan::FindInfix> > pattern(needle, seqan::SimpleScore(0, -1, -7));
@@ -440,15 +523,6 @@ void performTest(){
 	//         cout << '[' << beginPosition(finder) << ',' << endPosition(finder) << ")\t" << infix(finder) << endl;
 	// 	}
 	// }
-	
-	
-	// fstream out;
-	// openOutputFile(out, "test.out");
-	// 
-	// ostream &outStrm;
-	// outStrm = out;
-	// *outStrm << "Test output file.\n\n" << endl;
-	
 }
 
 

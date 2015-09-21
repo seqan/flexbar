@@ -10,9 +10,6 @@
 #include "SequenceOutputFilter.h"
 
 
-/* Structure to store statistics for each generated FASTQ file
-(how many reads were discarded due to being to short, etc.) */
-
 template <typename TString, typename TIDString, typename TStream>
 class OutputFileStruct {
 	
@@ -45,7 +42,7 @@ public:
 
 private:
 	
-	// forbid copying this object since we want to call the destructor only once (pointing to unique objects)
+	// forbid copying this object to call destructor only once (pointing to unique objects)
 	OutputFileStruct(OutputFileStruct&);
 	
 	OutputFileStruct& operator =(const OutputFileStruct& rhs);
