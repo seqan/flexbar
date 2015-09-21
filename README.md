@@ -12,13 +12,13 @@ See article on [PubMed](http://www.ncbi.nlm.nih.gov/pubmed/24832523).
 
 ### Download
 
-Follow instructions for building or installation of binaries below. A version of Flexbar source code for building or precompiled binaries for Linux 64 and Mac OS X can be obtained on the release [download](https://github.com/seqan/flexbar/releases) page. Versions older than 2.4 can be found [here](https://sourceforge.net/projects/flexbar). Additionally, Flexbar is available via package manager on Debian systems.
+Flexbar source code for building and precompiled binaries for Linux 64 and Mac OS X can be obtained on the release [download](https://github.com/seqan/flexbar/releases) page. Follow instructions for building or installation of binaries below. Versions older than 2.4 can be found [here](https://sourceforge.net/projects/flexbar). Additionally, Flexbar is available via package manager on Debian systems.
 
 ### Building from source
 
-Make sure that `cmake` is available, as well as development and runtime files of the TBB library 4.0 or later (Intel Threading Building Blocks). Using a package manager is a simple way to install them. Furthermore, the [SeqAn](https://github.com/seqan/seqan) library is required.
+Make sure that `cmake` is available, as well as development and runtime files of the TBB library 4.0 or later (Intel Threading Building Blocks). Using a package manager is a simple way to install them. Furthermore, the SeqAn library is required.
 
-* Download Flexbar source code [release](https://github.com/seqan/flexbar/releases)
+* Download Flexbar source code release
 * Get SeqAn library version 1.4.2 [here](https://github.com/seqan/seqan/releases/download/seqan-v1.4.2/seqan-library-1.4.2.tar.bz2)
 
 Decompress both and move SeqAn include folder to Flexbar:
@@ -33,7 +33,7 @@ Use these commands for building:
 
 ### Installation of binaries
 
-To run Flexbar binaries after [download](https://github.com/seqan/flexbar/releases), the corresponding TBB library has to be available. Downloads contain the library file for runtime. Follow the platform specific instructions below.
+To run Flexbar binaries after download, the corresponding TBB library has to be available. Downloads contain the library file for runtime. Follow the platform specific instructions below.
 
 #### Linux
 Adjust lib search path to include the absolute path of the Flexbar directory containing the lib file libtbb.so.2 for the current terminal session, or permanently in shell startup scripts:
@@ -44,20 +44,6 @@ Adjust lib search path to include the absolute path of the Flexbar directory con
 It applies the same as for Linux. Make the file libtbb.dylib available by setting the lib search path:
 
         export DYLD_LIBRARY_PATH=/path/FlexbarDir:$DYLD_LIBRARY_PATH
-
-### Program features
-
-* Demultiplexing of barcoded sequencing runs
-* Detection and removal of adapter sequences
-* Exact global alignment with free end-gaps
-* Paired reads and separate barcode reads
-* Wildcard N for barcodes and adapters
-* Basic read filtering and trimming features
-* Compressed input and output file support
-* Extensive logging features, e.g. alignments
-* Galaxy tool definition available in Tool Shed
-* Multithreaded computation based on TBB library
-* Sequence analysis based on SeqAn library
 
 ### Program usage
 
