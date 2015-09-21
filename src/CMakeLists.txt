@@ -1,6 +1,6 @@
 cmake_minimum_required( VERSION 2.8.2 )
 
-# include_directories( ${FLEXBAR_SOURCE_DIR}/include )
+include_directories( ${FLEXBAR_SOURCE_DIR}/include )
 # link_directories( ${FLEXBAR_SOURCE_DIR}/lib )
 
 if( CMAKE_SIZEOF_VOID_P MATCHES "8" )
