@@ -7,7 +7,7 @@ a=`diff correct_result_right.fastq result_right.fastq`
 if ! $a ; then
 echo "Error testing right mode fastq"
 echo $a
-exit -1
+exit 1
 else
 echo "Test 1 OK"
 fi
@@ -20,7 +20,7 @@ a=`diff correct_result_left.fastq result_left.fastq`
 if ! $a ; then
 echo "Error testing left mode fastq"
 echo $a
-exit -1
+exit 1
 else
 echo "Test 2 OK"
 fi
@@ -33,7 +33,7 @@ a=`diff correct_result_any.fastq result_any.fastq`
 if ! $a ; then
 echo "Error testing any mode fastq"
 echo $a
-exit -1
+exit 1
 else
 echo "Test 3 OK"
 fi
@@ -46,7 +46,7 @@ a=`diff correct_result_left_tail.fastq result_left_tail.fastq`
 if ! $a ; then
 echo "Error testing left_tail mode fastq"
 echo $a
-exit -1
+exit 1
 else
 echo "Test 4 OK"
 fi
@@ -59,7 +59,7 @@ a=`diff correct_result_right_tail.fastq result_right_tail.fastq`
 if ! $a ; then
 echo "Error testing right_tail mode fastq"
 echo $a
-exit -1
+exit 1
 else
 echo "Test 5 OK"
 fi

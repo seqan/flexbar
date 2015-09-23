@@ -7,7 +7,7 @@ a=`diff correct_result_right.fasta result_right.fasta`
 if ! $a ; then
 echo "Error testing right mode fasta"
 echo $a
-exit -1
+exit 1
 else
 echo "Test 1 OK"
 fi
@@ -20,7 +20,7 @@ a=`diff correct_result_left.fasta result_left.fasta`
 if ! $a ; then
 echo "Error testing left mode fasta"
 echo $a
-exit -1
+exit 1
 else
 echo "Test 2 OK"
 fi
@@ -33,7 +33,7 @@ a=`diff correct_result_any.fasta result_any.fasta`
 if ! $a ; then
 echo "Error testing any mode fasta"
 echo $a
-exit -1
+exit 1
 else
 echo "Test 3 OK"
 fi
@@ -46,7 +46,7 @@ a=`diff correct_result_left_tail.fasta result_left_tail.fasta`
 if ! $a ; then
 echo "Error testing left_tail mode fasta"
 echo $a
-exit -1
+exit 1
 else
 echo "Test 4 OK"
 fi
@@ -59,7 +59,7 @@ a=`diff correct_result_right_tail.fasta result_right_tail.fasta`
 if ! $a ; then
 echo "Error testing right_tail mode fasta"
 echo $a
-exit -1
+exit 1
 else
 echo "Test 5 OK"
 fi

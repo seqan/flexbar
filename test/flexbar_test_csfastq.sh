@@ -7,7 +7,7 @@ a=`diff correct_result_right.csfastq result_right.csfastq`
 if ! $a ; then
 echo "Error testing right mode csfastq"
 echo $a
-exit -1
+exit 1
 else
 echo "Test 1 OK"
 fi
@@ -20,7 +20,7 @@ a=`diff correct_result_left.csfastq result_left.csfastq`
 if ! $a ; then
 echo "Error testing left mode csfastq"
 echo $a
-exit -1
+exit 1
 else
 echo "Test 2 OK"
 fi
@@ -33,7 +33,7 @@ a=`diff correct_result_any.csfastq result_any.csfastq`
 if ! $a ; then
 echo "Error testing any mode csfastq"
 echo $a
-exit -1
+exit 1
 else
 echo "Test 3 OK"
 fi
@@ -46,7 +46,7 @@ a=`diff correct_result_left_tail.csfastq result_left_tail.csfastq`
 if ! $a ; then
 echo "Error testing left_tail mode csfastq"
 echo $a
-exit -1
+exit 1
 else
 echo "Test 4 OK"
 fi
@@ -59,7 +59,7 @@ a=`diff correct_result_right_tail.csfastq result_right_tail.csfastq`
 if ! $a ; then
 echo "Error testing right_tail mode csfastq"
 echo $a
-exit -1
+exit 1
 else
 echo "Test 5 OK"
 fi
