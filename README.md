@@ -1,6 +1,6 @@
 ## Flexbar — flexible barcode and adapter removal
 
-The program Flexbar preprocesses high-throughput sequencing data efficiently. It demultiplexes barcoded runs and removes adapter sequences. Moreover, trimming and filtering features are provided. Flexbar increases read mapping rates and improves genome and transcriptome assemblies. It supports next-generation sequencing data in fasta and fastq format, e.g. from Illumina and the Roche 454 platform.
+The program Flexbar preprocesses high-throughput sequencing data efficiently. It demultiplexes barcoded runs and removes adapter sequences. Moreover, trimming and filtering features are provided. Flexbar increases read mapping rates and improves genome as well as transcriptome assemblies. It supports next-generation sequencing data in fasta and fastq format, e.g. from Illumina and the Roche 454 platform.
 
 Refer to the [manual](https://github.com/seqan/flexbar/wiki) or contact [jtroehr](https://github.com/jtroehr) for support with this SeqAn application.
 
@@ -63,7 +63,7 @@ In this example, barcoded reads in illumina version 1.8 fastq format are demulti
 
         flexbar -r reads.csfastq.gz -a adap.fa -ao 5 -ae LEFT -c
 
-The second example, shows how to remove adapters in fasta format from left side of gzip compressed color-space reads with quality scores (csfastq), if the overlap of adapter and read has at least length five. For left trim-end mode the right side of reads is retained.
+The second example shows how to remove adapters in fasta format from left side of compressed color-space reads with quality scores (csfastq), if the overlap of adapter and read has at least length five. For left trim-end mode the right side of reads is retained.
 
 ### Test data
 
