@@ -1,6 +1,6 @@
 ## Flexbar — flexible barcode and adapter removal
 
-The program Flexbar preprocesses high-throughput sequencing data efficiently. It demultiplexes barcoded runs and removes adapter sequences. Moreover, trimming and filtering features are provided. Flexbar increases read mapping rates and improves genome as well as transcriptome assemblies. It supports next-generation sequencing data in fasta/q and csfasta/q format from Illumina, Roche 454, and the SOLiD platform.
+The program Flexbar preprocesses high-throughput sequencing data efficiently. It demultiplexes barcoded runs and removes adapter sequences. Moreover, trimming and filtering features are provided. Flexbar increases read mapping rates and improves genome and transcriptome assemblies. It supports next-generation sequencing data in fasta and fastq format, e.g. from Illumina and the Roche 454 platform.
 
 Refer to the [manual](https://github.com/seqan/flexbar/wiki) or contact [jtroehr](https://github.com/jtroehr) for support with this SeqAn application.
 
@@ -59,11 +59,11 @@ Please refer to the help screen `flexbar -h` or [manual](https://github.com/seqa
 
         flexbar -r reads.fq -f i1.8 -t target -b brc.fa -a adap.fa
 
-In this example, barcoded reads in illumina version 1.8 fastq format are demultiplexed by specifying a file with barcodes in fasta format. After read seperation based on barcodes, adapters given in fasta format are removed from the right side if they align at the read beginning or downstream. After removal the left side of reads is kept. Remaining reads are written to the file target.fastq in same format.
+In this example, barcoded reads in illumina version 1.8 fastq format are demultiplexed by specifying a file with barcodes in fasta format. After seperation of reads, adapters given in fasta format are removed from the right side if they do not align before read start. After removal the left side of reads is kept if long enough. Remaining reads are written to the file `target.fastq` in the same format.
 
         flexbar -r reads.csfastq.gz -a adap.fa -ao 5 -ae LEFT -c
 
-The second example, shows how to remove adapters in fasta format from left side of gzip compressed color-space (c) reads with quality scores (csfastq), if the overlap of adapter and read has at least length five. For left trim-end type the right side of reads is retained.
+The second example, shows how to remove adapters in fasta format from left side of gzip compressed color-space reads with quality scores (csfastq), if the overlap of adapter and read has at least length five. For left trim-end mode the right side of reads is retained.
 
 ### Test data
 
