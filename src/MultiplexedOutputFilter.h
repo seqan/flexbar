@@ -466,7 +466,7 @@ public:
 				if(m_isPaired){
 					*out << "Read file 2:             " << m_outMap[i].f2->getFileName()    << "\n";
 					*out << "  written reads          " << m_outMap[i].f2->getNrGoodReads() << "\n";
-					*out << "  too short reads        " << m_outMap[i].m_nShort_2           << "\n";
+					*out << "  skipped short reads    " << m_outMap[i].m_nShort_2           << "\n";
 					
 					if(m_writeSingleReads){
 						*out << "Single read file:        " << m_outMap[i].single1->getFileName()    << "\n";

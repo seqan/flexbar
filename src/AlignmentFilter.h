@@ -322,6 +322,12 @@ public:
 				if(m_writeTag){
 					TString newTag = myRead.getSequenceTag();
 					append(newTag, "_Flexbar_removal");
+					
+					if(! m_isBarcoding){
+						append(newTag, "_");
+						append(newTag, m_queries->at(qIndex).first->getSequenceTag());
+					}
+					
 					myRead.setSequenceTag(newTag);
 				}
 				
