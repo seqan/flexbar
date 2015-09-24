@@ -106,7 +106,6 @@ public:
 		
 		switch(m_format){
 			case FASTQ:
-			case CSFASTQ:
 				append(s, "@");
 				append(s, myRead.getSequenceTag());
 				
@@ -123,7 +122,6 @@ public:
 			break;
 			
 			case FASTA:
-			case CSFASTA:
 				append(s, ">");
 				append(s, myRead.getSequenceTag());
 				
@@ -174,9 +172,6 @@ public:
 				
 				if(m_format == FASTQ){
 					myRead->setQuality(prefix(myRead->getQuality(), m_cutLen_read));
-				}
-				else if(m_format == CSFASTQ){
-					myRead->setQuality(prefix(myRead->getQuality(), m_cutLen_read - 1));
 				}
 				
 				readLength = m_cutLen_read;

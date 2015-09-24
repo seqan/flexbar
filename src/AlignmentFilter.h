@@ -94,32 +94,17 @@ public:
 		float fallowedErrors;
 		
 		stringstream ss;
-		TString read, quality, finalAliStr, finalRandTag;
-		
+		TString seqread, quality, finalAliStr, finalRandTag;
 		
 		TString readTag = myRead.getSequenceTag();
 		
-		switch(m_format){
-			case CSFASTQ:
-				read    = suffix<TString>(myRead.getSequence(), 2);
-				quality = suffix<TString>(myRead.getQuality(), 1);
-				break;
-			case FASTQ:
-				read    = myRead.getSequence();
-				quality = myRead.getQuality();
-				break;
-			case CSFASTA:
-				read    = suffix<TString>(myRead.getSequence(), 2);
-				quality = "";
-				break;
-			case FASTA:
-				read    = myRead.getSequence();
-				quality = "";
-				break;
-		}
+		seqread = myRead.getSequence();
+		quality = "";
 		
-		TString sequence = read;
-		int readLength   = length(read);
+		if(m_format == FASTQ) quality = myRead.getQuality();
+		
+		TString sequence = seqread;
+		int readLength   = length(seqread);
 		
 		if(! m_isBarcoding && readLength < m_minLength){
 			++m_nPreShortReads;
@@ -141,9 +126,9 @@ public:
 				if(tailLength < readLength){
 					
 					if(m_trimEnd == LEFT_TAIL){
-						sequence = prefix<TString>(read, tailLength);
+						sequence = prefix<TString>(seqread, tailLength);
 					}else{
-						sequence = suffix<TString>(read, readLength - tailLength);
+						sequence = suffix<TString>(seqread, readLength - tailLength);
 					}
 					if(m_verb == ALL || m_verb == MOD)
 					ss << "Read tail length:  " << tailLength << "\n\n";
@@ -219,7 +204,7 @@ public:
 					
 					if(fstartPosA <= fstartPosS && fendPosS <= fendPosA){
 						myRead.setSequence("");
-						if(m_format == FASTQ || m_format == CSFASTQ) myRead.setQuality("");
+						if(m_format == FASTQ) myRead.setQuality("");
 					}
 					else if(fstartPosA - fstartPosS >= fendPosS - fendPosA){
 						trimEnd = RIGHT;
@@ -234,7 +219,7 @@ public:
 					int rCutPos;
 					
 					case LEFT_TAIL:
-						sequence = read;
+						sequence = seqread;
 					
 					case LEFT:
 						rCutPos = fendPos;
@@ -247,32 +232,17 @@ public:
 						
 						if(rCutPos > readLength) rCutPos = readLength;
 						
-						if(m_format == FASTA || m_format == FASTQ){
-							erase(sequence, 0, rCutPos);
-							myRead.setSequence(sequence);
-							
-							if(m_format == FASTQ){
-								erase(quality, 0, rCutPos);
-								myRead.setQuality(quality);
-							}
-						}
-						else {  // colorspace
-							if(rCutPos < readLength) ++rCutPos;
-							
-							erase(sequence, 0, rCutPos);
-							insert(sequence, 0, prefix(myRead.getSequence(), 2));
-							myRead.setSequence(sequence);
-							
-							if(m_format == CSFASTQ){
-								erase(quality, 0, rCutPos);
-								insert(quality, 0, prefix(myRead.getQuality(), 1));
-								myRead.setQuality(quality);
-							}
+						erase(sequence, 0, rCutPos);
+						myRead.setSequence(sequence);
+						
+						if(m_format == FASTQ){
+							erase(quality, 0, rCutPos);
+							myRead.setQuality(quality);
 						}
 						break;
 					
 					case RIGHT_TAIL:
-						sequence  = read;
+						sequence  = seqread;
 						// adjust cut pos to original read length
 						fstartPos += readLength - ftailLength;
 					
@@ -282,27 +252,12 @@ public:
 						// skipped restriction
 						if(rCutPos < 0) rCutPos = 0;
 						
-						if(m_format == FASTA || m_format == FASTQ){
-							erase(sequence, rCutPos, readLength);
-							myRead.setSequence(sequence);
-							
-							if(m_format == FASTQ){
-								erase(quality, rCutPos, readLength);
-								myRead.setQuality(quality);
-							}
-						}
-						else {
-							if(rCutPos > 0) --rCutPos;
-							
-							erase(sequence, rCutPos, readLength);
-							insert(sequence, 0, prefix(myRead.getSequence(), 2));
-							myRead.setSequence(sequence);
-							
-							if(m_format == CSFASTQ){
-								erase(quality, rCutPos, readLength);
-								insert(quality, 0, prefix(myRead.getQuality(), 1));
-								myRead.setQuality(quality);
-							}
+						erase(sequence, rCutPos, readLength);
+						myRead.setSequence(sequence);
+						
+						if(m_format == FASTQ){
+							erase(quality, rCutPos, readLength);
+							myRead.setQuality(quality);
 						}
 						break;
 						
@@ -363,7 +318,7 @@ public:
 				
 				ss << "  query tag        " << queryTag                      << "\n"
 				   << "  read tag         " << readTag                       << "\n"
-				   << "  read             " << read                          << "\n"
+				   << "  read             " << seqread                       << "\n"
 				   << "  read pos         " << fstartPosS << "-" << fendPosS << "\n"
 				   << "  query pos        " << fstartPosA << "-" << fendPosA << "\n"
 				   << "  score            " << scoreMax                      << "\n"
@@ -374,7 +329,7 @@ public:
 				if(performRemoval){
 					ss << "  remaining read   "  << myRead.getSequence() << "\n";
 					
-					if(m_format == FASTQ || m_format == CSFASTQ)
+					if(m_format == FASTQ)
 					ss << "  remaining qual   " << myRead.getQuality() << "\n";
 				}
 				
@@ -389,7 +344,7 @@ public:
 		else if(m_verb == ALL){
 			ss << "No valid alignment:"   << "\n"
 			   << "read tag  " << readTag << "\n"
-			   << "read      " << read    << "\n\n" << endl;
+			   << "read      " << seqread << "\n\n" << endl;
 		}
 		
 		// bundeled output for multi-threading

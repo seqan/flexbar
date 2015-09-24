@@ -2,7 +2,7 @@
    
    Flexbar - flexible barcode and adapter removal
    
-   Version 2.6 pre-alpha  (GPLv3)
+   Version 2.6 alpha  (GPLv3)
    
    Uses seqan library release 1.4.2
     and tbb library 4.0 or later
@@ -26,8 +26,8 @@ int main(int argc, const char* argv[]){
 	
 	using seqan::ArgumentParser;
 	
-	const string version = "2.6 pre-alpha";
-	const string date    = "Septembre 23, 2015";
+	const string version = "2.6 alpha";
+	const string date    = "September 24, 2015";
 	
 	ArgumentParser parser("flexbar");
 	

@@ -76,8 +76,7 @@ public:
 			m_format = FASTA;
 		}
 		else if(m_switch2Fasta){
-			if(m_format == FASTA)   m_format = FASTQ;
-			if(m_format == CSFASTA) m_format = CSFASTQ;
+			m_format = FASTQ;
 		}
 		
 		if(m_useStdin) readerCin = new TRecordReaderCin(cin);
@@ -147,6 +146,28 @@ public:
 		}
 	}
 	
+	// void readOneLine(seqan::Dna5String &text){
+	// 	using namespace std;
+	//
+	// 	text = "";
+	//
+	// 	if(! atStreamEnd()){
+	//
+	// 		if(m_useStdin){
+	// 			if(readLine(text, *readerCin) != 0){
+	// 				cerr << "File reading error occured.\n" << endl;
+	// 				exit(1);
+	// 			}
+	// 		}
+	// 		else{
+	// 			if(readLine(text, *reader) != 0){
+	// 				cerr << "File reading error occured.\n" << endl;
+	// 				exit(1);
+	// 			}
+	// 		}
+	// 	}
+	// }
+	
 	
 	// returns single SequencingRead or NULL if no more reads in file or error
 	
@@ -169,8 +190,7 @@ public:
 			isUncalled = false;
 			
 			try{
-				// FastA
-				if(m_format == FASTA || m_format == CSFASTA){
+				if(m_format == FASTA){
 					
 					// tag line is read in previous iteration
 					if(m_nextTag == "") readOneLine(tag);
@@ -179,14 +199,14 @@ public:
 					if(length(tag) > 0){
 						if(getValue(tag, 0) != '>'){
 							stringstream error;
-							error << "Incorrect FASTA entry, missing > on new line. Input: " << tag << endl;
+							error << "Incorrect FASTA entry: missing > symbol for " << tag << endl;
 							throw runtime_error(error.str());
 						}
 						else tag = suffix(tag, 1);
 						
 						if(length(tag) == 0){
 							stringstream error;
-							error << "Incorrect FASTA entry, missing read name after > symbol." << endl;
+							error << "Incorrect FASTA entry: missing read name after > symbol." << endl;
 							throw runtime_error(error.str());
 						}
 					}
@@ -197,14 +217,14 @@ public:
 					
 					if(length(source) < 1){
 						stringstream error;
-						error << "Empty FASTA entry, found tag without read! Tag: " << tag << endl;
+						error << "Empty FASTA entry: found tag without read for " << tag << endl;
 						throw runtime_error(error.str());
 					}
 					
 					
 					readOneLine(m_nextTag);
 					
-					// fasta files with sequences splitted over several lines
+					// fasta files with sequences on multiple lines
 					while(! atStreamEnd() && length(m_nextTag) > 0 && getValue(m_nextTag, 0) != '>'){
 						append(source, m_nextTag);
 						readOneLine(m_nextTag);
@@ -216,19 +236,18 @@ public:
 					if(m_preProcess){
 						isUncalled = isUncalledSequence(source);
 						
-						if(m_preTrimBegin > 0 && length(source) > 3){
+						if(m_preTrimBegin > 0 && length(source) > 1){
 							
 							int idx = m_preTrimBegin;
-							if(idx >= length(source) - 2) idx = length(source) - 3;
+							if(idx >= length(source)) idx = length(source) - 1;
 							
-							if(m_format == FASTA) erase(source, 0, idx);
-							else                  erase(source, 2, idx + 2);
+							erase(source, 0, idx);
 						}
 						
-						if(m_preTrimEnd > 0 && length(source) > 3){
+						if(m_preTrimEnd > 0 && length(source) > 1){
 							
 							int idx = m_preTrimEnd;
-							if(idx >= length(source) - 2) idx = length(source) - 3;
+							if(idx >= length(source)) idx = length(source) - 1;
 							
 							source = prefix(source, length(source) - idx);
 						}
@@ -247,14 +266,14 @@ public:
 					if(length(source) > 0){
 						if(getValue(source, 0) != '@'){
 							stringstream error;
-							error << "Incorrect FASTQ entry, missing @ on new line. Input: " << source << endl;
+							error << "Incorrect FASTQ entry: missing @ symbol for " << source << endl;
 							throw runtime_error(error.str());
 						}
 						else tag = suffix(source, 1);
 						
 						if(length(tag) == 0){
 							stringstream error;
-							error << "Incorrect FASTQ entry, missing read name after @ symbol." << endl;
+							error << "Incorrect FASTQ entry: missing read name after @ symbol." << endl;
 							throw runtime_error(error.str());
 						}
 					}
@@ -264,7 +283,7 @@ public:
 					
 					if(length(source) < 1){
 						stringstream error;
-						error << "Empty FASTQ entry, found tag without read! Tag: " << tag << endl;
+						error << "Empty FASTQ entry: found tag without read for " << tag << endl;
 						throw runtime_error(error.str());
 					}
 					
@@ -273,21 +292,15 @@ public:
 					
 					if(length(dummy) == 0 || seqan::isNotEqual(getValue(dummy, 0), '+')){
 							stringstream error;
-							error << "Incorrect FASTQ entry, missing + line. Tag: " << tag << endl;
+							error << "Incorrect FASTQ entry: missing + line for " << tag << endl;
 							throw runtime_error(error.str());
 					}
 					
 					readOneLine(quality);
 					
-					if(m_format == CSFASTQ){
-						if(length(quality) == length(source)){
-							quality = suffix(quality, 1);
-						}
-					}
-					
 					if(length(quality) < 1){
 						stringstream error;
-						error << "Empty FASTQ entry, found read without quality values! Tag: " << tag << endl;
+						error << "Empty FASTQ entry: found read without quality values for " << tag << endl;
 						throw runtime_error(error.str());
 					}
 					
@@ -297,56 +310,25 @@ public:
 					if(m_preProcess){
 						isUncalled = isUncalledSequence(source);
 						
-						if(m_preTrimBegin > 0 && length(source) > 3){
+						if(m_preTrimBegin > 0 && length(source) > 1){
 							
 							int idx = m_preTrimBegin;
-							if(idx >= length(source) - 2) idx = length(source) - 3;
+							if(idx >= length(source)) idx = length(source) - 1;
 							
-							if(m_format == FASTQ){
-								erase(source, 0, idx);
-								erase(quality, 0, idx);
-							}
-							else{
-								erase(source, 2, idx + 2);
-								erase(quality, 1, idx + 1);
-							}
+							erase(source, 0, idx);
+							erase(quality, 0, idx);
 						}
 						
-						if(m_preTrimEnd > 0 && length(source) > 3){
+						if(m_preTrimEnd > 0 && length(source) > 1){
 							
 							int idx = m_preTrimEnd;
-							if(idx >= length(source) - 2) idx = length(source) - 3;
+							if(idx >= length(source)) idx = length(source) - 1;
 							
 							source  = prefix(source,  length(source)  - idx);
 							quality = prefix(quality, length(quality) - idx);
 						}
 						
-						// filtering based on phred quality
-						if(m_prePhredTrim > 0){
-							typename seqan::Iterator<TString >::Type it    = seqan::begin(quality);
-							typename seqan::Iterator<TString >::Type itEnd = seqan::end(quality);
-							
-							--itEnd;
-							
-							unsigned int n = length(quality);
-							
-							bool nChanged = false;
-							
-							while(itEnd != it){
-								if(static_cast<int>(*itEnd) >= m_prePhredTrim) break;
-								--n;
-								--itEnd;
-								
-								if(! nChanged){
-									m_nLowPhred++;
-									nChanged = true;
-								}
-							}
-							source = prefix(source, n);
-							
-							if(m_format == CSFASTQ) --n;
-							quality = prefix(quality, n);
-						}
+						if(m_prePhredTrim > 0) qualityTrimming(source, quality);
 					}
 					
 					if(m_switch2Fasta) myRead = new SequencingRead<TString, TIDString>(source, tag);
@@ -378,10 +360,12 @@ public:
 	bool isUncalledSequence(TString &source){
 		int n = 0;
 		
-		typename seqan::Iterator<TString >::Type it, itEnd;
+		using namespace seqan;
 		
-		it    = seqan::begin(source);
-		itEnd = seqan::end(source);
+		typename Iterator<TString >::Type it, itEnd;
+		
+		it    = begin(source);
+		itEnd = end(source);
 		
 		while(it != itEnd){
 			 if(*it == '.' || *it == 'N') n++;
@@ -392,12 +376,14 @@ public:
 	}
  	
 	
-	bool qualityTrimming(TString &source, TString &quality){
+	void qualityTrimming(TString &source, TString &quality){
 		
-		using namespace flexbar;
+		using namespace seqan;
 		
-		typename seqan::Iterator<TString >::Type it    = seqan::begin(quality);
-		typename seqan::Iterator<TString >::Type itEnd = seqan::end(quality);
+		typename Iterator<TString >::Type it, itEnd;
+		
+		it    = begin(quality);
+		itEnd = end(quality);
 		
 		--itEnd;
 		
@@ -415,9 +401,7 @@ public:
 				nChanged = true;
 			}
 		}
-		source = prefix(source, n);
-		
-		if(m_format == CSFASTQ) --n;
+		source  = prefix(source,  n);
 		quality = prefix(quality, n);
 	}
 	

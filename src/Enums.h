@@ -35,9 +35,7 @@ namespace flexbar{
 	
 	enum FileFormat {
 		FASTA,
-		FASTQ,
-		CSFASTA,
-		CSFASTQ
+		FASTQ
 	};
 	
 	enum QualityType {

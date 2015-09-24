@@ -1,4 +1,6 @@
 /*
+ *   MultiplexedAlignmentFilter.h
+ *
  *   Authors: mat and jtr
  */
 

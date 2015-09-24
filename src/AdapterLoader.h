@@ -18,7 +18,6 @@
 #include "Enums.h"
 #include "Options.h"
 #include "SequencingRead.h"
-#include "SequenceConverter.h"
 
 
 template <typename TString, typename TIDString>
@@ -79,18 +78,9 @@ public:
 			TString seq = myRead->getSequence();
 			seqan::reverseComplement(seq);
 			
-			if(m_format == CSFASTA || m_format == CSFASTQ){
-				seq = SequenceConverter<TString>::getInstance()->bpToColorSpace(seq);
-			}
-			
 			append(tag, " revcomp");
 			
 			myReadRC = new SequencingRead<TString, TIDString>(seq, tag);
-		}
-		
-		if(m_format == CSFASTA || m_format == CSFASTQ){
-			TString csRead = SequenceConverter<TString>::getInstance()->bpToColorSpace(myRead->getSequence());
-			myRead->setSequence(csRead);
 		}
 		
 		TAdapter adap;

@@ -2,6 +2,8 @@ cmake_minimum_required( VERSION 2.8.2 )
 
 project( FLEXBAR )
 
+# file( MAKE_DIRECTORY build )
+
 set( EXECUTABLE_OUTPUT_PATH ${FLEXBAR_BINARY_DIR} )
 
 add_subdirectory( src )
