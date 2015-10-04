@@ -116,7 +116,7 @@ const std::string getFlexbarBanner(const seqan::CharString version){
 
 
 const std::string getFlexbarCitation(){
-	return "\nMatthias Dodt, Johannes T. Roehr, Rina Ahmed, Christoph Dieterich:\nFlexbar - flexible barcode and adapter processing for next-generation\nsequencing platforms. MDPI Biology 2012, 1(3):895-905.\n";
+	return "\nMatthias Dodt, Johannes T. Roehr, Rina Ahmed, Christoph Dieterich:\nFlexbar - flexible barcode and adapter processing for next-generation\nsequencing platforms. Biology 2012, 1(3):895-905.\n";
 }
 
 
@@ -136,7 +136,7 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	// addOption(parser, ArgParseOption("v", "version", "Display program version."));
 	addOption(parser, ArgParseOption("H", "advanced", "Print help with advanced options."));
 	addOption(parser, ArgParseOption("M", "man", "Print advanced options as man document."));
-	addOption(parser, ArgParseOption("i", "cite", "Show program reference for citation."));
+	addOption(parser, ArgParseOption("c", "cite", "Show program reference for citation."));
 	
 	// OUTPUTPREFIX
 	addSection(parser, "Basic options");
@@ -184,7 +184,7 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	addOption(parser, ArgParseOption("m", "min-read-length", "Minimum read length to remain after removal.", ARG::INTEGER));
 	
 	addSection(parser, "Output selection");
-	addOption(parser, ArgParseOption("o", "fasta-output", "Prefer non-quality format fasta or csfasta for output."));
+	addOption(parser, ArgParseOption("o", "fasta-output", "Prefer non-quality format fasta for output."));
 	addOption(parser, ArgParseOption("z", "zip-output", "Direct compression of output files.", ARG::STRING));
 	addOption(parser, ArgParseOption("1", "stdout-reads", "Write reads to stdout, tagged and interleaved if needed."));
 	addOption(parser, ArgParseOption("j", "length-dist", "Generate length distribution for read output files."));
@@ -359,7 +359,7 @@ void parseCommandLine(seqan::ArgumentParser &parser, std::string version, int ar
 		if(isSet(parser, "man")) printHelp(parser, cerr, "man");
 		else{
 			printHelp(parser);
-			cerr << "\nFurther documentation on flexbar.sourceforge.net\n" << endl;
+			cerr << "\nFurther documentation on github.com/seqan/flexbar\n" << endl;
 		}
 		exit(0);
 	}
