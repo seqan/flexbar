@@ -28,7 +28,7 @@ struct Options{
 	std::string barcodeFile, adapterFile, barcode2File, adapter2File;
 	std::string adapterSeq, targetName, logLevelStr, outCompression;
 	
-	bool isColorSpace, isPaired, useAdapterFile, useNumberTag, useRemovalTag, randTag;
+	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, randTag;
 	bool switch2Fasta, writeUnassigned, writeSingleReads, writeLengthDist;
 	bool useStdin, useStdout, relaxRegion, revCompAdapter;
 	
@@ -63,7 +63,6 @@ struct Options{
 		adapter2File   = "";
 		outCompression = "";
 		
-		isColorSpace     = false;
 		isPaired         = false;
 		useAdapterFile   = false;
 		useNumberTag     = false;
@@ -117,7 +116,7 @@ const std::string getFlexbarBanner(const seqan::CharString version){
 
 
 const std::string getFlexbarCitation(){
-	return "\nMatthias Dodt, Johannes T. Roehr, Rina Ahmed, Christoph Dieterich:\nFlexbar - flexible barcode and adapter processing for next-generation\nsequencing platforms. MDPI Biology 2012, 1(3):895-905.\n";
+	return "\nMatthias Dodt, Johannes T. Roehr, Rina Ahmed, Christoph Dieterich:\nFlexbar - flexible barcode and adapter processing for next-generation\nsequencing platforms. Biology 2012, 1(3):895-905.\n";
 }
 
 
@@ -137,7 +136,7 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	// addOption(parser, ArgParseOption("v", "version", "Display program version."));
 	addOption(parser, ArgParseOption("H", "advanced", "Print help with advanced options."));
 	addOption(parser, ArgParseOption("M", "man", "Print advanced options as man document."));
-	addOption(parser, ArgParseOption("i", "cite", "Show program reference for citation."));
+	addOption(parser, ArgParseOption("c", "cite", "Show program reference for citation."));
 	
 	// OUTPUTPREFIX
 	addSection(parser, "Basic options");
@@ -146,7 +145,6 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	addOption(parser, ArgParseOption("r", "reads", "Fasta/q file or stdin (-) with reads that may contain barcodes.", ARG::INPUTFILE));
 	addOption(parser, ArgParseOption("p", "reads2", "Second input file of paired reads, gz and bz2 files supported.", ARG::INPUTFILE));
 	addOption(parser, ArgParseOption("f", "format", "Quality format: sanger, solexa, i1.3, i1.5, i1.8 (illumina 1.8+).", ARG::STRING));
-	addOption(parser, ArgParseOption("c", "color-space", "Input in color-space format csfasta or csfastq in sanger scaling."));
 	
 	addSection(parser, "Barcode detection");
 	addOption(parser, ArgParseOption("b",  "barcodes", "Fasta file with barcodes for demultiplexing, may contain N.", ARG::INPUTFILE));
@@ -186,7 +184,7 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	addOption(parser, ArgParseOption("m", "min-read-length", "Minimum read length to remain after removal.", ARG::INTEGER));
 	
 	addSection(parser, "Output selection");
-	addOption(parser, ArgParseOption("o", "fasta-output", "Prefer non-quality format fasta or csfasta for output."));
+	addOption(parser, ArgParseOption("o", "fasta-output", "Prefer non-quality format fasta for output."));
 	addOption(parser, ArgParseOption("z", "zip-output", "Direct compression of output files.", ARG::STRING));
 	addOption(parser, ArgParseOption("1", "stdout-reads", "Write reads to stdout, tagged and interleaved if needed."));
 	addOption(parser, ArgParseOption("j", "length-dist", "Generate length distribution for read output files."));
@@ -290,7 +288,7 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	
 	addTextSection(parser, "EXAMPLES");
 	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq \\fB-f\\fP i1.8 \\fB-t\\fP target \\fB-b\\fP brc.fa \\fB-a\\fP adap.fa", false);
-	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.csfastq.gz \\fB-a\\fP adap.fa \\fB-ao\\fP 5 \\fB-ae\\fP LEFT \\fB-c\\fP");
+	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq.gz \\fB-a\\fP adap.fa \\fB-ao\\fP 5 \\fB-ae\\fP LEFT");
 }
 
 
@@ -361,7 +359,7 @@ void parseCommandLine(seqan::ArgumentParser &parser, std::string version, int ar
 		if(isSet(parser, "man")) printHelp(parser, cerr, "man");
 		else{
 			printHelp(parser);
-			cerr << "\nFurther documentation on flexbar.sourceforge.net\n" << endl;
+			cerr << "\nFurther documentation on github.com/seqan/flexbar\n" << endl;
 		}
 		exit(0);
 	}
@@ -390,26 +388,13 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 	getOptionValue(o.targetName, parser, "target");
 	*out << "Target name:           " << o.targetName << endl;
 	
-	if(isSet(parser, "color-space")){
-		o.isColorSpace = true;
-		
-		     if(o.format == FASTA) o.format = CSFASTA;
-		else if(o.format == FASTQ) o.format = CSFASTQ;
-	}
-	
 	*out << "File type:             ";
 	     if(o.format == FASTA)   *out << "fasta";
 	else if(o.format == FASTQ)   *out << "fastq";
-	else if(o.format == CSFASTA) *out << "csfasta";
-	else if(o.format == CSFASTQ) *out << "csfastq";
 	*out << endl;
 	
 	
-	if(o.format == CSFASTQ){
-		o.qual = SANGER;
-		*out << "Quality format:        sanger (color-space)" << endl;
-	}
-	else if(o.format == FASTQ && isSet(parser, "format")){
+	if(o.format == FASTQ && isSet(parser, "format")){
 		
 		string quality;
 		getOptionValue(quality, parser, "format");
@@ -521,7 +506,7 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 		*out << "pre-trim-right:        " << o.cutLen_end << endl;
 	}
 	
-	if(isSet(parser, "pre-trim-phred") && (o.format == FASTQ || o.format == CSFASTQ)){
+	if(isSet(parser, "pre-trim-phred") && o.format == FASTQ){
 		getOptionValue(o.phred_preQual, parser, "pre-trim-phred");
 		
 		if(o.phred_preQual > 0){
@@ -545,7 +530,6 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 	
 	getOptionValue(o.min_readLen, parser, "min-read-length");
 	*out << "min-read-length:       " << o.min_readLen << endl;
-	if(o.isColorSpace) o.min_readLen++;
 	
 	
 	// logging and tagging options
@@ -574,10 +558,6 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 	if(isSet(parser, "fasta-output")){
 		if(o.format == FASTQ){
 			o.format = FASTA;
-			o.switch2Fasta = true;
-		}
-		else if(o.format == CSFASTQ){
-			o.format = CSFASTA;
 			o.switch2Fasta = true;
 		}
 	}

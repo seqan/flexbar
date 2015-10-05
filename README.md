@@ -47,7 +47,7 @@ It applies the same as for Linux. Make the file libtbb.dylib available by settin
 
 ### Program usage
 
-Flexbar needs at least one file with sequencing reads in fasta/q or csfasta/q format as input. Additionally, the target name, quality format of reads and further options can be specified. For read separation based on barcodes and for adapter removal, a file in fasta format with barcode or adapter sequences should be provided.
+Flexbar needs at least one file with sequencing reads in fasta or fastq format as input. Additionally, the target name, quality format of reads and further options can be specified. For read separation based on barcodes and for adapter removal, a file in fasta format with barcode or adapter sequences should be provided.
 
 #### Synopsis
 
@@ -59,11 +59,11 @@ Please refer to the help screen `flexbar -h` or [manual](https://github.com/seqa
 
         flexbar -r reads.fq -f i1.8 -t target -b brc.fa -a adap.fa
 
-In this example, barcoded reads in illumina version 1.8 fastq format are demultiplexed by specifying a file with barcodes in fasta format. After seperation of reads, adapters given in fasta format are removed from the right side if they do not align before read start. After removal the left side of reads is kept if long enough. Remaining reads are written to the file `target.fastq` in the same format.
+In this example, barcoded reads in illumina version 1.8 fastq format are demultiplexed by specifying a file with barcodes in fasta format. After separation of reads, adapters given in fasta format are removed from the right side if they do not align before read start. After removal the left side of reads is kept if long enough. Remaining reads are written to the file `target.fastq` in the same format.
 
-        flexbar -r reads.csfastq.gz -a adap.fa -ao 5 -ae LEFT -c
+		flexbar -r reads.fq.gz -a adap.fa -ao 5 -ae LEFT
 
-The second example shows how to remove adapters in fasta format from left side of compressed color-space reads with quality scores (csfastq), if the overlap of adapter and read has at least length five. For left trim-end mode the right side of reads is retained.
+The second example shows how to remove adapters in fasta format from left side of compressed reads with quality scores, if the overlap of adapter and read has at least length five. For left trim-end mode the right side of reads is retained.
 
 ### Test data
 

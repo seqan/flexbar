@@ -216,8 +216,6 @@ std::string toFormatString(flexbar::FileFormat format){
 	switch(format){
 		case FASTA:   return ".fasta";
 		case FASTQ:   return ".fastq";
-		case CSFASTA: return ".csfasta";
-		case CSFASTQ: return ".csfastq";
 	}
 	return ".unknown";
 }

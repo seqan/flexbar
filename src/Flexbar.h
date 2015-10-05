@@ -25,7 +25,6 @@
 #include "FlexbarIO.h"
 #include "AdapterLoader.h"
 #include "SequencingRead.h"
-#include "SequenceConverter.h"
 #include "SequenceInputFilter.h"
 #include "MultiplexedInputFilter.h"
 #include "MultiplexedOutputFilter.h"
@@ -116,10 +115,6 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 		else{
 			CharString adapterSeq = o.adapterSeq;
 			
-			if(o.format == CSFASTA || o.format == CSFASTQ){
-				adapterSeq = SequenceConverter<CharString>::getInstance()->bpToColorSpace(adapterSeq);
-			}
-			
 			SequencingRead<CharString, CharString> *myRead;
 			myRead = new SequencingRead<CharString, CharString>(adapterSeq, "cmdline");
 			
@@ -130,10 +125,6 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 			if(o.revCompAdapter){
 				CharString adapterSeqRC = o.adapterSeq;
 				seqan::reverseComplement(adapterSeqRC);
-				
-				if(o.format == CSFASTA || o.format == CSFASTQ){
-					adapterSeqRC = SequenceConverter<CharString>::getInstance()->bpToColorSpace(adapterSeqRC);
-				}
 				
 				SequencingRead<CharString, CharString> *myReadRC;
 				myReadRC = new SequencingRead<CharString, CharString>(adapterSeqRC, "cmdline revcomp");
@@ -233,6 +224,9 @@ void startProcessing(Options &o){
 	using namespace std;
 	using namespace flexbar;
 	
+	// Check TString everywhere, e.g. qual
+	// typedef seqan::Dna5String TString;
+	
 	typedef seqan::CharString TString;
 	typedef seqan::CharString TIDString;
 	
@@ -324,18 +318,16 @@ void startProcessing(Options &o){
 	if(nReads > 0)
 	*out << "   (" << fixed << setprecision(2) << 100 * nGoodReads / nReads << "% of input)";
 	
-	if(! o.isColorSpace){
-		stringstream s; s << inputFilter.getNrProcessedChars();
-		int clen = s.str().length();
-		
-		*out << "\n" << endl;
-		
-		*out << "Processed bases:   " << alignValue(clen, nChars) << endl;
-		*out << "Remaining bases:   " << alignValue(clen, nGoodChars);
-		
-		if(nChars > 0)
-		*out << "   (" << fixed << setprecision(2) << 100 * nGoodChars / nChars << "% of input)";
-	}
+	stringstream schar; schar << inputFilter.getNrProcessedChars();
+	int clen = schar.str().length();
+	
+	*out << "\n" << endl;
+	
+	*out << "Processed bases:   " << alignValue(clen, nChars) << endl;
+	*out << "Remaining bases:   " << alignValue(clen, nGoodChars);
+	
+	if(nChars > 0)
+	*out << "   (" << fixed << setprecision(2) << 100 * nGoodChars / nChars << "% of input)";
 	
 	*out << "\n\n" << endl;
 }

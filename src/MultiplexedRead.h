@@ -1,7 +1,7 @@
 /*
  *   MultiplexedRead.h
  *
- *   Author: mat
+ *   Author: mat and jtr
  */
 
 #ifndef FLEXBAR_MULTIPLEXEDREAD_H_

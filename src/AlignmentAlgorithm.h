@@ -20,20 +20,18 @@ class AlignmentAlgorithm {
 private:
 	
 	typedef typename seqan::Dna5 TChar;
-	
 	typedef typename seqan::Value<TString>::Type TStringChar;
-	// typedef seqan::SimpleType<unsigned char, seqan::Finite<5> > TChar;
 	
 	typedef seqan::Align<TString, seqan::ArrayGaps> TAlign;
+	
 	typedef typename seqan::Row<TAlign>::Type TRow;
 	typedef typename seqan::Iterator<TRow>::Type TRowIterator;
 	
 	typedef seqan::Score<int, seqan::ScoreMatrix<TChar, seqan::Default> > TScoreDna5;
 	
 	TScoreDna5 m_scoreDna5;
-	seqan::Score<int> m_score;
 	
-	const bool m_isColorSpace, m_randTag;
+	const bool m_randTag;
 	const flexbar::LogLevel m_verb;
 	const flexbar::TrimEnd m_trimEnd;
 	
@@ -41,14 +39,11 @@ public:
 	
 	AlignmentAlgorithm(const Options &o, const int match, const int mismatch, const int gapCost, const flexbar::TrimEnd trimEnd):
 			m_randTag(o.randTag),
-			m_isColorSpace(o.isColorSpace),
 			m_verb(o.logLevel),
 			m_trimEnd(trimEnd){
 		
 		using namespace std;
 		using namespace seqan;
-		
-		m_score = Score<int>(match, mismatch, gapCost);
 		
 		m_scoreDna5 = TScoreDna5(gapCost);
 		
@@ -87,7 +82,7 @@ public:
 	};
 	
 	
-	void align(const TString &querySeq, const TString &read, int &gapsR, int &gapsA, int &mismatches, int &startPos, int &endPos, int &startPosA, int &endPosA, int &startPosS, int &endPosS, int &aliScore, std::stringstream &aliString, TString &tagSeq){
+	void align(const TString &querySeq, const TString &seqread, int &gapsR, int &gapsA, int &mismatches, int &startPos, int &endPos, int &startPosA, int &endPosA, int &startPosS, int &endPosS, int &aliScore, std::stringstream &aliString, TString &tagSeq){
 		
 		using namespace std;
 		using namespace seqan;
@@ -95,24 +90,23 @@ public:
 		
 		TAlign align;
 		resize(rows(align), 2);
-		assignSource(row(align, 0), read);
+		assignSource(row(align, 0), seqread);
 		assignSource(row(align, 1), querySeq);
 		
 		
 		if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
+			
 			AlignConfig<true, false, true, true> ac;
-			if(m_isColorSpace) aliScore = globalAlignment(align, m_score,     ac);
-			else               aliScore = globalAlignment(align, m_scoreDna5, ac);
+			aliScore = globalAlignment(align, m_scoreDna5, ac);
 		}
-		else if(m_trimEnd == LEFT  || m_trimEnd == LEFT_TAIL){
+		else if(m_trimEnd == LEFT || m_trimEnd == LEFT_TAIL){
+			
 			AlignConfig<true, true, false, true> ac;
-			if(m_isColorSpace) aliScore = globalAlignment(align, m_score,     ac);
-			else               aliScore = globalAlignment(align, m_scoreDna5, ac);
+			aliScore = globalAlignment(align, m_scoreDna5, ac);
 		}
 		else{
 			AlignConfig<true, true, true, true> ac;
-			if(m_isColorSpace) aliScore = globalAlignment(align, m_score,     ac);
-			else               aliScore = globalAlignment(align, m_scoreDna5, ac);
+			aliScore = globalAlignment(align, m_scoreDna5, ac);
 		}
 		
 		
@@ -131,11 +125,7 @@ public:
 		else                  endPos = endPosA;
 		
 		
-		// cout << endl << endl << startPosS << endl << startPosA << endl << endPosS << endl << endPosA;
-		// int fstartPosS = toViewPosition(row1, 0);
-		// int fstartPosA = toViewPosition(row2, 0);
-		// int fendPosS   = toViewPosition(row1, length(source(row1)));
-		// int fendPosA   = toViewPosition(row2, length(source(row2)));
+		// cout << "\n\n" << startPosS << endl << startPosA << endl << endPosS << endl << endPosA;
 		// cout << align << endl << aliScore << endl;
 		
 		if(m_verb != flexbar::NONE) aliString << align;
@@ -161,7 +151,7 @@ public:
 			++it2;
 		}
 		
-		// cout << endl << endl << gapsR << endl << gapsA << endl << mismatches << endl << align;
+		// cout << "\n\n" << gapsR << endl << gapsA << endl << mismatches << endl << align;
 	}
 };
 
