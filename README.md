@@ -57,13 +57,13 @@ Please refer to the help screen `flexbar -h` or [manual](https://github.com/seqa
 
 #### Examples
 
-        flexbar -r reads.fq -f i1.8 -t target -b brc.fa -a adap.fa
+In this example, reads that are barcoded on left side are demultiplexed by specifying a file with barcodes in fasta format. After separation of reads, given adapters are removed from the right side if they do not align before read start. Subsequently, the left side of reads is kept if long enough. Remaining reads are written to the file `target.fastq` in the same format.
 
-In this example, barcoded reads in illumina version 1.8 fastq format are demultiplexed by specifying a file with barcodes in fasta format. After separation of reads, adapters given in fasta format are removed from the right side if they do not align before read start. After removal the left side of reads is kept if long enough. Remaining reads are written to the file `target.fastq` in the same format.
+		flexbar -r reads.fq -t target -b brc.fa -be LEFT_TAIL -a adp.fa
 
-		flexbar -r reads.fq.gz -a adap.fa -ao 5 -ae LEFT
+The second example shows how to trim compressed reads based on their quality scores in illumina version 1.8 format. Afterwards, adapters given in fasta format are removed in right trim-end mode, only if the overlap of adapter and read has at least length five with at most four errors per ten base pairs.
 
-The second example shows how to remove adapters in fasta format from left side of compressed reads with quality scores, if the overlap of adapter and read has at least length five. For left trim-end mode the right side of reads is retained.
+		flexbar -r reads.fq.gz -f i1.8 -q 20 -a adp.fa -ao 5 -at 4
 
 ### Test data
 

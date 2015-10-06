@@ -175,6 +175,16 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	addOption(parser, ArgParseOption("ai", "adapter-mismatch", "Alignment mismatch score.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ag", "adapter-gap", "Alignment gap score.", ARG::INTEGER));
 	
+	// addSection(parser, "Joining paired reads");
+	// addOption(parser, ArgParseOption("j",  "join", "Fasta file with adapters for removal that may contain N.", ARG::STRING));
+	// addOption(parser, ArgParseOption("jo", "join-min-overlap", "Minimum overlap of adapter and read sequence.", ARG::INTEGER));
+	// addOption(parser, ArgParseOption("jn", "join-max-overlap", "Region size for tail trim-end modes. Default: adapter length.", ARG::INTEGER));
+	// addOption(parser, ArgParseOption("jt", "join-threshold", "Allowed mismatches and gaps per 10 bases overlap.", ARG::DOUBLE));
+	
+	// addOption(parser, ArgParseOption("jm", "join-match", "Alignment match score.", ARG::INTEGER));
+	// addOption(parser, ArgParseOption("ji", "join-mismatch", "Alignment mismatch score.", ARG::INTEGER));
+	// addOption(parser, ArgParseOption("jg", "join-gap", "Alignment gap score.", ARG::INTEGER));
+	
 	addSection(parser, "Filtering and trimming");
 	addOption(parser, ArgParseOption("u", "max-uncalled", "Allowed uncalled bases (N or .) for each read.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("x", "pre-trim-left", "Trim given number of bases on 5' read end before detection.", ARG::INTEGER));
@@ -287,8 +297,8 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	
 	
 	addTextSection(parser, "EXAMPLES");
-	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq \\fB-f\\fP i1.8 \\fB-t\\fP target \\fB-b\\fP brc.fa \\fB-a\\fP adap.fa", false);
-	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq.gz \\fB-a\\fP adap.fa \\fB-ao\\fP 5 \\fB-ae\\fP LEFT");
+	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq \\fB-t\\fP target \\fB-b\\fP brc.fa \\fB-be\\fP LEFT_TAIL \\fB-a\\fP adp.fa", false);
+	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq.gz \\fB-f\\fP i1.8 \\fB-q\\fP 20 \\fB-a\\fP adp.fa \\fB-ao\\fP 5 \\fB-at\\fP 4");
 }
 
 
