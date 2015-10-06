@@ -47,7 +47,7 @@ It applies the same as for Linux. Make the file libtbb.dylib available by settin
 
 ### Program usage
 
-Flexbar needs at least one file with sequencing reads in fasta or fastq format as input. Additionally, the target name, quality format of reads and further options can be specified. For read separation based on barcodes and for adapter removal, a file in fasta format with barcode or adapter sequences should be provided.
+Flexbar needs at least one file with sequencing reads in fasta or fastq format as input. Additionally, the target name and further options can be specified. For read separation based on barcodes and for adapter removal, a file in fasta format with barcode or adapter sequences should be provided.
 
 #### Synopsis
 
@@ -57,11 +57,11 @@ Please refer to the help screen `flexbar -h` or [manual](https://github.com/seqa
 
 #### Examples
 
-In this example, reads that are barcoded on left side are demultiplexed by specifying a file with barcodes in fasta format. After separation of reads, given adapters are removed from the right side if they do not align before read start. Subsequently, the left side of reads is kept if long enough. Remaining reads are written to the file `target.fastq` in the same format.
+In this example, reads that are barcoded on left side are demultiplexed by specifying a file with barcodes in fasta format. After separation of reads, given adapters are removed from the right side if they do not align before read start. Subsequently, the left side of reads is kept if long enough. Remaining reads are written to the file `target.fastq` in same format as the input.
 
 		flexbar -r reads.fq -t target -b brc.fa -be LEFT_TAIL -a adp.fa
 
-The second example shows how to trim compressed reads based on their quality scores in illumina version 1.8 format. Afterwards, adapters given in fasta format are removed in right trim-end mode, only if the overlap of adapter and read has at least length five with at most four errors per ten base pairs.
+The second example shows how to trim compressed reads based on their quality scores in illumina version 1.8 format. Afterwards, provided adapters are removed in right trim-end mode, only if the overlap of adapter and read has at least length five with at most four errors per ten base pairs.
 
 		flexbar -r reads.fq.gz -f i1.8 -q 20 -a adp.fa -ao 5 -at 4
 
