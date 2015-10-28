@@ -2,7 +2,7 @@
 
 The program Flexbar preprocesses high-throughput sequencing data efficiently. It demultiplexes barcoded runs and removes adapter sequences. Moreover, trimming and filtering features are provided. Flexbar increases read mapping rates and improves genome as well as transcriptome assemblies. It supports next-generation sequencing data in fasta and fastq format, e.g. from Illumina and the Roche 454 platform.
 
-Refer to the [manual](https://github.com/seqan/flexbar/wiki) or contact [jtroehr](https://github.com/jtroehr) for support with this SeqAn application.
+This is the flexbar repository by Johannes Roehr. Flexbar is in the process of being adapted to SeqAn and will incorporate features and changes from the seqan flexcat repository. Refer to the [manual](https://github.com/seqan/flexbar/wiki) or contact [jtroehr](https://github.com/jtroehr) for support with this SeqAn application.
 
 ### Reference
 

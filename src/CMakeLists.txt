@@ -1,10 +1,13 @@
 cmake_minimum_required( VERSION 2.8.2 )
 
 include_directories( ${FLEXBAR_SOURCE_DIR}/include )
+
 # link_directories( ${FLEXBAR_SOURCE_DIR}/lib )
+
 
 if( CMAKE_SIZEOF_VOID_P MATCHES "8" )
 	message( STATUS "Flexbar 64 bit architecture" )
+	
 	# if( WIN32 )
 	# 	link_directories( ${FLEXBAR_SOURCE_DIR}/lib/win64 )
 	# elseif( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
@@ -12,14 +15,18 @@ if( CMAKE_SIZEOF_VOID_P MATCHES "8" )
 	# else() # assuming linux, or adjust to your system's tbb lib
 	# 	link_directories( ${FLEXBAR_SOURCE_DIR}/lib/linux64 )
 	# endif()
+	
 else()
 	message( STATUS "Flexbar 32 bit architecture" )
+	
 	# if( WIN32 )
 	# 	link_directories( ${FLEXBAR_SOURCE_DIR}/lib/win32 )
 	# else()
 	# 	message( FATAL_ERROR "Platform not supported!" )
 	# endif()
+	
 endif()
+
 
 add_executable( flexbar Flexbar.cpp )
 target_link_libraries( flexbar tbb )
@@ -33,6 +40,7 @@ if( ZLIB_FOUND )
 else()
 	message( STATUS "Build will not support zlib!" )
 endif()
+
 
 find_package( BZip2 )
 if( BZIP2_FOUND )
