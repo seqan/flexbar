@@ -4,15 +4,14 @@
    
    Version 2.6 alpha  (GPLv3)
    
-   Uses seqan library release 1.4.2
-    and tbb library 4.0 or later
+   Uses SeqAn library release 1.4.2
+    and TBB library 4.0 or later
    
    Authors: Matthias Dodt and Johannes Roehr
    
    https://github.com/seqan/flexbar
    
 ===================================================*/
-
 
 #include "Flexbar.h"
 #include "Options.h"
@@ -27,7 +26,7 @@ int main(int argc, const char* argv[]){
 	using seqan::ArgumentParser;
 	
 	const string version = "2.6 alpha";
-	const string date    = "October 6, 2015";
+	const string date    = "October 29, 2015";
 	
 	ArgumentParser parser("flexbar");
 	
@@ -45,4 +44,3 @@ int main(int argc, const char* argv[]){
 	
 	return 0;
 }
-

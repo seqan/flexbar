@@ -4,8 +4,8 @@
  *   Author: mat and jtr
  */
 
-#ifndef FLEXBAR_OUTPUTFILESTRUCT_H_
-#define FLEXBAR_OUTPUTFILESTRUCT_H_
+#ifndef FLEXBAR_OUTPUTFILESTRUCT_H
+#define FLEXBAR_OUTPUTFILESTRUCT_H
 
 #include "SequenceOutputFilter.h"
 
@@ -49,4 +49,4 @@ private:
 	
 };
 
-#endif /* FLEXBAR_OUTPUTFILESTRUCT_H_ */
+#endif

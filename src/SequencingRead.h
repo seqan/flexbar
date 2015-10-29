@@ -4,8 +4,8 @@
  *   Author: mat and jtr
  */
 
-#ifndef FLEXBAR_SEQUENCINGREAD_H_
-#define FLEXBAR_SEQUENCINGREAD_H_
+#ifndef FLEXBAR_SEQUENCINGREAD_H
+#define FLEXBAR_SEQUENCINGREAD_H
 
 
 template <typename TString, typename TIDString>
@@ -65,4 +65,4 @@ public:
 	
 };
 
-#endif /* FLEXBAR_SEQUENCINGREAD_H_ */
+#endif

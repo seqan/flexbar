@@ -4,8 +4,8 @@
  *   Authors: mat and jtr
  */
 
-#ifndef FLEXBAR_MULTIPLEXEDOUTPUTFILTER_H_
-#define FLEXBAR_MULTIPLEXEDOUTPUTFILTER_H_
+#ifndef FLEXBAR_MULTIPLEXEDOUTPUTFILTER_H
+#define FLEXBAR_MULTIPLEXEDOUTPUTFILTER_H
 
 #include <tbb/pipeline.h>
 #include <tbb/concurrent_vector.h>
@@ -483,4 +483,4 @@ public:
 	
 };
 
-#endif /* FLEXBAR_MULTIPLEXEDOUTPUTFILTER_H_ */
+#endif

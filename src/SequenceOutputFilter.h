@@ -4,8 +4,8 @@
  *   Authors: mat and jtr
  */
 
-#ifndef FLEXBAR_SEQUENCEOUTPUTFILTER_H_
-#define FLEXBAR_SEQUENCEOUTPUTFILTER_H_
+#ifndef FLEXBAR_SEQUENCEOUTPUTFILTER_H
+#define FLEXBAR_SEQUENCEOUTPUTFILTER_H
 
 #include <fstream>
 
@@ -195,4 +195,4 @@ public:
 	
 };
 
-#endif /* FLEXBAR_SEQUENCEOUTPUTFILTER_H_ */
+#endif

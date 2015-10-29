@@ -4,8 +4,8 @@
  *   Authors: mat and jtr
  */
 
-#ifndef FLEXBAR_MULTIPLEXEDINPUTFILTER_H_
-#define FLEXBAR_MULTIPLEXEDINPUTFILTER_H_
+#ifndef FLEXBAR_MULTIPLEXEDINPUTFILTER_H
+#define FLEXBAR_MULTIPLEXEDINPUTFILTER_H
 
 #include <tbb/pipeline.h>
 
@@ -168,4 +168,4 @@ public:
 	
 };
 
-#endif /* FLEXBAR_MULTIPLEXEDINPUTFILTER_H_ */
+#endif

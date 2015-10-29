@@ -4,8 +4,8 @@
  *   Author: jtr
  */
 
-#ifndef FLEXBAR_FLEXBARIO_H_
-#define FLEXBAR_FLEXBARIO_H_
+#ifndef FLEXBAR_FLEXBARIO_H
+#define FLEXBAR_FLEXBARIO_H
 
 #include <string>
 #include <fstream>
@@ -235,4 +235,4 @@ void runQualityCheck(std::string path){
 }
 
 
-#endif /* FLEXBAR_FLEXBARIO_H_ */
+#endif

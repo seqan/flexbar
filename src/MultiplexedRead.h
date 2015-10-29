@@ -4,8 +4,8 @@
  *   Author: mat and jtr
  */
 
-#ifndef FLEXBAR_MULTIPLEXEDREAD_H_
-#define FLEXBAR_MULTIPLEXEDREAD_H_
+#ifndef FLEXBAR_MULTIPLEXEDREAD_H
+#define FLEXBAR_MULTIPLEXEDREAD_H
 
 
 template <typename TString, typename TIDString>
@@ -39,4 +39,4 @@ public:
 	
 };
 
-#endif /* FLEXBAR_MULTIPLEXEDREAD_H_ */
+#endif

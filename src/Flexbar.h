@@ -4,8 +4,8 @@
  *   Author: jtr
  */
 
-#ifndef FLEXBAR_FLEXBAR_H_
-#define FLEXBAR_FLEXBAR_H_
+#ifndef FLEXBAR_FLEXBAR_H
+#define FLEXBAR_FLEXBAR_H
 
 #include <string>
 #include <fstream>
@@ -528,4 +528,4 @@ void startComputation(Options &o){
 }
 
 
-#endif /* FLEXBAR_FLEXBAR_H_ */
+#endif

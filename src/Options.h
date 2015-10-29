@@ -4,8 +4,8 @@
  *   Author: jtr
  */
 
-#ifndef FLEXBAR_OPTIONS_H_
-#define FLEXBAR_OPTIONS_H_
+#ifndef FLEXBAR_OPTIONS_H
+#define FLEXBAR_OPTIONS_H
 
 #include <string>
 #include <iostream>
@@ -711,4 +711,4 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 }
 
 
-#endif /* FLEXBAR_OPTIONS_H_ */
+#endif

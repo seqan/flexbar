@@ -4,8 +4,8 @@
  *   Authors: mat and jtr
  */
 
-#ifndef FLEXBAR_ENUMS_H_
-#define FLEXBAR_ENUMS_H_
+#ifndef FLEXBAR_ENUMS_H
+#define FLEXBAR_ENUMS_H
 
 
 namespace flexbar{
@@ -70,4 +70,4 @@ namespace flexbar{
 	
 }
 
-#endif /* FLEXBAR_ENUMS_H_ */
+#endif

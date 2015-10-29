@@ -4,8 +4,8 @@
  *   Authors: mat and jtr
  */
 
-#ifndef FLEXBAR_ALIGNMENTALGORITHM_H_
-#define FLEXBAR_ALIGNMENTALGORITHM_H_
+#ifndef FLEXBAR_ALIGNMENTALGORITHM_H
+#define FLEXBAR_ALIGNMENTALGORITHM_H
 
 #include <iostream>
 #include <string>
@@ -156,4 +156,4 @@ public:
 };
 
 
-#endif /* FLEXBAR_ALIGNMENTALGORITHM_H_ */
+#endif

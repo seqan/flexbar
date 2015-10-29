@@ -4,8 +4,8 @@
  *   Authors: mat and jtr
  */
 
-#ifndef FLEXBAR_ALIGNMENTFILTER_H_
-#define FLEXBAR_ALIGNMENTFILTER_H_
+#ifndef FLEXBAR_ALIGNMENTFILTER_H
+#define FLEXBAR_ALIGNMENTFILTER_H
 
 #include <string>
 #include <sstream>
@@ -404,4 +404,4 @@ public:
 	
 };
 
-#endif /* FLEXBAR_ALIGNMENTFILTER_H_ */
+#endif

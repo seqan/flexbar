@@ -4,8 +4,8 @@
  *   Authors: mat and jtr
  */
 
-#ifndef FLEXBAR_ADAPTERLOADER_H_
-#define FLEXBAR_ADAPTERLOADER_H_
+#ifndef FLEXBAR_ADAPTERLOADER_H
+#define FLEXBAR_ADAPTERLOADER_H
 
 #include <sstream>
 #include <string>
@@ -134,4 +134,4 @@ public:
 	
 };
 
-#endif /* FLEXBAR_ADAPTERLOADER_H_ */
+#endif
