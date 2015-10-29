@@ -24,7 +24,7 @@
 #include "SeqRead.h"
 
 
-template <typename TString, typename TIDString, typename TStream>
+template <typename TSeqStr, typename TIDString, typename TStream>
 class SeqInputFilter : public tbb::filter {
 
 private:
@@ -180,9 +180,9 @@ public:
 		using seqan::suffix;
 		using seqan::length;
 		
-		SeqRead<TString, TIDString> *myRead = NULL;
+		SeqRead<TSeqStr, TIDString> *myRead = NULL;
 		
-		TString source = "", quality = "", dummy = "";
+		TSeqStr source = "", quality = "", dummy = "";
 		TIDString tag = "";
 		
 		if(! atStreamEnd()){
@@ -253,7 +253,7 @@ public:
 						}
 					}
 					
-					myRead = new SeqRead<TString, TIDString>(source, tag);
+					myRead = new SeqRead<TSeqStr, TIDString>(source, tag);
 					
 					++m_nrReads;
 				}
@@ -331,8 +331,8 @@ public:
 						if(m_prePhredTrim > 0) qualityTrimming(source, quality);
 					}
 					
-					if(m_switch2Fasta) myRead = new SeqRead<TString, TIDString>(source, tag);
-					else               myRead = new SeqRead<TString, TIDString>(source, tag, quality);
+					if(m_switch2Fasta) myRead = new SeqRead<TSeqStr, TIDString>(source, tag);
+					else               myRead = new SeqRead<TSeqStr, TIDString>(source, tag, quality);
 					
 					++m_nrReads;
 				}
@@ -357,12 +357,12 @@ public:
 	
 	
 	// returns TRUE if read contains too many uncalled bases
-	bool isUncalledSequence(TString &source){
+	bool isUncalledSequence(TSeqStr &source){
 		int n = 0;
 		
 		using namespace seqan;
 		
-		typename Iterator<TString >::Type it, itEnd;
+		typename Iterator<TSeqStr >::Type it, itEnd;
 		
 		it    = begin(source);
 		itEnd = end(source);
@@ -376,11 +376,11 @@ public:
 	}
  	
 	
-	void qualityTrimming(TString &source, TString &quality){
+	void qualityTrimming(TSeqStr &source, TSeqStr &quality){
 		
 		using namespace seqan;
 		
-		typename Iterator<TString >::Type it, itEnd;
+		typename Iterator<TSeqStr >::Type it, itEnd;
 		
 		it    = begin(quality);
 		itEnd = end(quality);

@@ -21,7 +21,7 @@
 #include "AdapterLoader.h"
 
 
-template <typename TString, typename TIDString, typename TStream>
+template <typename TSeqStr, typename TIDString, typename TStream>
 class PairedOutputFilter : public tbb::filter {
 
 private:
@@ -38,8 +38,8 @@ private:
 	const flexbar::RunType        m_runType;
 	const flexbar::BarcodeDetect  m_barDetect;
 	
-	typedef SeqOutputFilter<TString, TIDString, TStream> TOutputFilter;
-	typedef OutputFileStruct<TString, TIDString, TStream> filters;
+	typedef SeqOutputFilter<TSeqStr, TIDString, TStream> TOutputFilter;
+	typedef OutputFileStruct<TSeqStr, TIDString, TStream> filters;
 	
 	filters *m_outMap;
 	std::ostream *out;
@@ -238,7 +238,7 @@ public:
 		
 		using namespace flexbar;
 		
-		PairedRead<TString, TIDString> *read = static_cast< PairedRead<TString, TIDString>* >(item);
+		PairedRead<TSeqStr, TIDString> *read = static_cast< PairedRead<TSeqStr, TIDString>* >(item);
 		
 		bool l1ok = false, l2ok = false;
 		

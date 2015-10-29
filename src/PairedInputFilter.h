@@ -14,7 +14,7 @@
 #include "SeqInputFilter.h"
 
 
-template <typename TString, typename TIDString, typename TStreamR, typename TStreamP, typename TStreamB>
+template <typename TSeqStr, typename TIDString, typename TStreamR, typename TStreamP, typename TStreamB>
 class PairedInputFilter : public tbb::filter {
 
 private:
@@ -22,9 +22,9 @@ private:
 	const bool m_isPaired, m_useBarcodeRead, m_useNumberTag;
 	tbb::atomic<unsigned long> m_uncalled, m_uncalledPairs, m_tagCounter;
 	
-	SeqInputFilter<TString, TString, TStreamR> *m_f1;
-	SeqInputFilter<TString, TString, TStreamP> *m_f2;
-	SeqInputFilter<TString, TString, TStreamB> *m_b;
+	SeqInputFilter<TSeqStr, TSeqStr, TStreamR> *m_f1;
+	SeqInputFilter<TSeqStr, TSeqStr, TStreamP> *m_f2;
+	SeqInputFilter<TSeqStr, TSeqStr, TStreamB> *m_b;
 	
 public:
 	
@@ -39,17 +39,17 @@ public:
 		m_uncalled      = 0;
 		m_uncalledPairs = 0;
 		
-		m_f1 = new SeqInputFilter<TString, TString, TStreamR>(o, o.readsFile, false, true, o.useStdin);
+		m_f1 = new SeqInputFilter<TSeqStr, TSeqStr, TStreamR>(o, o.readsFile, false, true, o.useStdin);
 		
 		m_f2 = NULL;
 		m_b  = NULL;
 		
 		if(m_isPaired){
-			m_f2 = new SeqInputFilter<TString, TString, TStreamP>(o, o.readsFile2, false, true, false);
+			m_f2 = new SeqInputFilter<TSeqStr, TSeqStr, TStreamP>(o, o.readsFile2, false, true, false);
 		}
 		
 		if(m_useBarcodeRead){
-			m_b = new SeqInputFilter<TString, TString, TStreamB>(o, o.barReadsFile, false, false, false);
+			m_b = new SeqInputFilter<TSeqStr, TSeqStr, TStreamB>(o, o.barReadsFile, false, false, false);
 		}
 	}
 	
@@ -65,16 +65,16 @@ public:
 		
 		using namespace std;
 		
-		SeqRead<TString, TIDString> *myRead1 = NULL, *myRead2 = NULL, *myBarcode = NULL;
+		SeqRead<TSeqStr, TIDString> *myRead1 = NULL, *myRead2 = NULL, *myBarcode = NULL;
 		
 		bool uncalled = true, uncalled2 = true, uBR = true;
 		
 		if(! m_isPaired){
 			
 			while(uncalled){
-				myRead1 = static_cast< SeqRead<TString, TIDString>* >(m_f1->getRead(uncalled));
+				myRead1 = static_cast< SeqRead<TSeqStr, TIDString>* >(m_f1->getRead(uncalled));
 				
-				if(m_useBarcodeRead) myBarcode = static_cast< SeqRead<TString, TIDString>* >(m_b->getRead(uBR));
+				if(m_useBarcodeRead) myBarcode = static_cast< SeqRead<TSeqStr, TIDString>* >(m_b->getRead(uBR));
 				
 				if(myRead1 == NULL) return NULL;
 				
@@ -96,10 +96,10 @@ public:
 			
 			while(uncalled || uncalled2){
 				
-				myRead1 = static_cast< SeqRead<TString, TIDString>* >(m_f1->getRead(uncalled));
-				myRead2 = static_cast< SeqRead<TString, TIDString>* >(m_f2->getRead(uncalled2));
+				myRead1 = static_cast< SeqRead<TSeqStr, TIDString>* >(m_f1->getRead(uncalled));
+				myRead2 = static_cast< SeqRead<TSeqStr, TIDString>* >(m_f2->getRead(uncalled2));
 				
-				if(m_useBarcodeRead) myBarcode = static_cast< SeqRead<TString, TIDString>* >(m_b->getRead(uBR));
+				if(m_useBarcodeRead) myBarcode = static_cast< SeqRead<TSeqStr, TIDString>* >(m_b->getRead(uBR));
 				
 				// end of files reached
 				if(myRead1 == NULL && myRead2 == NULL) return NULL;
@@ -128,14 +128,14 @@ public:
 		if(m_useNumberTag){
 			stringstream converter;
 			converter << ++m_tagCounter;
-			TString tagCount = converter.str();
+			TSeqStr tagCount = converter.str();
 			
 			myRead1->setSequenceTag(tagCount);
 			if(m_isPaired) myRead2->setSequenceTag(tagCount);
 			if(m_useBarcodeRead) myBarcode->setSequenceTag(tagCount);
 		}
 		
-		return new PairedRead<TString, TIDString>(myRead1, myRead2, myBarcode);
+		return new PairedRead<TSeqStr, TIDString>(myRead1, myRead2, myBarcode);
 	}
 	
 	

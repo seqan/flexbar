@@ -8,18 +8,18 @@
 #define FLEXBAR_PAIREDREAD_H
 
 
-template <typename TString, typename TIDString>
+template <typename TSeqStr, typename TIDString>
 class PairedRead {
 
 public:
 	
-	typedef SeqRead<TString, TIDString> TSeqRead;
+	typedef SeqRead<TSeqStr, TIDString> TSeqRead;
 	
 	TSeqRead *m_r1;
 	TSeqRead *m_r2;
 	TSeqRead *m_b;
 	
-	TString m_randTag;
+	TSeqStr m_randTag;
 	int m_barcode_id, m_barcode_id2;
 	
 	PairedRead(TSeqRead *r1, TSeqRead *r2, TSeqRead *b) :

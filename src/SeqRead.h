@@ -8,12 +8,12 @@
 #define FLEXBAR_SEQREAD_H
 
 
-template <typename TString, typename TIDString>
+template <typename TSeqStr, typename TIDString>
 class SeqRead {
 
 private:
 	
-	TString m_seq;
+	TSeqStr m_seq;
 	TIDString m_tag, m_qual;
 	
 public:
@@ -23,27 +23,27 @@ public:
       	  m_seq(){
 	}
 	
-	SeqRead(const TString& source, const TIDString& sequence_tag)
+	SeqRead(const TSeqStr& source, const TIDString& sequence_tag)
 		: m_tag(sequence_tag),
 		  m_seq(source){
 	}
 	
-	SeqRead(const TString& source, const TIDString& sequence_tag, const TIDString& qual)
+	SeqRead(const TSeqStr& source, const TIDString& sequence_tag, const TIDString& qual)
 		: m_tag(sequence_tag),
 		  m_seq(source),
 		  m_qual(qual){
 	}
 	
 	
-	void setSequenceTag(const TString& tag){
+	void setSequenceTag(const TSeqStr& tag){
 		m_tag = tag;
 	}
 	
-	void setSequence(const TString& seq){
+	void setSequence(const TSeqStr& seq){
 		m_seq = seq;
 	}
 	
-	void setQuality(const TString& qual){
+	void setQuality(const TSeqStr& qual){
 		m_qual = qual;
 	}
 	
@@ -52,7 +52,7 @@ public:
 		return m_tag;
 	}
 	
-	const TString& getSequence() const {
+	const TSeqStr& getSequence() const {
 		return m_seq;
 	}
 	

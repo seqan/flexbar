@@ -20,7 +20,7 @@
 #include "AdapterLoader.h"
 
 
-template <typename TString, typename TIDString>
+template <typename TSeqStr, typename TIDString>
 class PairedAlignmentFilter : public tbb::filter {
 
 private:
@@ -37,8 +37,8 @@ private:
 	tbb::concurrent_vector<TAdapter> *m_adapters, *m_adapters2;
 	tbb::concurrent_vector<TAdapter> *m_barcodes, *m_barcodes2;
 	
-	typedef AlignmentFilter<TString, TIDString, AlignmentAlgorithm<TString> > AliFilter;
-	AliFilter *m_afilter, *m_bfilter, *m_a2filter, *m_b2filter;
+	typedef AlignmentFilter<TSeqStr, TIDString, AlignmentAlgorithm<TSeqStr> > AlignFilter;
+	AlignFilter *m_afilter, *m_bfilter, *m_a2filter, *m_b2filter;
 	
 	std::ostream *out;
 	
@@ -62,11 +62,11 @@ public:
 		m_barcodes2 = &o.barcodes2;
 		m_adapters2 = &o.adapters2;
 		
-		m_bfilter = new AliFilter(m_barcodes, o, o.b_min_overlap, o.b_threshold, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, o.b_end, true);
-		m_afilter = new AliFilter(m_adapters, o, o.a_min_overlap, o.a_threshold, o.a_tail_len, o.match, o.mismatch, o.gapCost, o.end, false);
+		m_bfilter = new AlignFilter(m_barcodes, o, o.b_min_overlap, o.b_threshold, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, o.b_end, true);
+		m_afilter = new AlignFilter(m_adapters, o, o.a_min_overlap, o.a_threshold, o.a_tail_len, o.match, o.mismatch, o.gapCost, o.end, false);
 		
-		m_b2filter = new AliFilter(m_barcodes2, o, o.b_min_overlap, o.b_threshold, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, o.b_end, true);
-		m_a2filter = new AliFilter(m_adapters2, o, o.a_min_overlap, o.a_threshold, o.a_tail_len, o.match, o.mismatch, o.gapCost, o.end, false);
+		m_b2filter = new AlignFilter(m_barcodes2, o, o.b_min_overlap, o.b_threshold, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, o.b_end, true);
+		m_a2filter = new AlignFilter(m_adapters2, o, o.a_min_overlap, o.a_threshold, o.a_tail_len, o.match, o.mismatch, o.gapCost, o.end, false);
 		
 		if(m_verb == flexbar::TAB)
 		*out << "ReadTag\tQueryTag\tQueryStart\tQueryEnd\tOverlapLength\tMismatches\tIndels\tAllowedErrors" << std::endl;
@@ -86,7 +86,7 @@ public:
 		using namespace flexbar;
 		
 		if(item != NULL){
-			PairedRead<TString, TIDString> *myRead = static_cast< PairedRead<TString, TIDString>* >(item);
+			PairedRead<TSeqStr, TIDString> *myRead = static_cast< PairedRead<TSeqStr, TIDString>* >(item);
 			
 			bool skipAdapRem = false;
 			

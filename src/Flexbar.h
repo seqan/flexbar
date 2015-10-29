@@ -224,10 +224,10 @@ void startProcessing(Options &o){
 	using namespace std;
 	using namespace flexbar;
 	
-	// Check TString everywhere, e.g. qual
-	// typedef seqan::Dna5String TString;
+	// Check TSeqStr everywhere, e.g. qual
+	// typedef seqan::Dna5String TSeqStr;
 	
-	typedef seqan::CharString TString;
+	typedef seqan::CharString TSeqStr;
 	typedef seqan::CharString TIDString;
 	
 	time_t start;
@@ -239,9 +239,9 @@ void startProcessing(Options &o){
 	
 	if(o.logLevel != NONE) *out << "\n\nLog level " << o.logLevelStr << " output generation:\n\n" << endl;
 	
-	PairedInputFilter<TString, TIDString, TStreamR, TStreamP, TStreamB> inputFilter(o);
-	PairedAlignmentFilter<TString, TIDString> alignFilter(o);
-	PairedOutputFilter<TString, TIDString, TStreamOut> outputFilter(o);
+	PairedInputFilter<TSeqStr, TIDString, TStreamR, TStreamP, TStreamB> inputFilter(o);
+	PairedAlignmentFilter<TSeqStr, TIDString> alignFilter(o);
+	PairedOutputFilter<TSeqStr, TIDString, TStreamOut> outputFilter(o);
 	
 	tbb::task_scheduler_init init_serial(o.nThreads);
 	tbb::pipeline pipe;

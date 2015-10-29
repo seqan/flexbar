@@ -16,7 +16,7 @@
 #include "SeqRead.h"
 
 
-template <typename TString, typename TIDString, typename TStream>
+template <typename TSeqStr, typename TIDString, typename TStream>
 class SeqOutputFilter {
 
 private:
@@ -97,7 +97,7 @@ public:
 	}
 	
 	
-	void writeFastString(const SeqRead<TString, TIDString>& myRead){
+	void writeFastString(const SeqRead<TSeqStr, TIDString>& myRead){
 		
 		using namespace std;
 		using namespace flexbar;
@@ -162,7 +162,7 @@ public:
 		using namespace flexbar;
 		
 		if(item){
-			SeqRead<TString, TIDString> *myRead = static_cast< SeqRead<TString, TIDString>* >(item);
+			SeqRead<TSeqStr, TIDString> *myRead = static_cast< SeqRead<TSeqStr, TIDString>* >(item);
 			
 			unsigned int readLength = length(myRead->getSequence());
 			

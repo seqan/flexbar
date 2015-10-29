@@ -18,7 +18,7 @@
 #include "AdapterLoader.h"
 
 
-template <typename TString, typename TIDString, class TAlgorithm>
+template <typename TSeqStr, typename TIDString, class TAlgorithm>
 class AlignmentFilter {
 
 private:
@@ -83,7 +83,7 @@ public:
 		using seqan::infix;
 		
 		
-		SeqRead<TString, TIDString> &myRead = *static_cast< SeqRead<TString, TIDString>* >(item);
+		SeqRead<TSeqStr, TIDString> &myRead = *static_cast< SeqRead<TSeqStr, TIDString>* >(item);
 		
 		int fmismatches, fgapsR, fgapsA, foverlapLength, fqueryLength, ftailLength;
 		int fstartPos, fstartPosA, fstartPosS, fendPos, fendPosS, fendPosA;
@@ -94,16 +94,16 @@ public:
 		float fallowedErrors;
 		
 		stringstream ss;
-		TString seqread, quality, finalAliStr, finalRandTag;
+		TSeqStr seqread, quality, finalAliStr, finalRandTag;
 		
-		TString readTag = myRead.getSequenceTag();
+		TSeqStr readTag = myRead.getSequenceTag();
 		
 		seqread = myRead.getSequence();
 		quality = "";
 		
 		if(m_format == FASTQ) quality = myRead.getQuality();
 		
-		TString sequence = seqread;
+		TSeqStr sequence = seqread;
 		int readLength   = length(seqread);
 		
 		if(! m_isBarcoding && readLength < m_minLength){
@@ -115,7 +115,7 @@ public:
 		// align each query sequence and keep track of best one
 		for(unsigned int i = 0; i < m_queries->size(); ++i){
 			
-			TString query = m_queries->at(i).first->getSequence();
+			TSeqStr query = m_queries->at(i).first->getSequence();
 			
 			int queryLength = length(query);
 			int tailLength  = (m_tailLength > 0) ? m_tailLength : queryLength;
@@ -126,9 +126,9 @@ public:
 				if(tailLength < readLength){
 					
 					if(m_trimEnd == LEFT_TAIL){
-						sequence = prefix<TString>(seqread, tailLength);
+						sequence = prefix<TSeqStr>(seqread, tailLength);
 					}else{
-						sequence = suffix<TString>(seqread, readLength - tailLength);
+						sequence = suffix<TSeqStr>(seqread, readLength - tailLength);
 					}
 					if(m_verb == ALL || m_verb == MOD)
 					ss << "Read tail length:  " << tailLength << "\n\n";
@@ -139,7 +139,7 @@ public:
 			int startPos = 0, endPos = 0, startPosA = 0, endPosA = 0, startPosS = 0, endPosS = 0;
 			int aliScore = 0, mismatches = 0, gapsR = 0, gapsA = 0;
 			
-			TString randTag = "";
+			TSeqStr randTag = "";
 			stringstream aliString;
 			
 			// align query with specified algorithm
@@ -275,7 +275,7 @@ public:
 				}
 				
 				if(m_writeTag){
-					TString newTag = myRead.getSequenceTag();
+					TSeqStr newTag = myRead.getSequenceTag();
 					append(newTag, "_Flexbar_removal");
 					
 					if(! m_isBarcoding){
@@ -295,7 +295,7 @@ public:
 			// valid alignment, not neccesarily removal
 			
 			if(m_randTag && finalRandTag != ""){
-				TString newTag = myRead.getSequenceTag();
+				TSeqStr newTag = myRead.getSequenceTag();
 				append(newTag, "_");
 				append(newTag, finalRandTag);
 				myRead.setSequenceTag(newTag);
@@ -303,7 +303,7 @@ public:
 			
 			
 			// alignment stats
-			TString queryTag = m_queries->at(qIndex).first->getSequenceTag();
+			TSeqStr queryTag = m_queries->at(qIndex).first->getSequenceTag();
 			
 			if(m_verb == ALL || (m_verb == MOD && performRemoval)){
 				

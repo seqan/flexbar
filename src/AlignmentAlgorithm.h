@@ -14,15 +14,15 @@
 #include <seqan/align.h>
 
 
-template <typename TString>
+template <typename TSeqStr>
 class AlignmentAlgorithm {
 
 private:
 	
 	typedef typename seqan::Dna5 TChar;
-	typedef typename seqan::Value<TString>::Type TStringChar;
+	typedef typename seqan::Value<TSeqStr>::Type TSeqStrChar;
 	
-	typedef seqan::Align<TString, seqan::ArrayGaps> TAlign;
+	typedef seqan::Align<TSeqStr, seqan::ArrayGaps> TAlign;
 	
 	typedef typename seqan::Row<TAlign>::Type TRow;
 	typedef typename seqan::Iterator<TRow>::Type TRowIterator;
@@ -82,7 +82,7 @@ public:
 	};
 	
 	
-	void align(const TString &querySeq, const TString &seqread, int &gapsR, int &gapsA, int &mismatches, int &startPos, int &endPos, int &startPosA, int &endPosA, int &startPosS, int &endPosS, int &aliScore, std::stringstream &aliString, TString &tagSeq){
+	void align(const TSeqStr &querySeq, const TSeqStr &seqread, int &gapsR, int &gapsA, int &mismatches, int &startPos, int &endPos, int &startPosA, int &endPosA, int &startPosS, int &endPosS, int &aliScore, std::stringstream &aliString, TSeqStr &tagSeq){
 		
 		using namespace std;
 		using namespace seqan;
@@ -145,7 +145,7 @@ public:
 				     if(isGap(it1))                   ++gapsR;
 				else if(isGap(it2))                   ++gapsA;
 				else if(*it1 != *it2 && *it2 != 'N')  ++mismatches;
-				else if(m_randTag    && *it2 == 'N')  append(tagSeq, (TStringChar) *it1);
+				else if(m_randTag    && *it2 == 'N')  append(tagSeq, (TSeqStrChar) *it1);
 			}
 			++aliPos;
 			++it2;

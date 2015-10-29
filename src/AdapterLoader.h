@@ -20,7 +20,7 @@
 #include "SeqRead.h"
 
 
-template <typename TString, typename TIDString>
+template <typename TSeqStr, typename TIDString>
 class AdapterLoader : public tbb::filter{
 
 private:
@@ -52,8 +52,8 @@ public:
 		using namespace std;
 		using namespace flexbar;
 		
-		SeqRead<TString, TIDString> *myRead = static_cast< SeqRead<TString, TIDString>* >(item);
-		SeqRead<TString, TIDString> *myReadRC;
+		SeqRead<TSeqStr, TIDString> *myRead = static_cast< SeqRead<TSeqStr, TIDString>* >(item);
+		SeqRead<TSeqStr, TIDString> *myReadRC;
 		
 		TIDString tag = myRead->getSequenceTag();
 		
@@ -75,12 +75,12 @@ public:
 		}
 		
 		if(m_revComp){
-			TString seq = myRead->getSequence();
+			TSeqStr seq = myRead->getSequence();
 			seqan::reverseComplement(seq);
 			
 			append(tag, " revcomp");
 			
-			myReadRC = new SeqRead<TString, TIDString>(seq, tag);
+			myReadRC = new SeqRead<TSeqStr, TIDString>(seq, tag);
 		}
 		
 		TAdapter adap;
@@ -120,7 +120,7 @@ public:
 		*out << adapterName << ":" << string(maxSpaceLen - len, ' ') << "Sequence:" << "\n";
 		
 		for(unsigned int i=0; i < adapters.size(); ++i){
-			TString seqTag = adapters.at(i).first->getSequenceTag();
+			TSeqStr seqTag = adapters.at(i).first->getSequenceTag();
 			
 			int whiteSpaceLen = maxSpaceLen - length(seqTag);
 			if(whiteSpaceLen < 2) whiteSpaceLen = 2;
