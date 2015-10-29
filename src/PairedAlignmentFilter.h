@@ -20,7 +20,7 @@
 #include "AdapterLoader.h"
 
 
-template <typename TSeqStr, typename TIDString>
+template <typename TSeqStr, typename TString>
 class PairedAlignmentFilter : public tbb::filter {
 
 private:
@@ -37,7 +37,7 @@ private:
 	tbb::concurrent_vector<TAdapter> *m_adapters, *m_adapters2;
 	tbb::concurrent_vector<TAdapter> *m_barcodes, *m_barcodes2;
 	
-	typedef AlignmentFilter<TSeqStr, TIDString, AlignmentAlgorithm<TSeqStr> > AlignFilter;
+	typedef AlignmentFilter<TSeqStr, TString, AlignmentAlgorithm<TSeqStr> > AlignFilter;
 	AlignFilter *m_afilter, *m_bfilter, *m_a2filter, *m_b2filter;
 	
 	std::ostream *out;
@@ -86,7 +86,7 @@ public:
 		using namespace flexbar;
 		
 		if(item != NULL){
-			PairedRead<TSeqStr, TIDString> *myRead = static_cast< PairedRead<TSeqStr, TIDString>* >(item);
+			PairedRead<TSeqStr, TString> *myRead = static_cast< PairedRead<TSeqStr, TString>* >(item);
 			
 			bool skipAdapRem = false;
 			

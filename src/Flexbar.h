@@ -228,7 +228,7 @@ void startProcessing(Options &o){
 	// typedef seqan::Dna5String TSeqStr;
 	
 	typedef seqan::CharString TSeqStr;
-	typedef seqan::CharString TIDString;
+	typedef seqan::CharString TString;
 	
 	time_t start;
 	time(&start);
@@ -239,9 +239,9 @@ void startProcessing(Options &o){
 	
 	if(o.logLevel != NONE) *out << "\n\nLog level " << o.logLevelStr << " output generation:\n\n" << endl;
 	
-	PairedInputFilter<TSeqStr, TIDString, TStreamR, TStreamP, TStreamB> inputFilter(o);
-	PairedAlignmentFilter<TSeqStr, TIDString> alignFilter(o);
-	PairedOutputFilter<TSeqStr, TIDString, TStreamOut> outputFilter(o);
+	PairedInputFilter<TSeqStr, TString, TStreamR, TStreamP, TStreamB> inputFilter(o);
+	PairedAlignmentFilter<TSeqStr, TString> alignFilter(o);
+	PairedOutputFilter<TSeqStr, TString, TStreamOut> outputFilter(o);
 	
 	tbb::task_scheduler_init init_serial(o.nThreads);
 	tbb::pipeline pipe;

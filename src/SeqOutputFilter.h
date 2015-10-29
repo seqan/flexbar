@@ -16,7 +16,7 @@
 #include "SeqRead.h"
 
 
-template <typename TSeqStr, typename TIDString, typename TStream>
+template <typename TSeqStr, typename TString, typename TStream>
 class SeqOutputFilter {
 
 private:
@@ -27,7 +27,7 @@ private:
 	const unsigned int m_minLength, m_cutLen_read;
 	
 	const std::string m_filePath;
-	const TIDString m_tagStr;
+	const TString m_tagStr;
 	
 	const flexbar::FileFormat m_format;
 	const flexbar::CompressionType m_cmprsType;
@@ -38,7 +38,7 @@ private:
 	
 public:
 	
-	SeqOutputFilter(const std::string &filePath, const TIDString tagStr, const bool alwaysFile, const Options &o) :
+	SeqOutputFilter(const std::string &filePath, const TString tagStr, const bool alwaysFile, const Options &o) :
 		m_format(o.format),
 		m_tagStr(tagStr),
 		m_minLength(o.min_readLen),
@@ -97,7 +97,7 @@ public:
 	}
 	
 	
-	void writeFastString(const SeqRead<TSeqStr, TIDString>& myRead){
+	void writeFastString(const SeqRead<TSeqStr, TString>& myRead){
 		
 		using namespace std;
 		using namespace flexbar;
@@ -162,7 +162,7 @@ public:
 		using namespace flexbar;
 		
 		if(item){
-			SeqRead<TSeqStr, TIDString> *myRead = static_cast< SeqRead<TSeqStr, TIDString>* >(item);
+			SeqRead<TSeqStr, TString> *myRead = static_cast< SeqRead<TSeqStr, TString>* >(item);
 			
 			unsigned int readLength = length(myRead->getSequence());
 			

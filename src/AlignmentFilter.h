@@ -18,7 +18,7 @@
 #include "AdapterLoader.h"
 
 
-template <typename TSeqStr, typename TIDString, class TAlgorithm>
+template <typename TSeqStr, typename TString, class TAlgorithm>
 class AlignmentFilter {
 
 private:
@@ -83,7 +83,7 @@ public:
 		using seqan::infix;
 		
 		
-		SeqRead<TSeqStr, TIDString> &myRead = *static_cast< SeqRead<TSeqStr, TIDString>* >(item);
+		SeqRead<TSeqStr, TString> &myRead = *static_cast< SeqRead<TSeqStr, TString>* >(item);
 		
 		int fmismatches, fgapsR, fgapsA, foverlapLength, fqueryLength, ftailLength;
 		int fstartPos, fstartPosA, fstartPosS, fendPos, fendPosS, fendPosA;

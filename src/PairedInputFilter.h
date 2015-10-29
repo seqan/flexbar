@@ -14,7 +14,7 @@
 #include "SeqInputFilter.h"
 
 
-template <typename TSeqStr, typename TIDString, typename TStreamR, typename TStreamP, typename TStreamB>
+template <typename TSeqStr, typename TString, typename TStreamR, typename TStreamP, typename TStreamB>
 class PairedInputFilter : public tbb::filter {
 
 private:
@@ -65,16 +65,16 @@ public:
 		
 		using namespace std;
 		
-		SeqRead<TSeqStr, TIDString> *myRead1 = NULL, *myRead2 = NULL, *myBarcode = NULL;
+		SeqRead<TSeqStr, TString> *myRead1 = NULL, *myRead2 = NULL, *myBarcode = NULL;
 		
 		bool uncalled = true, uncalled2 = true, uBR = true;
 		
 		if(! m_isPaired){
 			
 			while(uncalled){
-				myRead1 = static_cast< SeqRead<TSeqStr, TIDString>* >(m_f1->getRead(uncalled));
+				myRead1 = static_cast< SeqRead<TSeqStr, TString>* >(m_f1->getRead(uncalled));
 				
-				if(m_useBarcodeRead) myBarcode = static_cast< SeqRead<TSeqStr, TIDString>* >(m_b->getRead(uBR));
+				if(m_useBarcodeRead) myBarcode = static_cast< SeqRead<TSeqStr, TString>* >(m_b->getRead(uBR));
 				
 				if(myRead1 == NULL) return NULL;
 				
@@ -96,10 +96,10 @@ public:
 			
 			while(uncalled || uncalled2){
 				
-				myRead1 = static_cast< SeqRead<TSeqStr, TIDString>* >(m_f1->getRead(uncalled));
-				myRead2 = static_cast< SeqRead<TSeqStr, TIDString>* >(m_f2->getRead(uncalled2));
+				myRead1 = static_cast< SeqRead<TSeqStr, TString>* >(m_f1->getRead(uncalled));
+				myRead2 = static_cast< SeqRead<TSeqStr, TString>* >(m_f2->getRead(uncalled2));
 				
-				if(m_useBarcodeRead) myBarcode = static_cast< SeqRead<TSeqStr, TIDString>* >(m_b->getRead(uBR));
+				if(m_useBarcodeRead) myBarcode = static_cast< SeqRead<TSeqStr, TString>* >(m_b->getRead(uBR));
 				
 				// end of files reached
 				if(myRead1 == NULL && myRead2 == NULL) return NULL;
@@ -135,7 +135,7 @@ public:
 			if(m_useBarcodeRead) myBarcode->setSequenceTag(tagCount);
 		}
 		
-		return new PairedRead<TSeqStr, TIDString>(myRead1, myRead2, myBarcode);
+		return new PairedRead<TSeqStr, TString>(myRead1, myRead2, myBarcode);
 	}
 	
 	

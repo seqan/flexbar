@@ -20,7 +20,7 @@
 #include "SeqRead.h"
 
 
-template <typename TSeqStr, typename TIDString>
+template <typename TSeqStr, typename TString>
 class AdapterLoader : public tbb::filter{
 
 private:
@@ -52,10 +52,10 @@ public:
 		using namespace std;
 		using namespace flexbar;
 		
-		SeqRead<TSeqStr, TIDString> *myRead = static_cast< SeqRead<TSeqStr, TIDString>* >(item);
-		SeqRead<TSeqStr, TIDString> *myReadRC;
+		SeqRead<TSeqStr, TString> *myRead = static_cast< SeqRead<TSeqStr, TString>* >(item);
+		SeqRead<TSeqStr, TString> *myReadRC;
 		
-		TIDString tag = myRead->getSequenceTag();
+		TString tag = myRead->getSequenceTag();
 		
 		if(adapters.size() < 1000){
 			for(int i = 0; i < adapters.size(); ++i){
@@ -80,7 +80,7 @@ public:
 			
 			append(tag, " revcomp");
 			
-			myReadRC = new SeqRead<TSeqStr, TIDString>(seq, tag);
+			myReadRC = new SeqRead<TSeqStr, TString>(seq, tag);
 		}
 		
 		TAdapter adap;

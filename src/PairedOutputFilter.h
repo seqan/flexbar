@@ -21,7 +21,7 @@
 #include "AdapterLoader.h"
 
 
-template <typename TSeqStr, typename TIDString, typename TStream>
+template <typename TSeqStr, typename TString, typename TStream>
 class PairedOutputFilter : public tbb::filter {
 
 private:
@@ -38,8 +38,8 @@ private:
 	const flexbar::RunType        m_runType;
 	const flexbar::BarcodeDetect  m_barDetect;
 	
-	typedef SeqOutputFilter<TSeqStr, TIDString, TStream> TOutputFilter;
-	typedef OutputFileStruct<TSeqStr, TIDString, TStream> filters;
+	typedef SeqOutputFilter<TSeqStr, TString, TStream> TOutputFilter;
+	typedef OutputFileStruct<TSeqStr, TString, TStream> filters;
 	
 	filters *m_outMap;
 	std::ostream *out;
@@ -90,15 +90,15 @@ public:
 					int idxB1 = i % m_barcodes->size();
 					int idxB2 = div(i, m_barcodes->size()).quot;
 					
-					TIDString barcode = m_barcodes->at(idxB1).first->getSequenceTag();
+					TString barcode = m_barcodes->at(idxB1).first->getSequenceTag();
 					
 					if(m_twoBarcodes){
 						append(barcode, "-");
 						append(barcode, m_barcodes2->at(idxB2).first->getSequenceTag());
 					}
 					
-					TIDString barcode1 = barcode;
-					TIDString barcode2 = barcode;
+					TString barcode1 = barcode;
+					TString barcode2 = barcode;
 					
 					append(barcode1, "_1");
 					append(barcode2, "_2");
@@ -207,7 +207,7 @@ public:
 				
 				for(int i = 0; i < m_barcodes->size(); ++i){
 					
-					TIDString barcode = m_barcodes->at(i).first->getSequenceTag();
+					TString barcode = m_barcodes->at(i).first->getSequenceTag();
 					
 					stringstream ss;
 					ss << m_target << "_barcode_" << barcode << toFormatString(m_format);
@@ -238,7 +238,7 @@ public:
 		
 		using namespace flexbar;
 		
-		PairedRead<TSeqStr, TIDString> *read = static_cast< PairedRead<TSeqStr, TIDString>* >(item);
+		PairedRead<TSeqStr, TString> *read = static_cast< PairedRead<TSeqStr, TString>* >(item);
 		
 		bool l1ok = false, l2ok = false;
 		

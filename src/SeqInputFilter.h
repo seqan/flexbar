@@ -24,7 +24,7 @@
 #include "SeqRead.h"
 
 
-template <typename TSeqStr, typename TIDString, typename TStream>
+template <typename TSeqStr, typename TString, typename TStream>
 class SeqInputFilter : public tbb::filter {
 
 private:
@@ -42,7 +42,7 @@ private:
 	
 	const flexbar::QualityType m_qualType;
 	flexbar::FileFormat m_format;
-	TIDString m_nextTag;
+	TString m_nextTag;
 	
 	const bool m_switch2Fasta, m_preProcess, m_useStdin;
 	const int m_maxUncalled, m_preTrimBegin, m_preTrimEnd, m_prePhredTrim;
@@ -180,10 +180,10 @@ public:
 		using seqan::suffix;
 		using seqan::length;
 		
-		SeqRead<TSeqStr, TIDString> *myRead = NULL;
+		SeqRead<TSeqStr, TString> *myRead = NULL;
 		
 		TSeqStr source = "", quality = "", dummy = "";
-		TIDString tag = "";
+		TString tag = "";
 		
 		if(! atStreamEnd()){
 			
@@ -253,7 +253,7 @@ public:
 						}
 					}
 					
-					myRead = new SeqRead<TSeqStr, TIDString>(source, tag);
+					myRead = new SeqRead<TSeqStr, TString>(source, tag);
 					
 					++m_nrReads;
 				}
@@ -331,8 +331,8 @@ public:
 						if(m_prePhredTrim > 0) qualityTrimming(source, quality);
 					}
 					
-					if(m_switch2Fasta) myRead = new SeqRead<TSeqStr, TIDString>(source, tag);
-					else               myRead = new SeqRead<TSeqStr, TIDString>(source, tag, quality);
+					if(m_switch2Fasta) myRead = new SeqRead<TSeqStr, TString>(source, tag);
+					else               myRead = new SeqRead<TSeqStr, TString>(source, tag, quality);
 					
 					++m_nrReads;
 				}
