@@ -1,11 +1,11 @@
 /*
- *   MultiplexedOutputFilter.h
+ *   PairedOutputFilter.h
  *
  *   Authors: mat and jtr
  */
 
-#ifndef FLEXBAR_MULTIPLEXEDOUTPUTFILTER_H
-#define FLEXBAR_MULTIPLEXEDOUTPUTFILTER_H
+#ifndef FLEXBAR_PAIREDOUTPUTFILTER_H
+#define FLEXBAR_PAIREDOUTPUTFILTER_H
 
 #include <tbb/pipeline.h>
 #include <tbb/concurrent_vector.h>
@@ -15,14 +15,14 @@
 #include "Enums.h"
 #include "Options.h"
 #include "FlexbarIO.h"
-#include "MultiplexedRead.h"
-#include "SequenceOutputFilter.h"
+#include "PairedRead.h"
+#include "SeqOutputFilter.h"
 #include "OutputFileStruct.h"
 #include "AdapterLoader.h"
 
 
 template <typename TString, typename TIDString, typename TStream>
-class MultiplexedOutputFilter : public tbb::filter {
+class PairedOutputFilter : public tbb::filter {
 
 private:
 	
@@ -38,7 +38,7 @@ private:
 	const flexbar::RunType        m_runType;
 	const flexbar::BarcodeDetect  m_barDetect;
 	
-	typedef SequenceOutputFilter<TString, TIDString, TStream> TOutputFilter;
+	typedef SeqOutputFilter<TString, TIDString, TStream> TOutputFilter;
 	typedef OutputFileStruct<TString, TIDString, TStream> filters;
 	
 	filters *m_outMap;
@@ -49,7 +49,7 @@ private:
 	
 public:
 	
-	MultiplexedOutputFilter(Options &o) :
+	PairedOutputFilter(Options &o) :
 		
 		filter(serial_in_order),
 		m_target(o.targetName),
@@ -229,7 +229,7 @@ public:
 	}
 	
 	
-	virtual ~MultiplexedOutputFilter(){
+	virtual ~PairedOutputFilter(){
 		delete[] m_outMap;
 	};
 	
@@ -238,7 +238,7 @@ public:
 		
 		using namespace flexbar;
 		
-		MultiplexedRead<TString, TIDString> *read = static_cast< MultiplexedRead<TString, TIDString>* >(item);
+		PairedRead<TString, TIDString> *read = static_cast< PairedRead<TString, TIDString>* >(item);
 		
 		bool l1ok = false, l2ok = false;
 		

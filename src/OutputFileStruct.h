@@ -7,7 +7,7 @@
 #ifndef FLEXBAR_OUTPUTFILESTRUCT_H
 #define FLEXBAR_OUTPUTFILESTRUCT_H
 
-#include "SequenceOutputFilter.h"
+#include "SeqOutputFilter.h"
 
 
 template <typename TString, typename TIDString, typename TStream>
@@ -15,7 +15,7 @@ class OutputFileStruct {
 	
 public:
 	
-	typedef SequenceOutputFilter<TString, TIDString, TStream> TOutputFilter;
+	typedef SeqOutputFilter<TString, TIDString, TStream> TOutputFilter;
 	
 	TOutputFilter *f1, *f2, *single1, *single2;
 	

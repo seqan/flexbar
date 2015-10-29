@@ -1,28 +1,28 @@
 /*
- *   MultiplexedRead.h
+ *   PairedRead.h
  *
  *   Author: mat and jtr
  */
 
-#ifndef FLEXBAR_MULTIPLEXEDREAD_H
-#define FLEXBAR_MULTIPLEXEDREAD_H
+#ifndef FLEXBAR_PAIREDREAD_H
+#define FLEXBAR_PAIREDREAD_H
 
 
 template <typename TString, typename TIDString>
-class MultiplexedRead {
+class PairedRead {
 
 public:
 	
-	typedef SequencingRead<TString, TIDString> TSequencingRead;
+	typedef SeqRead<TString, TIDString> TSeqRead;
 	
-	TSequencingRead *m_r1;
-	TSequencingRead *m_r2;
-	TSequencingRead *m_b;
+	TSeqRead *m_r1;
+	TSeqRead *m_r2;
+	TSeqRead *m_b;
 	
 	TString m_randTag;
 	int m_barcode_id, m_barcode_id2;
 	
-	MultiplexedRead(TSequencingRead *r1, TSequencingRead *r2, TSequencingRead *b) :
+	PairedRead(TSeqRead *r1, TSeqRead *r2, TSeqRead *b) :
 		m_r1(r1),
 		m_r2(r2),
 		m_b(b),
@@ -31,7 +31,7 @@ public:
 		m_randTag(""){
 	};
 	
-	virtual ~MultiplexedRead(){
+	virtual ~PairedRead(){
 		delete m_r1;
 		delete m_r2;
 		delete m_b;

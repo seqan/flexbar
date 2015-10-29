@@ -17,7 +17,7 @@
 
 #include "Enums.h"
 #include "Options.h"
-#include "SequencingRead.h"
+#include "SeqRead.h"
 
 
 template <typename TString, typename TIDString>
@@ -52,8 +52,8 @@ public:
 		using namespace std;
 		using namespace flexbar;
 		
-		SequencingRead<TString, TIDString> *myRead = static_cast< SequencingRead<TString, TIDString>* >(item);
-		SequencingRead<TString, TIDString> *myReadRC;
+		SeqRead<TString, TIDString> *myRead = static_cast< SeqRead<TString, TIDString>* >(item);
+		SeqRead<TString, TIDString> *myReadRC;
 		
 		TIDString tag = myRead->getSequenceTag();
 		
@@ -80,7 +80,7 @@ public:
 			
 			append(tag, " revcomp");
 			
-			myReadRC = new SequencingRead<TString, TIDString>(seq, tag);
+			myReadRC = new SeqRead<TString, TIDString>(seq, tag);
 		}
 		
 		TAdapter adap;

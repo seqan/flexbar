@@ -1,11 +1,11 @@
 /*
- *   SequenceInputFilter.h
+ *   SeqInputFilter.h
  *
  *   Authors: mat and jtr
  */
 
-#ifndef FLEXBAR_SEQUENCEINPUTFILTER_H
-#define FLEXBAR_SEQUENCEINPUTFILTER_H
+#ifndef FLEXBAR_SEQINPUTFILTER_H
+#define FLEXBAR_SEQINPUTFILTER_H
 
 #include <string>
 #include <fstream>
@@ -21,11 +21,11 @@
 #include "Enums.h"
 #include "Options.h"
 #include "FlexbarIO.h"
-#include "SequencingRead.h"
+#include "SeqRead.h"
 
 
 template <typename TString, typename TIDString, typename TStream>
-class SequenceInputFilter : public tbb::filter {
+class SeqInputFilter : public tbb::filter {
 
 private:
 	
@@ -51,7 +51,7 @@ private:
 	
 public:
 	
-	SequenceInputFilter(const Options &o, const std::string filePath, const bool fastaFormat, const bool preProcess, const bool useStdin) :
+	SeqInputFilter(const Options &o, const std::string filePath, const bool fastaFormat, const bool preProcess, const bool useStdin) :
 		
 		filter(serial_in_order),
 		m_preProcess(preProcess),
@@ -93,7 +93,7 @@ public:
 	};
 	
 	
-	virtual ~SequenceInputFilter(){
+	virtual ~SeqInputFilter(){
 		
 		if(m_useStdin) delete readerCin;
 		else{
@@ -169,7 +169,7 @@ public:
 	// }
 	
 	
-	// returns single SequencingRead or NULL if no more reads in file or error
+	// returns single SeqRead or NULL if no more reads in file or error
 	
 	void* getRead(bool &isUncalled){
 		
@@ -180,7 +180,7 @@ public:
 		using seqan::suffix;
 		using seqan::length;
 		
-		SequencingRead<TString, TIDString> *myRead = NULL;
+		SeqRead<TString, TIDString> *myRead = NULL;
 		
 		TString source = "", quality = "", dummy = "";
 		TIDString tag = "";
@@ -253,7 +253,7 @@ public:
 						}
 					}
 					
-					myRead = new SequencingRead<TString, TIDString>(source, tag);
+					myRead = new SeqRead<TString, TIDString>(source, tag);
 					
 					++m_nrReads;
 				}
@@ -331,8 +331,8 @@ public:
 						if(m_prePhredTrim > 0) qualityTrimming(source, quality);
 					}
 					
-					if(m_switch2Fasta) myRead = new SequencingRead<TString, TIDString>(source, tag);
-					else               myRead = new SequencingRead<TString, TIDString>(source, tag, quality);
+					if(m_switch2Fasta) myRead = new SeqRead<TString, TIDString>(source, tag);
+					else               myRead = new SeqRead<TString, TIDString>(source, tag, quality);
 					
 					++m_nrReads;
 				}

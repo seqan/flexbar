@@ -1,34 +1,34 @@
 /*
- *   MultiplexedInputFilter.h
+ *   PairedInputFilter.h
  *
  *   Authors: mat and jtr
  */
 
-#ifndef FLEXBAR_MULTIPLEXEDINPUTFILTER_H
-#define FLEXBAR_MULTIPLEXEDINPUTFILTER_H
+#ifndef FLEXBAR_PAIREDINPUTFILTER_H
+#define FLEXBAR_PAIREDINPUTFILTER_H
 
 #include <tbb/pipeline.h>
 
 #include "Options.h"
-#include "MultiplexedRead.h"
-#include "SequenceInputFilter.h"
+#include "PairedRead.h"
+#include "SeqInputFilter.h"
 
 
 template <typename TString, typename TIDString, typename TStreamR, typename TStreamP, typename TStreamB>
-class MultiplexedInputFilter : public tbb::filter {
+class PairedInputFilter : public tbb::filter {
 
 private:
 	
 	const bool m_isPaired, m_useBarcodeRead, m_useNumberTag;
 	tbb::atomic<unsigned long> m_uncalled, m_uncalledPairs, m_tagCounter;
 	
-	SequenceInputFilter<TString, TString, TStreamR> *m_f1;
-	SequenceInputFilter<TString, TString, TStreamP> *m_f2;
-	SequenceInputFilter<TString, TString, TStreamB> *m_b;
+	SeqInputFilter<TString, TString, TStreamR> *m_f1;
+	SeqInputFilter<TString, TString, TStreamP> *m_f2;
+	SeqInputFilter<TString, TString, TStreamB> *m_b;
 	
 public:
 	
-	MultiplexedInputFilter(const Options &o) :
+	PairedInputFilter(const Options &o) :
 		
 		filter(serial_in_order),
 		m_useNumberTag(o.useNumberTag),
@@ -39,22 +39,22 @@ public:
 		m_uncalled      = 0;
 		m_uncalledPairs = 0;
 		
-		m_f1 = new SequenceInputFilter<TString, TString, TStreamR>(o, o.readsFile, false, true, o.useStdin);
+		m_f1 = new SeqInputFilter<TString, TString, TStreamR>(o, o.readsFile, false, true, o.useStdin);
 		
 		m_f2 = NULL;
 		m_b  = NULL;
 		
 		if(m_isPaired){
-			m_f2 = new SequenceInputFilter<TString, TString, TStreamP>(o, o.readsFile2, false, true, false);
+			m_f2 = new SeqInputFilter<TString, TString, TStreamP>(o, o.readsFile2, false, true, false);
 		}
 		
 		if(m_useBarcodeRead){
-			m_b = new SequenceInputFilter<TString, TString, TStreamB>(o, o.barReadsFile, false, false, false);
+			m_b = new SeqInputFilter<TString, TString, TStreamB>(o, o.barReadsFile, false, false, false);
 		}
 	}
 	
 	
-	virtual ~MultiplexedInputFilter(){
+	virtual ~PairedInputFilter(){
 		delete m_f1;
 		delete m_f2;
 		delete m_b;
@@ -65,16 +65,16 @@ public:
 		
 		using namespace std;
 		
-		SequencingRead<TString, TIDString> *myRead1 = NULL, *myRead2 = NULL, *myBarcode = NULL;
+		SeqRead<TString, TIDString> *myRead1 = NULL, *myRead2 = NULL, *myBarcode = NULL;
 		
 		bool uncalled = true, uncalled2 = true, uBR = true;
 		
 		if(! m_isPaired){
 			
 			while(uncalled){
-				myRead1 = static_cast< SequencingRead<TString, TIDString>* >(m_f1->getRead(uncalled));
+				myRead1 = static_cast< SeqRead<TString, TIDString>* >(m_f1->getRead(uncalled));
 				
-				if(m_useBarcodeRead) myBarcode = static_cast< SequencingRead<TString, TIDString>* >(m_b->getRead(uBR));
+				if(m_useBarcodeRead) myBarcode = static_cast< SeqRead<TString, TIDString>* >(m_b->getRead(uBR));
 				
 				if(myRead1 == NULL) return NULL;
 				
@@ -96,10 +96,10 @@ public:
 			
 			while(uncalled || uncalled2){
 				
-				myRead1 = static_cast< SequencingRead<TString, TIDString>* >(m_f1->getRead(uncalled));
-				myRead2 = static_cast< SequencingRead<TString, TIDString>* >(m_f2->getRead(uncalled2));
+				myRead1 = static_cast< SeqRead<TString, TIDString>* >(m_f1->getRead(uncalled));
+				myRead2 = static_cast< SeqRead<TString, TIDString>* >(m_f2->getRead(uncalled2));
 				
-				if(m_useBarcodeRead) myBarcode = static_cast< SequencingRead<TString, TIDString>* >(m_b->getRead(uBR));
+				if(m_useBarcodeRead) myBarcode = static_cast< SeqRead<TString, TIDString>* >(m_b->getRead(uBR));
 				
 				// end of files reached
 				if(myRead1 == NULL && myRead2 == NULL) return NULL;
@@ -135,7 +135,7 @@ public:
 			if(m_useBarcodeRead) myBarcode->setSequenceTag(tagCount);
 		}
 		
-		return new MultiplexedRead<TString, TIDString>(myRead1, myRead2, myBarcode);
+		return new PairedRead<TString, TIDString>(myRead1, myRead2, myBarcode);
 	}
 	
 	

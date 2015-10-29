@@ -14,7 +14,7 @@
 #include <tbb/concurrent_vector.h>
 
 #include "Enums.h"
-#include "SequencingRead.h"
+#include "SeqRead.h"
 #include "AdapterLoader.h"
 
 
@@ -83,7 +83,7 @@ public:
 		using seqan::infix;
 		
 		
-		SequencingRead<TString, TIDString> &myRead = *static_cast< SequencingRead<TString, TIDString>* >(item);
+		SeqRead<TString, TIDString> &myRead = *static_cast< SeqRead<TString, TIDString>* >(item);
 		
 		int fmismatches, fgapsR, fgapsA, foverlapLength, fqueryLength, ftailLength;
 		int fstartPos, fstartPosA, fstartPosS, fendPos, fendPosS, fendPosA;

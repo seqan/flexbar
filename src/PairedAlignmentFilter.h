@@ -1,11 +1,11 @@
 /*
- *   MultiplexedAlignmentFilter.h
+ *   PairedAlignmentFilter.h
  *
  *   Authors: mat and jtr
  */
 
-#ifndef FLEXBAR_MULTIPLEXEDALIGNMENTFILTER_H
-#define FLEXBAR_MULTIPLEXEDALIGNMENTFILTER_H
+#ifndef FLEXBAR_PAIREDALIGNMENTFILTER_H
+#define FLEXBAR_PAIREDALIGNMENTFILTER_H
 
 #include <string>
 
@@ -14,14 +14,14 @@
 
 #include "Enums.h"
 #include "Options.h"
-#include "MultiplexedRead.h"
+#include "PairedRead.h"
 #include "AlignmentFilter.h"
 #include "AlignmentAlgorithm.h"
 #include "AdapterLoader.h"
 
 
 template <typename TString, typename TIDString>
-class MultiplexedAlignmentFilter : public tbb::filter {
+class PairedAlignmentFilter : public tbb::filter {
 
 private:
 	
@@ -44,7 +44,7 @@ private:
 	
 public:
 	
-	MultiplexedAlignmentFilter(Options &o) :
+	PairedAlignmentFilter(Options &o) :
 		
 		filter(parallel),
 		m_verb(o.logLevel),
@@ -73,7 +73,7 @@ public:
 	}
 	
 	
-	virtual ~MultiplexedAlignmentFilter(){
+	virtual ~PairedAlignmentFilter(){
 		delete m_bfilter;
 		delete m_afilter;
 		delete m_b2filter;
@@ -86,7 +86,7 @@ public:
 		using namespace flexbar;
 		
 		if(item != NULL){
-			MultiplexedRead<TString, TIDString> *myRead = static_cast< MultiplexedRead<TString, TIDString>* >(item);
+			PairedRead<TString, TIDString> *myRead = static_cast< PairedRead<TString, TIDString>* >(item);
 			
 			bool skipAdapRem = false;
 			

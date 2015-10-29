@@ -1,11 +1,11 @@
 /*
- *   SequenceOutputFilter.h
+ *   SeqOutputFilter.h
  *
  *   Authors: mat and jtr
  */
 
-#ifndef FLEXBAR_SEQUENCEOUTPUTFILTER_H
-#define FLEXBAR_SEQUENCEOUTPUTFILTER_H
+#ifndef FLEXBAR_SEQOUTPUTFILTER_H
+#define FLEXBAR_SEQOUTPUTFILTER_H
 
 #include <fstream>
 
@@ -13,11 +13,11 @@
 
 #include "Enums.h"
 #include "FlexbarIO.h"
-#include "SequencingRead.h"
+#include "SeqRead.h"
 
 
 template <typename TString, typename TIDString, typename TStream>
-class SequenceOutputFilter {
+class SeqOutputFilter {
 
 private:
 	
@@ -38,7 +38,7 @@ private:
 	
 public:
 	
-	SequenceOutputFilter(const std::string &filePath, const TIDString tagStr, const bool alwaysFile, const Options &o) :
+	SeqOutputFilter(const std::string &filePath, const TIDString tagStr, const bool alwaysFile, const Options &o) :
 		m_format(o.format),
 		m_tagStr(tagStr),
 		m_minLength(o.min_readLen),
@@ -62,7 +62,7 @@ public:
 	};
 	
 	
-	virtual ~SequenceOutputFilter(){
+	virtual ~SeqOutputFilter(){
 		if(! m_useStdout) closeFile(m_targetStream);
 		delete m_lengthDist;
 	};
@@ -97,7 +97,7 @@ public:
 	}
 	
 	
-	void writeFastString(const SequencingRead<TString, TIDString>& myRead){
+	void writeFastString(const SeqRead<TString, TIDString>& myRead){
 		
 		using namespace std;
 		using namespace flexbar;
@@ -162,7 +162,7 @@ public:
 		using namespace flexbar;
 		
 		if(item){
-			SequencingRead<TString, TIDString> *myRead = static_cast< SequencingRead<TString, TIDString>* >(item);
+			SeqRead<TString, TIDString> *myRead = static_cast< SeqRead<TString, TIDString>* >(item);
 			
 			unsigned int readLength = length(myRead->getSequence());
 			

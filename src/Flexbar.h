@@ -24,11 +24,11 @@
 #include "Options.h"
 #include "FlexbarIO.h"
 #include "AdapterLoader.h"
-#include "SequencingRead.h"
-#include "SequenceInputFilter.h"
-#include "MultiplexedInputFilter.h"
-#include "MultiplexedOutputFilter.h"
-#include "MultiplexedAlignmentFilter.h"
+#include "SeqRead.h"
+#include "SeqInputFilter.h"
+#include "PairedInputFilter.h"
+#include "PairedOutputFilter.h"
+#include "PairedAlignmentFilter.h"
 
 
 void loadBarcodes(Options &o, const bool secondSet){
@@ -44,7 +44,7 @@ void loadBarcodes(Options &o, const bool secondSet){
 		
 		string barFile = secondSet ? o.barcode2File : o.barcodeFile;
 		
-		SequenceInputFilter<CharString, CharString, fstream> adapter_filter(o, barFile, true, false, false);
+		SeqInputFilter<CharString, CharString, fstream> adapter_filter(o, barFile, true, false, false);
 		bpipeline.add_filter(adapter_filter);
 		
 		AdapterLoader<CharString, CharString> adapterLoader(o, false);
@@ -90,7 +90,7 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 			
 			string adapFile = secondSet ? o.adapter2File : o.adapterFile;
 			
-			SequenceInputFilter<CharString, CharString, fstream> adapter_filter(o, adapFile, true, false, false);
+			SeqInputFilter<CharString, CharString, fstream> adapter_filter(o, adapFile, true, false, false);
 			prepipe.add_filter(adapter_filter);
 			prepipe.add_filter(adapterLoader);
 			prepipe.run(1);
@@ -115,8 +115,8 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 		else{
 			CharString adapterSeq = o.adapterSeq;
 			
-			SequencingRead<CharString, CharString> *myRead;
-			myRead = new SequencingRead<CharString, CharString>(adapterSeq, "cmdline");
+			SeqRead<CharString, CharString> *myRead;
+			myRead = new SeqRead<CharString, CharString>(adapterSeq, "cmdline");
 			
 			TAdapter adap;
 			adap.first = myRead;
@@ -126,8 +126,8 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 				CharString adapterSeqRC = o.adapterSeq;
 				seqan::reverseComplement(adapterSeqRC);
 				
-				SequencingRead<CharString, CharString> *myReadRC;
-				myReadRC = new SequencingRead<CharString, CharString>(adapterSeqRC, "cmdline revcomp");
+				SeqRead<CharString, CharString> *myReadRC;
+				myReadRC = new SeqRead<CharString, CharString>(adapterSeqRC, "cmdline revcomp");
 				
 				TAdapter adapRC;
 				adapRC.first = myReadRC;
@@ -239,9 +239,9 @@ void startProcessing(Options &o){
 	
 	if(o.logLevel != NONE) *out << "\n\nLog level " << o.logLevelStr << " output generation:\n\n" << endl;
 	
-	MultiplexedInputFilter<TString, TIDString, TStreamR, TStreamP, TStreamB> inputFilter(o);
-	MultiplexedAlignmentFilter<TString, TIDString> alignFilter(o);
-	MultiplexedOutputFilter<TString, TIDString, TStreamOut> outputFilter(o);
+	PairedInputFilter<TString, TIDString, TStreamR, TStreamP, TStreamB> inputFilter(o);
+	PairedAlignmentFilter<TString, TIDString> alignFilter(o);
+	PairedOutputFilter<TString, TIDString, TStreamOut> outputFilter(o);
 	
 	tbb::task_scheduler_init init_serial(o.nThreads);
 	tbb::pipeline pipe;

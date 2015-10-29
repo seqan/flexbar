@@ -1,15 +1,15 @@
 /*
- *   SequencingRead.h
+ *   SeqRead.h
  *
  *   Author: mat and jtr
  */
 
-#ifndef FLEXBAR_SEQUENCINGREAD_H
-#define FLEXBAR_SEQUENCINGREAD_H
+#ifndef FLEXBAR_SEQREAD_H
+#define FLEXBAR_SEQREAD_H
 
 
 template <typename TString, typename TIDString>
-class SequencingRead {
+class SeqRead {
 
 private:
 	
@@ -18,17 +18,17 @@ private:
 	
 public:
 	
-	SequencingRead()
+	SeqRead()
     	: m_tag(),
       	  m_seq(){
 	}
 	
-	SequencingRead(const TString& source, const TIDString& sequence_tag)
+	SeqRead(const TString& source, const TIDString& sequence_tag)
 		: m_tag(sequence_tag),
 		  m_seq(source){
 	}
 	
-	SequencingRead(const TString& source, const TIDString& sequence_tag, const TIDString& qual)
+	SeqRead(const TString& source, const TIDString& sequence_tag, const TIDString& qual)
 		: m_tag(sequence_tag),
 		  m_seq(source),
 		  m_qual(qual){
@@ -61,7 +61,7 @@ public:
 	}
 	
 	
-	virtual ~SequencingRead(){};
+	virtual ~SeqRead(){};
 	
 };
 

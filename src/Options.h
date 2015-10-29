@@ -16,10 +16,10 @@
 #include <seqan/arg_parse.h>
 
 #include "Enums.h"
-#include "SequencingRead.h"
+#include "SeqRead.h"
 
 
-typedef std::pair< SequencingRead<seqan::CharString, seqan::CharString>*,
+typedef std::pair< SeqRead<seqan::CharString, seqan::CharString>*,
                    std::pair< tbb::atomic<unsigned long>, tbb::atomic<unsigned long> > > TAdapter;
 
 struct Options{
