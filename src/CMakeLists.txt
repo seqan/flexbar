@@ -1,12 +1,7 @@
 cmake_minimum_required( VERSION 2.8.2 )
 
-include_directories( ${FLEXBAR_SOURCE_DIR}/include )
-# link_directories( ${FLEXBAR_SOURCE_DIR}/lib )
-
-
 if( CMAKE_SIZEOF_VOID_P MATCHES "8" )
 	message( STATUS "Flexbar 64 bit architecture" )
-	
 	# if( WIN32 )
 	# 	link_directories( ${FLEXBAR_SOURCE_DIR}/lib/win64 )
 	# elseif( ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" )
@@ -16,7 +11,6 @@ if( CMAKE_SIZEOF_VOID_P MATCHES "8" )
 	# endif()
 else()
 	message( STATUS "Flexbar 32 bit architecture" )
-	
 	# if( WIN32 )
 	# 	link_directories( ${FLEXBAR_SOURCE_DIR}/lib/win32 )
 	# else()
