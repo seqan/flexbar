@@ -22,9 +22,9 @@ private:
 	const bool m_isPaired, m_useBarcodeRead, m_useNumberTag;
 	tbb::atomic<unsigned long> m_uncalled, m_uncalledPairs, m_tagCounter;
 	
-	SeqInputFilter<TSeqStr, TSeqStr, TStreamR> *m_f1;
-	SeqInputFilter<TSeqStr, TSeqStr, TStreamP> *m_f2;
-	SeqInputFilter<TSeqStr, TSeqStr, TStreamB> *m_b;
+	SeqInputFilter<TSeqStr, TString, TStreamR> *m_f1;
+	SeqInputFilter<TSeqStr, TString, TStreamP> *m_f2;
+	SeqInputFilter<TSeqStr, TString, TStreamB> *m_b;
 	
 public:
 	
@@ -39,17 +39,17 @@ public:
 		m_uncalled      = 0;
 		m_uncalledPairs = 0;
 		
-		m_f1 = new SeqInputFilter<TSeqStr, TSeqStr, TStreamR>(o, o.readsFile, false, true, o.useStdin);
+		m_f1 = new SeqInputFilter<TSeqStr, TString, TStreamR>(o, o.readsFile, false, true, o.useStdin);
 		
 		m_f2 = NULL;
 		m_b  = NULL;
 		
 		if(m_isPaired){
-			m_f2 = new SeqInputFilter<TSeqStr, TSeqStr, TStreamP>(o, o.readsFile2, false, true, false);
+			m_f2 = new SeqInputFilter<TSeqStr, TString, TStreamP>(o, o.readsFile2, false, true, false);
 		}
 		
 		if(m_useBarcodeRead){
-			m_b = new SeqInputFilter<TSeqStr, TSeqStr, TStreamB>(o, o.barReadsFile, false, false, false);
+			m_b = new SeqInputFilter<TSeqStr, TString, TStreamB>(o, o.barReadsFile, false, false, false);
 		}
 	}
 	
@@ -128,7 +128,7 @@ public:
 		if(m_useNumberTag){
 			stringstream converter;
 			converter << ++m_tagCounter;
-			TSeqStr tagCount = converter.str();
+			TString tagCount = converter.str();
 			
 			myRead1->setSequenceTag(tagCount);
 			if(m_isPaired) myRead2->setSequenceTag(tagCount);

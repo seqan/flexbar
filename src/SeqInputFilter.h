@@ -162,8 +162,8 @@ public:
 		
 		SeqRead<TSeqStr, TString> *myRead = NULL;
 		
-		TSeqStr source = "", quality = "", dummy = "";
-		TString tag = "";
+		TSeqStr source = "";
+		TString tag = "", quality = "", dummy = "";
 		
 		if(! atStreamEnd()){
 			
@@ -348,7 +348,7 @@ public:
 		itEnd = end(source);
 		
 		while(it != itEnd){
-			 if(*it == '.' || *it == 'N') n++;
+			 if(*it == 'N') n++;
 			 ++it;
 		}
 		
@@ -356,7 +356,7 @@ public:
 	}
  	
 	
-	void qualityTrimming(TSeqStr &source, TSeqStr &quality){
+	void qualityTrimming(TSeqStr &source, TString &quality){
 		
 		using namespace seqan;
 		

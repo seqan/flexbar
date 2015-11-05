@@ -120,7 +120,7 @@ public:
 		*out << adapterName << ":" << string(maxSpaceLen - len, ' ') << "Sequence:" << "\n";
 		
 		for(unsigned int i=0; i < adapters.size(); ++i){
-			TSeqStr seqTag = adapters.at(i).first->getSequenceTag();
+			TString seqTag = adapters.at(i).first->getSequenceTag();
 			
 			int whiteSpaceLen = maxSpaceLen - length(seqTag);
 			if(whiteSpaceLen < 2) whiteSpaceLen = 2;

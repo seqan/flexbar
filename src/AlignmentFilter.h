@@ -94,9 +94,11 @@ public:
 		float fallowedErrors;
 		
 		stringstream ss;
-		TSeqStr seqread, quality, finalAliStr, finalRandTag;
+		TSeqStr seqread, finalRandTag;
 		
-		TSeqStr readTag = myRead.getSequenceTag();
+		TString quality, finalAliStr;
+		
+		TString readTag = myRead.getSequenceTag();
 		
 		seqread = myRead.getSequence();
 		quality = "";
@@ -275,7 +277,7 @@ public:
 				}
 				
 				if(m_writeTag){
-					TSeqStr newTag = myRead.getSequenceTag();
+					TString newTag = myRead.getSequenceTag();
 					append(newTag, "_Flexbar_removal");
 					
 					if(! m_isBarcoding){
@@ -295,7 +297,7 @@ public:
 			// valid alignment, not neccesarily removal
 			
 			if(m_randTag && finalRandTag != ""){
-				TSeqStr newTag = myRead.getSequenceTag();
+				TString newTag = myRead.getSequenceTag();
 				append(newTag, "_");
 				append(newTag, finalRandTag);
 				myRead.setSequenceTag(newTag);
@@ -303,7 +305,7 @@ public:
 			
 			
 			// alignment stats
-			TSeqStr queryTag = m_queries->at(qIndex).first->getSequenceTag();
+			TString queryTag = m_queries->at(qIndex).first->getSequenceTag();
 			
 			if(m_verb == ALL || (m_verb == MOD && performRemoval)){
 				

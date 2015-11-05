@@ -148,7 +148,6 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	addOption(parser, ArgParseOption("t", "target", "Prefix for output file names or paths.", ARG::STRING));
 	addOption(parser, ArgParseOption("r", "reads", "Fasta/q file or stdin (-) with reads that may contain barcodes.", ARG::INPUTFILE));
 	addOption(parser, ArgParseOption("p", "reads2", "Second input file of paired reads, gz and bz2 files supported.", ARG::INPUTFILE));
-	// addOption(parser, ArgParseOption("f", "format", "Quality format: sanger, solexa, i1.3, i1.5, i1.8 (illumina 1.8+).", ARG::STRING));
 	
 	addSection(parser, "Barcode detection");
 	addOption(parser, ArgParseOption("b",  "barcodes", "Fasta file with barcodes for demultiplexing, may contain N.", ARG::INPUTFILE));
@@ -192,7 +191,6 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	addOption(parser, ArgParseOption("u", "max-uncalled", "Allowed uncalled bases (N or .) for each read.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("x", "pre-trim-left", "Trim given number of bases on 5' read end before detection.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("y", "pre-trim-right", "Trim specified number of bases on 3' end prior to detection.", ARG::INTEGER));
-	// addOption(parser, ArgParseOption("q", "pre-trim-phred", "Trim 3' end until specified or higher quality reached.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("k", "post-trim-length", "Trim to specified read length from 3' end after removal.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("m", "min-read-length", "Minimum read length to remain after removal.", ARG::INTEGER));
 	
@@ -241,7 +239,6 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	hideOption(parser, "adapter-mismatch");
 	hideOption(parser, "adapter-gap");
 	
-	// hideOption(parser, "qtrim-win-mean");
 	hideOption(parser, "qtrim-win-size");
 	hideOption(parser, "qtrim-post-removal");
 	
@@ -253,7 +250,7 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	hideOption(parser, "random-tags");
 	
 	
-	// setCategory(parser, "Trimming");
+	setCategory(parser, "Trimming");
 	// setRequired(parser, "reads");
 	// setMinValue(parser, "threads", "1");
 	// setValidValues(parser, "qtrim-format", "sanger solexa i1.3 i1.5 i1.8");
@@ -379,7 +376,6 @@ void parseCommandLine(seqan::ArgumentParser &parser, std::string version, int ar
 		hideOption(parser, "adapter-gap",         false);
 		
 		hideOption(parser, "qtrim-win-size",      false);
-		// hideOption(parser, "qtrim-win-mean",      false);
 		// hideOption(parser, "qtrim-post-removal",  false);
 		
 		hideOption(parser, "adapters2",    false);

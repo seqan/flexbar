@@ -66,8 +66,6 @@ void closeFile(std::fstream &strm){
 void openInputFile(seqan::Stream<seqan::GZFile> &strm, std::string path){
 	using namespace std;
 	
-	// if(path == "-.gz") path = "-";
-	
 	if(! open(strm, path.c_str(), "rb")){
 		cerr << "Error opening gzip file: " << path << "\n" << endl;
 		exit(1);
@@ -76,11 +74,6 @@ void openInputFile(seqan::Stream<seqan::GZFile> &strm, std::string path){
 
 void openOutputFile(seqan::Stream<seqan::GZFile> &strm, std::string path){
 	using namespace std;
-	
-	// bool ok;
-	// 
-	// if(path == "-") ok = open(strm, path.c_str(), "w");
-	// else            ok = open(strm, path.c_str(), "wb");
 	
 	if(! open(strm, path.c_str(), "wb")){
 		cerr << "Error opening gzip file: " << path << "\n" << endl;
@@ -97,8 +90,6 @@ void closeFile(seqan::Stream<seqan::GZFile> &strm){}
 
 void openInputFile(seqan::Stream<seqan::BZ2File> &strm, std::string path){
 	using namespace std;
-	
-	// if(path == "-.bz2") path = "-";
 	
 	if(! open(strm, path.c_str(), "rb")){
 		cerr << "Error opening bz2 file: " << path << "\n" << endl;

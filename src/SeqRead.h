@@ -35,7 +35,7 @@ public:
 	}
 	
 	
-	void setSequenceTag(const TSeqStr& tag){
+	void setSequenceTag(const TString& tag){
 		m_tag = tag;
 	}
 	
@@ -43,7 +43,7 @@ public:
 		m_seq = seq;
 	}
 	
-	void setQuality(const TSeqStr& qual){
+	void setQuality(const TString& qual){
 		m_qual = qual;
 	}
 	
