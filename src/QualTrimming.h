@@ -68,7 +68,7 @@ struct Window {
 
 inline unsigned getQuality(const seqan::CharString& seq, unsigned i)
 {
-	return seq[i];
+	return static_cast<int>(seq[i]);
 }
 
 
@@ -138,7 +138,7 @@ unsigned _qualTrim(const TSeq& seq, unsigned const cutoff, BWA const &)
 
 
 template <typename TSeq>
-unsigned qualTrim(TSeq& seq, const flexbar::QualTrimType qtrim, const int cutoff, const int wSize)
+unsigned qualTrim(const TSeq& seq, const flexbar::QualTrimType qtrim, const int cutoff, const int wSize)
 {
 	unsigned cut_pos;
 	
@@ -160,9 +160,6 @@ unsigned qualTrim(TSeq& seq, const flexbar::QualTrimType qtrim, const int cutoff
 // {
 // 	return seqan::getQualityValue(seq[i]);
 // }
-
-// template <typename TSeq>
-// unsigned _trimRead(const TSeq& seq, unsigned const cutoff, Tail const &) noexcept
 
 // template <typename TSeq, typename TSpec>
 // unsigned trimRead(TSeq& seq, unsigned const cutoff, TSpec const & spec) noexcept

@@ -560,21 +560,19 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 			exit(1);
 		}
 		
-		if(isSet(parser, "qtrim-threshold")){
-			getOptionValue(o.qtrimThresh, parser, "qtrim-threshold");
+		getOptionValue(o.qtrimThresh, parser, "qtrim-threshold");
+		
+		if(o.qtrimThresh > 0){
+			*out << "qtrim-threshold:       " << o.qtrimThresh;
 			
-			if(o.qtrimThresh > 0){
-				*out << "qtrim-threshold:       " << o.qtrimThresh;
-				
-				switch(o.qual){
-					case SANGER:      o.qtrimThresh += 33;
-						break;
-					case SOLEXA:      o.qtrimThresh += 59;
-						break;
-					case ILLUMINA13:  o.qtrimThresh += 64;
-				}
-				*out << "  (" << o.qtrimThresh << ")" << endl;
+			switch(o.qual){
+				case SANGER:      o.qtrimThresh += 33;
+					break;
+				case SOLEXA:      o.qtrimThresh += 59;
+					break;
+				case ILLUMINA13:  o.qtrimThresh += 64;
 			}
+			*out << "  (" << o.qtrimThresh << ")" << endl;
 		}
 		
 		if(o.qTrim == WIN || o.qTrim == WINTAIL){

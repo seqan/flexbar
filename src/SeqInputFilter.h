@@ -360,9 +360,7 @@ public:
 		
 		using namespace seqan;
 		
-		unsigned cut_pos;
-		
-		cut_pos = qualTrim(quality, m_qtrim, m_qtrimThresh, m_qtrimWinSize);
+		unsigned cut_pos = qualTrim(quality, m_qtrim, m_qtrimThresh, m_qtrimWinSize);
 		
 		if(cut_pos < length(quality)){
 			
@@ -371,30 +369,6 @@ public:
 			source  = prefix(source,  cut_pos);
 			quality = prefix(quality, cut_pos);
 		}
-		
-		// typename Iterator<TSeqStr >::Type it, itEnd;
-		//
-		// it    = begin(quality);
-		// itEnd = end(quality);
-		//
-		// --itEnd;
-		//
-		// unsigned int n = length(quality);
-		//
-		// bool nChanged = false;
-		//
-		// while(itEnd != it){
-		// 	if(static_cast<int>(*itEnd) >= m_qtrimThresh) break;
-		// 	--n;
-		// 	--itEnd;
-		//
-		// 	if(! nChanged){
-		// 		m_nLowPhred++;
-		// 		nChanged = true;
-		// 	}
-		// }
-		// source  = prefix(source,  n);
-		// quality = prefix(quality, n);
 	}
 	
 	
