@@ -30,9 +30,10 @@ struct Options{
 	
 	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, randTag;
 	bool switch2Fasta, writeUnassigned, writeSingleReads, writeLengthDist;
-	bool useStdin, useStdout, relaxRegion, revCompAdapter;
+	bool useStdin, useStdout, relaxRegion, revCompAdapter, qtrimPostRm;
 	
-	int cutLen_begin, cutLen_end, phred_preQual, cutLen_read, a_tail_len, b_tail_len;
+	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len;
+	int qtrimThresh, qtrimWinSize;
 	int maxUncalled, min_readLen, a_min_overlap, b_min_overlap, nThreads;
 	int match, mismatch, gapCost, b_match, b_mismatch, b_gapCost;
 	
@@ -41,6 +42,7 @@ struct Options{
 	flexbar::TrimEnd         end, b_end;
 	flexbar::FileFormat      format;
 	flexbar::QualityType     qual;
+	flexbar::QualTrimType    qTrim;
 	flexbar::LogLevel        logLevel;
 	flexbar::CompressionType cmprsType;
 	flexbar::RunType         runType;
@@ -53,7 +55,6 @@ struct Options{
 	std::fstream fstrmOut;
 	
 	Options(){
-		
 		readsFile      = "";
 		readsFile2     = "";
 		barReadsFile   = "";
@@ -76,17 +77,20 @@ struct Options{
 		useStdout        = false;
 		relaxRegion      = false;
 		revCompAdapter   = false;
+		qtrimPostRm      = false;
 		
 		cutLen_begin  = 0;
 		cutLen_end    = 0;
 		cutLen_read   = 0;
-		phred_preQual = 0;
+		qtrimThresh   = 0;
+		qtrimWinSize  = 0;
 		a_tail_len    = 0;
 		b_tail_len    = 0;
 		b_min_overlap = 0;
 		
 		format    = flexbar::FASTA;
 		qual      = flexbar::SANGER;
+		qTrim     = flexbar::QOFF;
 		logLevel  = flexbar::NONE;
 		cmprsType = flexbar::UNCOMPRESSED;
 		barDetect = flexbar::BOFF;
@@ -144,7 +148,7 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	addOption(parser, ArgParseOption("t", "target", "Prefix for output file names or paths.", ARG::STRING));
 	addOption(parser, ArgParseOption("r", "reads", "Fasta/q file or stdin (-) with reads that may contain barcodes.", ARG::INPUTFILE));
 	addOption(parser, ArgParseOption("p", "reads2", "Second input file of paired reads, gz and bz2 files supported.", ARG::INPUTFILE));
-	addOption(parser, ArgParseOption("f", "format", "Quality format: sanger, solexa, i1.3, i1.5, i1.8 (illumina 1.8+).", ARG::STRING));
+	// addOption(parser, ArgParseOption("f", "format", "Quality format: sanger, solexa, i1.3, i1.5, i1.8 (illumina 1.8+).", ARG::STRING));
 	
 	addSection(parser, "Barcode detection");
 	addOption(parser, ArgParseOption("b",  "barcodes", "Fasta file with barcodes for demultiplexing, may contain N.", ARG::INPUTFILE));
@@ -180,7 +184,6 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	// addOption(parser, ArgParseOption("jo", "join-min-overlap", "Minimum overlap of adapter and read sequence.", ARG::INTEGER));
 	// addOption(parser, ArgParseOption("jn", "join-max-overlap", "Region size for tail trim-end modes. Default: adapter length.", ARG::INTEGER));
 	// addOption(parser, ArgParseOption("jt", "join-threshold", "Allowed mismatches and gaps per 10 bases overlap.", ARG::DOUBLE));
-	
 	// addOption(parser, ArgParseOption("jm", "join-match", "Alignment match score.", ARG::INTEGER));
 	// addOption(parser, ArgParseOption("ji", "join-mismatch", "Alignment mismatch score.", ARG::INTEGER));
 	// addOption(parser, ArgParseOption("jg", "join-gap", "Alignment gap score.", ARG::INTEGER));
@@ -189,9 +192,17 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	addOption(parser, ArgParseOption("u", "max-uncalled", "Allowed uncalled bases (N or .) for each read.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("x", "pre-trim-left", "Trim given number of bases on 5' read end before detection.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("y", "pre-trim-right", "Trim specified number of bases on 3' end prior to detection.", ARG::INTEGER));
-	addOption(parser, ArgParseOption("q", "pre-trim-phred", "Trim 3' end until specified or higher quality reached.", ARG::INTEGER));
+	// addOption(parser, ArgParseOption("q", "pre-trim-phred", "Trim 3' end until specified or higher quality reached.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("k", "post-trim-length", "Trim to specified read length from 3' end after removal.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("m", "min-read-length", "Minimum read length to remain after removal.", ARG::INTEGER));
+	
+	addSection(parser, "Quality-based trimming");
+	addOption(parser, ArgParseOption("q",  "qtrim", "Quality-based trimming mode.", ARG::STRING));
+	addOption(parser, ArgParseOption("qf", "qtrim-format", "Quality format: sanger, solexa, i1.3, i1.5, i1.8 (illumina).", ARG::STRING));
+	addOption(parser, ArgParseOption("qt", "qtrim-threshold", "Minimum quality as threshold for trimming.", ARG::INTEGER));
+	// addOption(parser, ArgParseOption("qm", "qtrim-win-mean", "Different threshold for min mean quality of window.", ARG::INTEGER));
+	addOption(parser, ArgParseOption("qw", "qtrim-win-size", "Region size for sliding window approach.", ARG::INTEGER));
+	addOption(parser, ArgParseOption("qa", "qtrim-post-removal", "Perform quality-based trimming after removal steps."));
 	
 	addSection(parser, "Output selection");
 	addOption(parser, ArgParseOption("o", "fasta-output", "Prefer non-quality format fasta for output."));
@@ -230,6 +241,10 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	hideOption(parser, "adapter-mismatch");
 	hideOption(parser, "adapter-gap");
 	
+	// hideOption(parser, "qtrim-win-mean");
+	hideOption(parser, "qtrim-win-size");
+	hideOption(parser, "qtrim-post-removal");
+	
 	hideOption(parser, "man");
 	hideOption(parser, "version");
 	hideOption(parser, "stdout-reads");
@@ -241,7 +256,7 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	// setCategory(parser, "Trimming");
 	// setRequired(parser, "reads");
 	// setMinValue(parser, "threads", "1");
-	// setValidValues(parser, "format", "sanger solexa i1.3 i1.5 i1.8");
+	// setValidValues(parser, "qtrim-format", "sanger solexa i1.3 i1.5 i1.8");
 	
 	// setValidValues(parser, "target", "fasta fa fastq fq");
 	// setValidValues(parser, "reads", "fasta fa fastq fq");
@@ -268,11 +283,13 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	// setMinValue(parser, "max-uncalled",     "0");
 	// setMinValue(parser, "pre-trim-left",    "1");
 	// setMinValue(parser, "pre-trim-right",   "1");
-	// setMinValue(parser, "pre-trim-phred",   "0");
 	// setMinValue(parser, "post-trim-length", "1");
-	// setMinValue(parser, "min-read-length",   "1");
+	// setMinValue(parser, "min-read-length",  "1");
+	// 
+	// setMinValue(parser, "qtrim-threshold",  "0");
 	
 	
+	setValidValues(parser, "qtrim", "TAIL WIN BWA");
 	setValidValues(parser, "log-level", "ALL MOD TAB");
 	setValidValues(parser, "zip-output", "GZ BZ2");
 	setValidValues(parser, "adapter-read-set", "1 2");
@@ -295,10 +312,12 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	setDefaultValue(parser, "adapter-mismatch",   "-1");
 	setDefaultValue(parser, "adapter-gap",        "-6");
 	
+	setDefaultValue(parser, "qtrim-threshold",    "20");
+	setDefaultValue(parser, "qtrim-win-size",     "5");
 	
 	addTextSection(parser, "EXAMPLES");
 	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq \\fB-t\\fP target \\fB-b\\fP brc.fa \\fB-be\\fP LEFT_TAIL \\fB-a\\fP adp.fa", false);
-	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq.gz \\fB-f\\fP i1.8 \\fB-q\\fP 20 \\fB-a\\fP adp.fa \\fB-ao\\fP 5 \\fB-at\\fP 4");
+	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq.gz \\fB-q\\fP TAIL \\fB-qf\\fP i1.8 \\fB-a\\fP adp.fa \\fB-ao\\fP 5 \\fB-at\\fP 4");
 }
 
 
@@ -359,6 +378,10 @@ void parseCommandLine(seqan::ArgumentParser &parser, std::string version, int ar
 		hideOption(parser, "adapter-mismatch",    false);
 		hideOption(parser, "adapter-gap",         false);
 		
+		hideOption(parser, "qtrim-win-size",      false);
+		// hideOption(parser, "qtrim-win-mean",      false);
+		// hideOption(parser, "qtrim-post-removal",  false);
+		
 		hideOption(parser, "adapters2",    false);
 		hideOption(parser, "version",      false);
 		hideOption(parser, "stdout-reads", false);
@@ -404,29 +427,6 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 	*out << endl;
 	
 	
-	if(o.format == FASTQ && isSet(parser, "format")){
-		
-		string quality;
-		getOptionValue(quality, parser, "format");
-		
-		     if(quality == "sanger") o.qual = SANGER;
-		else if(quality == "solexa") o.qual = SOLEXA;
-		else if(quality == "i1.3")   o.qual = ILLUMINA13;
-		else if(quality == "i1.5")   o.qual = ILLUMINA13;
-		else if(quality == "i1.8")   o.qual = SANGER;
-		else{
-			cerr << "\n\n" << "Specified quality format is unknown!\n" << endl;
-			exit(1);
-		}
-		*out << "Quality format:        " << quality << endl;
-	}
-	else if(o.format == FASTQ){
-		if(isSet(parser, "pre-trim-phred")){
-			cerr << "\n\n" << "Specify fastq format for quality based trimming.\n" << endl;
-			exit(1);
-		}
-	}
-	
 	getOptionValue(o.readsFile, parser, "reads");
 	*out << "Reads file:            ";
 	
@@ -434,9 +434,7 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 		*out << "stdin" << endl;
 		o.useStdin = true;
 	}
-	// else if(o.readsFile == "-.gz")  *out << "stdin gz"  << endl;
-	// else if(o.readsFile == "-.bz2") *out << "stdin bz2" << endl;
-	else                            *out << o.readsFile << endl;
+	else *out << o.readsFile << endl;
 	
 	o.runType = SINGLE;
 	
@@ -516,23 +514,6 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 		*out << "pre-trim-right:        " << o.cutLen_end << endl;
 	}
 	
-	if(isSet(parser, "pre-trim-phred") && o.format == FASTQ){
-		getOptionValue(o.phred_preQual, parser, "pre-trim-phred");
-		
-		if(o.phred_preQual > 0){
-			*out << "pre-trim-phred:        " << o.phred_preQual;
-			
-			switch(o.qual){
-				case SANGER:      o.phred_preQual += 33;
-					break;
-				case SOLEXA:      o.phred_preQual += 59;
-					break;
-				case ILLUMINA13:  o.phred_preQual += 64;
-			}
-			*out << "  (" << o.phred_preQual << ")" << endl;
-		}
-	}
-	
 	if(isSet(parser, "post-trim-length")){
 		getOptionValue(o.cutLen_read, parser, "post-trim-length");
 		*out << "post-trim-length:      " << o.cutLen_read << endl;
@@ -542,7 +523,76 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 	*out << "min-read-length:       " << o.min_readLen << endl;
 	
 	
-	// logging and tagging options
+	// quality-based trimming
+	
+	if(isSet(parser, "qtrim") && o.format == FASTQ){
+		
+		string qt;
+		getOptionValue(qt, parser, "qtrim");
+		
+		     if(qt == "TAIL") o.qTrim = TAIL;
+ 		else if(qt == "WIN")  o.qTrim = WIN;
+ 		else if(qt == "BWA")  o.qTrim = BWA;
+		else{
+			cerr << "\n\n" << "Specified qtrim mode is unknown!\n" << endl;
+			exit(1);
+		}
+		*out << "qtrim:                 " << qt << endl;
+		
+		if(isSet(parser, "qtrim-format")){
+			
+			string quality;
+			getOptionValue(quality, parser, "qtrim-format");
+			
+			     if(quality == "sanger") o.qual = SANGER;
+			else if(quality == "solexa") o.qual = SOLEXA;
+			else if(quality == "i1.3")   o.qual = ILLUMINA13;
+			else if(quality == "i1.5")   o.qual = ILLUMINA13;
+			else if(quality == "i1.8")   o.qual = SANGER;
+			else{
+				cerr << "\n\n" << "Specified quality format is unknown!\n" << endl;
+				exit(1);
+			}
+			*out << "qtrim-format:          " << quality << endl;
+		}
+		else{
+			cerr << "\n\n" << "Specify qtrim-format for quality-based trimming.\n" << endl;
+			exit(1);
+		}
+		
+		if(isSet(parser, "qtrim-threshold")){
+			getOptionValue(o.qtrimThresh, parser, "qtrim-threshold");
+			
+			if(o.qtrimThresh > 0){
+				*out << "qtrim-threshold:       " << o.qtrimThresh;
+				
+				switch(o.qual){
+					case SANGER:      o.qtrimThresh += 33;
+						break;
+					case SOLEXA:      o.qtrimThresh += 59;
+						break;
+					case ILLUMINA13:  o.qtrimThresh += 64;
+				}
+				*out << "  (" << o.qtrimThresh << ")" << endl;
+			}
+		}
+		
+		if(o.qTrim == WIN || o.qTrim == WINTAIL){
+			
+			// if(isSet(parser, "qtrim-win-mean")){
+			// 	getOptionValue(o.qtrimWinMean, parser, "qtrim-win-mean");
+			// 	*out << "qtrim-win-mean:        " << o.qtrimWinMean << endl;
+			// }
+			
+			getOptionValue(o.qtrimWinSize, parser, "qtrim-win-size");
+			*out << "qtrim-win-size:        " << o.qtrimWinSize << endl;
+		}
+		
+		if(isSet(parser, "qtrim-post-removal")) o.qtrimPostRm = true;
+	}
+	
+	
+	// output, logging and tagging options
 	
 	if(isSet(parser, "log-level")){
 		getOptionValue(o.logLevelStr, parser, "log-level");
@@ -572,11 +622,11 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 		}
 	}
 	
-	if(isSet(parser, "single-reads"))  o.writeSingleReads = true;
-	if(isSet(parser, "length-dist"))   o.writeLengthDist  = true;
-	if(isSet(parser, "number-tags"))   o.useNumberTag     = true;
-	if(isSet(parser, "removal-tags"))  o.useRemovalTag    = true;
-	if(isSet(parser, "random-tags"))   o.randTag          = true;
+	if(isSet(parser, "single-reads")) o.writeSingleReads = true;
+	if(isSet(parser, "length-dist"))  o.writeLengthDist  = true;
+	if(isSet(parser, "number-tags"))  o.useNumberTag     = true;
+	if(isSet(parser, "removal-tags")) o.useRemovalTag    = true;
+	if(isSet(parser, "random-tags"))  o.randTag          = true;
 	
 	*out << endl;
 	

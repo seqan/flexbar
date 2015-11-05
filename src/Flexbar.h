@@ -298,7 +298,7 @@ void startProcessing(Options &o){
 	}
 	else *out << alignValue(len, uncalled) << endl;
 	
-	if(o.phred_preQual > 0)
+	if(o.qTrim != QOFF)
 	*out << "  trimmed due to low quality      " << alignValue(len, inputFilter.getNrLowPhredReads()) << endl;
 	
 	if(o.barDetect != BOFF && ! o.writeUnassigned)

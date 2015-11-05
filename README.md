@@ -2,7 +2,7 @@
 
 The program Flexbar preprocesses high-throughput sequencing data efficiently. It demultiplexes barcoded runs and removes adapter sequences. Moreover, trimming and filtering features are provided. Flexbar increases read mapping rates and improves genome as well as transcriptome assemblies. It supports next-generation sequencing data in fasta and fastq format, e.g. from Illumina and the Roche 454 platform.
 
-This is the flexbar repository by Johannes Roehr. Flexbar is in the process of being adapted to SeqAn and will incorporate features and changes from the seqan flexcat repository. Refer to the [manual](https://github.com/seqan/flexbar/wiki) or contact [jtroehr](https://github.com/jtroehr) for support with this SeqAn application.
+This is the Flexbar repository by Johannes Roehr. Flexbar is in the process of being adapted to SeqAn and will incorporate features and changes from the seqan flexcat repository. Refer to the [manual](https://github.com/seqan/flexbar/wiki) or contact [jtroehr](https://github.com/jtroehr) for support with this SeqAn application.
 
 ### Reference
 
@@ -63,9 +63,9 @@ In this example, reads that are barcoded on left side are demultiplexed by speci
 
 The second example shows how to trim compressed reads based on their quality scores in illumina version 1.8 format. Afterwards, provided adapters are removed in right trim-end mode, only if the overlap of adapter and read has at least length five with at most four errors per ten base pairs.
 
-		flexbar -r reads.fq.gz -f i1.8 -q 20 -a adp.fa -ao 5 -at 4
+		flexbar -r reads.fq.gz -q TAIL -qf i1.8 -a adp.fa -ao 5 -at 4
 
 ### Test data
 
-To run Flexbar with the test datasets, make sure `flexbar` is reachable via the path variable and run `flexbar_validate.sh` within the test folder. Although default parameters of Flexbar are optimized to deliver good results in a large number of scenarios, the adjustment of parameters might improve results, e.g. `--adapter-min-overlap` and `--adapter-threshold`.
+To run Flexbar with the test datasets, make sure `flexbar` is reachable via the path variable and run `flexbar_validate.sh` within the test folder. Although default parameters of Flexbar are optimized to deliver good results in many scenarios, the adjustment of parameters might improve results, e.g. `--adapter-min-overlap` and `--adapter-threshold`.
 

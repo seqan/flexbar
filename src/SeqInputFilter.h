@@ -22,6 +22,7 @@
 #include "Options.h"
 #include "FlexbarIO.h"
 #include "SeqRead.h"
+#include "QualTrimming.h"
 
 
 template <typename TSeqStr, typename TString, typename TStream>
@@ -40,12 +41,12 @@ private:
 	// typedef seqan::RecordReader<TMMapString, seqan::SinglePass<seqan::StringReader> > TRecordReaderStr;
 	// TRecordReaderStr *strReader;
 	
-	const flexbar::QualityType m_qualType;
+	const flexbar::QualTrimType m_qtrim;
 	flexbar::FileFormat m_format;
 	TString m_nextTag;
 	
 	const bool m_switch2Fasta, m_preProcess, m_useStdin;
-	const int m_maxUncalled, m_preTrimBegin, m_preTrimEnd, m_prePhredTrim;
+	const int m_maxUncalled, m_preTrimBegin, m_preTrimEnd, m_qtrimThresh, m_qtrimWinSize;
 	
 	tbb::atomic<unsigned long> m_nrReads, m_nrChars, m_nLowPhred;
 	
@@ -56,12 +57,13 @@ public:
 		filter(serial_in_order),
 		m_preProcess(preProcess),
 		m_useStdin(useStdin),
-		m_qualType(o.qual),
 		m_switch2Fasta(o.switch2Fasta),
 		m_maxUncalled(o.maxUncalled),
 		m_preTrimBegin(o.cutLen_begin),
 		m_preTrimEnd(o.cutLen_end),
-		m_prePhredTrim(o.phred_preQual),
+		m_qtrim(o.qTrim),
+		m_qtrimThresh(o.qtrimThresh),
+		m_qtrimWinSize(o.qtrimWinSize),
 		m_format(o.format){
 		
 		m_nextTag   = "";
@@ -145,28 +147,6 @@ public:
 			}
 		}
 	}
-	
-	// void readOneLine(seqan::Dna5String &text){
-	// 	using namespace std;
-	//
-	// 	text = "";
-	//
-	// 	if(! atStreamEnd()){
-	//
-	// 		if(m_useStdin){
-	// 			if(readLine(text, *readerCin) != 0){
-	// 				cerr << "File reading error occured.\n" << endl;
-	// 				exit(1);
-	// 			}
-	// 		}
-	// 		else{
-	// 			if(readLine(text, *reader) != 0){
-	// 				cerr << "File reading error occured.\n" << endl;
-	// 				exit(1);
-	// 			}
-	// 		}
-	// 	}
-	// }
 	
 	
 	// returns single SeqRead or NULL if no more reads in file or error
@@ -328,7 +308,7 @@ public:
 							quality = prefix(quality, length(quality) - idx);
 						}
 						
-						if(m_prePhredTrim > 0) qualityTrimming(source, quality);
+						if(m_qtrim != QOFF) qualityTrimming(source, quality);
 					}
 					
 					if(m_switch2Fasta) myRead = new SeqRead<TSeqStr, TString>(source, tag);
@@ -380,29 +360,41 @@ public:
 		
 		using namespace seqan;
 		
-		typename Iterator<TSeqStr >::Type it, itEnd;
+		unsigned cut_pos;
 		
-		it    = begin(quality);
-		itEnd = end(quality);
+		cut_pos = qualTrim(quality, m_qtrim, m_qtrimThresh, m_qtrimWinSize);
 		
-		--itEnd;
-		
-		unsigned int n = length(quality);
-		
-		bool nChanged = false;
-		
-		while(itEnd != it){
-			if(static_cast<int>(*itEnd) >= m_prePhredTrim) break;
-			--n;
-			--itEnd;
+		if(cut_pos < length(quality)){
 			
-			if(! nChanged){
-				m_nLowPhred++;
-				nChanged = true;
-			}
+			++m_nLowPhred;
+			
+			source  = prefix(source,  cut_pos);
+			quality = prefix(quality, cut_pos);
 		}
-		source  = prefix(source,  n);
-		quality = prefix(quality, n);
+		
+		// typename Iterator<TSeqStr >::Type it, itEnd;
+		//
+		// it    = begin(quality);
+		// itEnd = end(quality);
+		//
+		// --itEnd;
+		//
+		// unsigned int n = length(quality);
+		//
+		// bool nChanged = false;
+		//
+		// while(itEnd != it){
+		// 	if(static_cast<int>(*itEnd) >= m_qtrimThresh) break;
+		// 	--n;
+		// 	--itEnd;
+		//
+		// 	if(! nChanged){
+		// 		m_nLowPhred++;
+		// 		nChanged = true;
+		// 	}
+		// }
+		// source  = prefix(source,  n);
+		// quality = prefix(quality, n);
 	}
 	
 	

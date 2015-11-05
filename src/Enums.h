@@ -44,6 +44,14 @@ namespace flexbar{
 		ILLUMINA13
 	};
 	
+	enum QualTrimType {
+		QOFF,
+		TAIL,
+		WIN,
+		WINTAIL,
+		BWA
+	};
+	
 	enum BarcodeDetect {
 		BARCODE_READ,
 		WITHIN_READ,
