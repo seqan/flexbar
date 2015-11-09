@@ -37,6 +37,9 @@
 #ifndef FLEXBAR_QUALTRIMMING_H
 #define FLEXBAR_QUALTRIMMING_H
 
+#include "Enums.h"
+#include "SeqRead.h"
+
 
 // ============================================================================
 // Tags, Classes, Enums
@@ -74,7 +77,7 @@ inline unsigned getQuality(const seqan::CharString& seq, unsigned i)
 
 // Tail trimming method
 template <typename TSeq>
-unsigned _qualTrim(const TSeq& seq, unsigned const cutoff, Tail const &)
+unsigned qualTrimming(const TSeq& seq, unsigned const cutoff, Tail const &)
 {
 	for (int i = length(seq) - 1; i >= 0; --i)
     {
@@ -89,7 +92,7 @@ unsigned _qualTrim(const TSeq& seq, unsigned const cutoff, Tail const &)
 
 // Trim by shifting a window over the seq and cut where avg qual in window turns bad first.
 template <typename TSeq>
-unsigned _qualTrim(const TSeq& seq, unsigned const _cutoff, Window const & spec)
+unsigned qualTrimming(const TSeq& seq, unsigned const _cutoff, Window const & spec)
 {
 	unsigned window = spec.size;
 	unsigned avg = 0, i = 0;
@@ -116,7 +119,7 @@ unsigned _qualTrim(const TSeq& seq, unsigned const _cutoff, Window const & spec)
 
 // Trimming mechanism using BWA. Trim to argmax_x sum_{i=x+1}^l {cutoff - q_i}
 template <typename TSeq>
-unsigned _qualTrim(const TSeq& seq, unsigned const cutoff, BWA const &)
+unsigned qualTrimming(const TSeq& seq, unsigned const cutoff, BWA const &)
 {
 	int max_arg = length(seq) - 1, sum = 0, max = 0;
 
@@ -137,22 +140,50 @@ unsigned _qualTrim(const TSeq& seq, unsigned const cutoff, BWA const &)
 }
 
 
-template <typename TSeq>
-unsigned qualTrim(const TSeq& seq, const flexbar::QualTrimType qtrim, const int cutoff, const int wSize)
+template <typename TSeqStr, typename TString>
+bool qualTrim(TSeqStr &seq, TString &qual, const flexbar::QualTrimType qtrim, const int cutoff, const int wSize)
 {
-	unsigned cut_pos;
+	unsigned cutPos;
 	
 	if(qtrim == flexbar::TAIL){
-		cut_pos = _qualTrim(seq, cutoff, Tail());
+		cutPos = qualTrimming(qual, cutoff, Tail());
 	}
 	else if(qtrim == flexbar::WIN){
-		cut_pos = _qualTrim(seq, cutoff, Window(wSize));
+		cutPos = qualTrimming(qual, cutoff, Window(wSize));
 	}
 	else if(qtrim == flexbar::BWA){
-		cut_pos = _qualTrim(seq, cutoff, BWA());
+		cutPos = qualTrimming(qual, cutoff, BWA());
 	}
 	
-	return cut_pos;
+	using namespace seqan;
+	
+	if(cutPos < length(qual)){
+		
+		seq  = prefix(seq,  cutPos);
+		qual = prefix(qual, cutPos);
+		
+		return true;
+	}
+	else{
+		return false;
+	}
+}
+
+
+template <typename TSeqStr, typename TString>
+bool qualTrim(SeqRead<TSeqStr, TString> *seqRead, const flexbar::QualTrimType qtrim, const int cutoff, const int wSize)
+{
+	TSeqStr seq  = seqRead->getSequence();
+	TString qual = seqRead->getQuality();
+	
+	bool trimmed = qualTrim(seq, qual, qtrim, cutoff, wSize);
+	
+	if(trimmed){
+		seqRead->setSequence(seq);
+		seqRead->setQuality(qual);
+	}
+	
+	return trimmed;
 }
 
 
@@ -160,6 +191,12 @@ unsigned qualTrim(const TSeq& seq, const flexbar::QualTrimType qtrim, const int 
 // {
 // 	return seqan::getQualityValue(seq[i]);
 // }
+
+// template<bool tag>
+// struct TagTrimming
+// {
+//     static const bool value = tag;
+// };
 
 // template <typename TSeq, typename TSpec>
 // unsigned trimRead(TSeq& seq, unsigned const cutoff, TSpec const & spec) noexcept
@@ -169,29 +206,6 @@ unsigned qualTrim(const TSeq& seq, const flexbar::QualTrimType qtrim, const int 
 // 	ret = length(seq) - cut_pos;
 // 	erase(seq, cut_pos, length(seq));
 // 	return ret;
-// }
-
-// template<bool tag>
-// struct TagTrimming
-// {
-//     static const bool value = tag;
-// };
-
-// template <typename TRead, typename TSpec, typename TTagTrimming>
-// unsigned _trimReads(std::vector<TRead>& reads, unsigned const cutoff, const TSpec& spec, TTagTrimming) noexcept(!TTagTrimming::value)
-// {
-//     int trimmedReads = 0;
-//     std::transform(reads.begin(),reads.end(),reads.begin(),[&trimmedReads, cutoff, &spec](auto& read)->auto
-//     {
-//         if (trimRead(read.seq, cutoff, spec))
-//         {
-//             ++trimmedReads;
-//             if (TTagTrimming::value)
-//                 append(read.id, "[trimmed]");
-//         }
-//         return read;
-//     });
-//     return trimmedReads;
 // }
 
 #endif

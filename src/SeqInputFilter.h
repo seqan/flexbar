@@ -45,7 +45,7 @@ private:
 	flexbar::FileFormat m_format;
 	TString m_nextTag;
 	
-	const bool m_switch2Fasta, m_preProcess, m_useStdin;
+	const bool m_switch2Fasta, m_preProcess, m_useStdin, m_qtrimPostRm;
 	const int m_maxUncalled, m_preTrimBegin, m_preTrimEnd, m_qtrimThresh, m_qtrimWinSize;
 	
 	tbb::atomic<unsigned long> m_nrReads, m_nrChars, m_nLowPhred;
@@ -64,6 +64,7 @@ public:
 		m_qtrim(o.qTrim),
 		m_qtrimThresh(o.qtrimThresh),
 		m_qtrimWinSize(o.qtrimWinSize),
+		m_qtrimPostRm(o.qtrimPostRm),
 		m_format(o.format){
 		
 		m_nextTag   = "";
@@ -162,8 +163,8 @@ public:
 		
 		SeqRead<TSeqStr, TString> *myRead = NULL;
 		
-		TSeqStr source = "";
-		TString tag = "", quality = "", dummy = "";
+		TSeqStr rseq = "";
+		TString qual = "", tag = "", tmp = "";
 		
 		if(! atStreamEnd()){
 			
@@ -193,9 +194,9 @@ public:
 					else return NULL;
 					
 					
-					readOneLine(source);
+					readOneLine(rseq);
 					
-					if(length(source) < 1){
+					if(length(rseq) < 1){
 						stringstream error;
 						error << "Empty FASTA entry: found tag without read for " << tag << endl;
 						throw runtime_error(error.str());
@@ -206,50 +207,50 @@ public:
 					
 					// fasta files with sequences on multiple lines
 					while(! atStreamEnd() && length(m_nextTag) > 0 && getValue(m_nextTag, 0) != '>'){
-						append(source, m_nextTag);
+						append(rseq, m_nextTag);
 						readOneLine(m_nextTag);
 					}
 					
-					m_nrChars += length(source);
+					m_nrChars += length(rseq);
 					
 					
 					if(m_preProcess){
-						isUncalled = isUncalledSequence(source);
+						isUncalled = isUncalledSequence(rseq);
 						
-						if(m_preTrimBegin > 0 && length(source) > 1){
+						if(m_preTrimBegin > 0 && length(rseq) > 1){
 							
 							int idx = m_preTrimBegin;
-							if(idx >= length(source)) idx = length(source) - 1;
+							if(idx >= length(rseq)) idx = length(rseq) - 1;
 							
-							erase(source, 0, idx);
+							erase(rseq, 0, idx);
 						}
 						
-						if(m_preTrimEnd > 0 && length(source) > 1){
+						if(m_preTrimEnd > 0 && length(rseq) > 1){
 							
 							int idx = m_preTrimEnd;
-							if(idx >= length(source)) idx = length(source) - 1;
+							if(idx >= length(rseq)) idx = length(rseq) - 1;
 							
-							source = prefix(source, length(source) - idx);
+							rseq = prefix(rseq, length(rseq) - idx);
 						}
 					}
 					
-					myRead = new SeqRead<TSeqStr, TString>(source, tag);
+					myRead = new SeqRead<TSeqStr, TString>(rseq, tag);
 					
 					++m_nrReads;
 				}
 				
-				// FastQ
+				// fastq
 				else{
 					
-					readOneLine(source);
+					readOneLine(rseq);
 					
-					if(length(source) > 0){
-						if(getValue(source, 0) != '@'){
+					if(length(rseq) > 0){
+						if(getValue(rseq, 0) != '@'){
 							stringstream error;
-							error << "Incorrect FASTQ entry: missing @ symbol for " << source << endl;
+							error << "Incorrect FASTQ entry: missing @ symbol for " << rseq << endl;
 							throw runtime_error(error.str());
 						}
-						else tag = suffix(source, 1);
+						else tag = suffix(rseq, 1);
 						
 						if(length(tag) == 0){
 							stringstream error;
@@ -259,60 +260,63 @@ public:
 					}
 					else return NULL;
 					
-					readOneLine(source);
+					readOneLine(rseq);
 					
-					if(length(source) < 1){
+					if(length(rseq) < 1){
 						stringstream error;
 						error << "Empty FASTQ entry: found tag without read for " << tag << endl;
 						throw runtime_error(error.str());
 					}
 					
 					
-					readOneLine(dummy);
+					readOneLine(tmp);
 					
-					if(length(dummy) == 0 || seqan::isNotEqual(getValue(dummy, 0), '+')){
+					if(length(tmp) == 0 || seqan::isNotEqual(getValue(tmp, 0), '+')){
 							stringstream error;
 							error << "Incorrect FASTQ entry: missing + line for " << tag << endl;
 							throw runtime_error(error.str());
 					}
 					
-					readOneLine(quality);
+					readOneLine(qual);
 					
-					if(length(quality) < 1){
+					if(length(qual) < 1){
 						stringstream error;
 						error << "Empty FASTQ entry: found read without quality values for " << tag << endl;
 						throw runtime_error(error.str());
 					}
 					
-					m_nrChars += length(source);
+					m_nrChars += length(rseq);
 					
 					
 					if(m_preProcess){
-						isUncalled = isUncalledSequence(source);
+						isUncalled = isUncalledSequence(rseq);
 						
-						if(m_preTrimBegin > 0 && length(source) > 1){
+						if(m_preTrimBegin > 0 && length(rseq) > 1){
 							
 							int idx = m_preTrimBegin;
-							if(idx >= length(source)) idx = length(source) - 1;
+							if(idx >= length(rseq)) idx = length(rseq) - 1;
 							
-							erase(source, 0, idx);
-							erase(quality, 0, idx);
+							erase(rseq, 0, idx);
+							erase(qual, 0, idx);
 						}
 						
-						if(m_preTrimEnd > 0 && length(source) > 1){
+						if(m_preTrimEnd > 0 && length(rseq) > 1){
 							
 							int idx = m_preTrimEnd;
-							if(idx >= length(source)) idx = length(source) - 1;
+							if(idx >= length(rseq)) idx = length(rseq) - 1;
 							
-							source  = prefix(source,  length(source)  - idx);
-							quality = prefix(quality, length(quality) - idx);
+							rseq = prefix(rseq, length(rseq) - idx);
+							qual = prefix(qual, length(qual) - idx);
 						}
 						
-						if(m_qtrim != QOFF) qualityTrimming(source, quality);
+						if(m_qtrim != QOFF && ! m_qtrimPostRm){
+							
+							if(qualTrim(rseq, qual, m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
+						}
 					}
 					
-					if(m_switch2Fasta) myRead = new SeqRead<TSeqStr, TString>(source, tag);
-					else               myRead = new SeqRead<TSeqStr, TString>(source, tag, quality);
+					if(m_switch2Fasta) myRead = new SeqRead<TSeqStr, TString>(rseq, tag);
+					else               myRead = new SeqRead<TSeqStr, TString>(rseq, tag, qual);
 					
 					++m_nrReads;
 				}
@@ -337,15 +341,15 @@ public:
 	
 	
 	// returns TRUE if read contains too many uncalled bases
-	bool isUncalledSequence(TSeqStr &source){
+	bool isUncalledSequence(TSeqStr &seq){
 		int n = 0;
 		
 		using namespace seqan;
 		
 		typename Iterator<TSeqStr >::Type it, itEnd;
 		
-		it    = begin(source);
-		itEnd = end(source);
+		it    = begin(seq);
+		itEnd = end(seq);
 		
 		while(it != itEnd){
 			 if(*it == 'N') n++;
@@ -355,22 +359,6 @@ public:
 		return(n > m_maxUncalled);
 	}
  	
-	
-	void qualityTrimming(TSeqStr &source, TString &quality){
-		
-		using namespace seqan;
-		
-		unsigned cut_pos = qualTrim(quality, m_qtrim, m_qtrimThresh, m_qtrimWinSize);
-		
-		if(cut_pos < length(quality)){
-			
-			++m_nLowPhred;
-			
-			source  = prefix(source,  cut_pos);
-			quality = prefix(quality, cut_pos);
-		}
-	}
-	
 	
 	// override
 	void* operator()(void*){
