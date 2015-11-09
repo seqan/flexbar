@@ -19,6 +19,7 @@
 #include "SeqOutputFilter.h"
 #include "OutputFileStruct.h"
 #include "AdapterLoader.h"
+#include "QualTrimming.h"
 
 
 template <typename TSeqStr, typename TString, typename TStream>
@@ -27,16 +28,17 @@ class PairedOutputFilter : public tbb::filter {
 private:
 	
 	int m_mapsize;
-	const int m_minLength, m_cutLen_read;
-	const bool m_isPaired, m_writeUnassigned, m_writeSingleReads, m_twoBarcodes;
+	const int m_minLength, m_cutLen_read, m_qtrimThresh, m_qtrimWinSize;
+	const bool m_isPaired, m_writeUnassigned, m_writeSingleReads, m_twoBarcodes, m_qtrimPostRm;
 	
-	tbb::atomic<unsigned long> m_nSingleReads;
+	tbb::atomic<unsigned long> m_nSingleReads, m_nLowPhred;
 	
 	const std::string m_target;
 	
 	const flexbar::FileFormat     m_format;
 	const flexbar::RunType        m_runType;
 	const flexbar::BarcodeDetect  m_barDetect;
+	const flexbar::QualTrimType   m_qtrim;
 	
 	typedef SeqOutputFilter<TSeqStr, TString, TStream> TOutputFilter;
 	typedef OutputFileStruct<TSeqStr, TString, TStream> filters;
@@ -58,6 +60,10 @@ public:
 		m_barDetect(o.barDetect),
 		m_minLength(o.min_readLen),
 		m_cutLen_read(o.cutLen_read),
+		m_qtrim(o.qTrim),
+		m_qtrimThresh(o.qtrimThresh),
+		m_qtrimWinSize(o.qtrimWinSize),
+		m_qtrimPostRm(o.qtrimPostRm),
 		m_isPaired(o.isPaired),
 		m_writeUnassigned(o.writeUnassigned),
 		m_writeSingleReads(o.writeSingleReads),
@@ -74,6 +80,7 @@ public:
 		
 		m_mapsize      = 0;
 		m_nSingleReads = 0;
+		m_nLowPhred    = 0;
 		
 		switch(m_runType){
 			
@@ -234,11 +241,11 @@ public:
 	};
 	
 	
-	void* operator()(void* item) {
+	void* operator()(void* item){
 		
 		using namespace flexbar;
 		
-		PairedRead<TSeqStr, TString> *read = static_cast< PairedRead<TSeqStr, TString>* >(item);
+		PairedRead<TSeqStr, TString> *pRead = static_cast< PairedRead<TSeqStr, TString>* >(item);
 		
 		bool l1ok = false, l2ok = false;
 		
@@ -247,14 +254,18 @@ public:
 			case SINGLE:
 			case SINGLE_BARCODED:{
 				
-				if(read->m_r1 != NULL){
-					if(m_runType == SINGLE || m_writeUnassigned || read->m_barcode_id > 0){
+				if(pRead->m_r1 != NULL){
+					if(m_runType == SINGLE || m_writeUnassigned || pRead->m_barcode_id > 0){
 						
-						if(length(read->m_r1->getSequence()) >= m_minLength){
-							
-							m_outMap[read->m_barcode_id].f1->writeRead(read->m_r1);
+						if(m_qtrim != QOFF && m_qtrimPostRm){
+							if(qualTrim(pRead->m_r1, m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
 						}
-						else m_outMap[read->m_barcode_id].m_nShort_1++;
+						
+						if(length(pRead->m_r1->getSequence()) >= m_minLength){
+							
+							m_outMap[pRead->m_barcode_id].f1->writeRead(pRead->m_r1);
+						}
+						else m_outMap[pRead->m_barcode_id].m_nShort_1++;
 					}
 				}
 				break;
@@ -263,38 +274,43 @@ public:
 			case PAIRED:
 			case PAIRED_BARCODED:{
 				
-				if(read->m_r1 != NULL && read->m_r2 != NULL){
+				if(pRead->m_r1 != NULL && pRead->m_r2 != NULL){
 					
-					int outIdx = read->m_barcode_id;
+					int outIdx = pRead->m_barcode_id;
 					
 					if(m_twoBarcodes){
-						if(outIdx == 0 || read->m_barcode_id2 == 0){
+						if(outIdx == 0 || pRead->m_barcode_id2 == 0){
 							outIdx = 0;
 						}
-						else outIdx += (read->m_barcode_id2 - 1) * m_barcodes->size();
+						else outIdx += (pRead->m_barcode_id2 - 1) * m_barcodes->size();
 					}
 					
 					if(m_runType == PAIRED || m_writeUnassigned || outIdx > 0){
 						
-						if(length(read->m_r1->getSequence()) >= m_minLength) l1ok = true;
-						if(length(read->m_r2->getSequence()) >= m_minLength) l2ok = true;
+						if(m_qtrim != QOFF && m_qtrimPostRm){
+							if(qualTrim(pRead->m_r1, m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
+							if(qualTrim(pRead->m_r2, m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
+						}
+						
+						if(length(pRead->m_r1->getSequence()) >= m_minLength) l1ok = true;
+						if(length(pRead->m_r2->getSequence()) >= m_minLength) l2ok = true;
 						
 						if(l1ok && l2ok){
-							m_outMap[outIdx].f1->writeRead(read->m_r1);
-							m_outMap[outIdx].f2->writeRead(read->m_r2);
+							m_outMap[outIdx].f1->writeRead(pRead->m_r1);
+							m_outMap[outIdx].f2->writeRead(pRead->m_r2);
 						}
 						else if(l1ok && ! l2ok){
 							m_nSingleReads++;
 							
 							if(m_writeSingleReads){
-								m_outMap[outIdx].single1->writeRead(read->m_r1);
+								m_outMap[outIdx].single1->writeRead(pRead->m_r1);
 							}
 						}
 						else if(! l1ok && l2ok){
 							m_nSingleReads++;
 							
 							if(m_writeSingleReads){
-								m_outMap[outIdx].single2->writeRead(read->m_r2);
+								m_outMap[outIdx].single2->writeRead(pRead->m_r2);
 							}
 						}
 						
@@ -305,7 +321,7 @@ public:
 			}
 		}
 		
-		delete read;
+		delete pRead;
 		
 		return NULL;
 	}
@@ -323,6 +339,11 @@ public:
 	
 	unsigned long getNrSingleReads() const {
 		return m_nSingleReads;
+	}
+	
+	
+	unsigned long getNrLowPhredReads() const {
+		return m_nLowPhred;
 	}
 	
 	

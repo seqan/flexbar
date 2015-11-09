@@ -376,7 +376,7 @@ void parseCommandLine(seqan::ArgumentParser &parser, std::string version, int ar
 		hideOption(parser, "adapter-gap",         false);
 		
 		hideOption(parser, "qtrim-win-size",      false);
-		// hideOption(parser, "qtrim-post-removal",  false);
+		hideOption(parser, "qtrim-post-removal",  false);
 		
 		hideOption(parser, "adapters2",    false);
 		hideOption(parser, "version",      false);

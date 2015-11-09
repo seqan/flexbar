@@ -275,11 +275,11 @@ void startProcessing(Options &o){
 	
 	
 	const unsigned long nReads     = inputFilter.getNrProcessedReads();
-	const unsigned long nGoodReads = outputFilter.getNrGoodReads();
 	const unsigned long nChars     = inputFilter.getNrProcessedChars();
-	const unsigned long nGoodChars = outputFilter.getNrGoodChars();
 	const unsigned long uncalled   = inputFilter.getNrUncalledReads();
 	const unsigned long uPairs     = inputFilter.getNrUncalledPairedReads();
+	const unsigned long nGoodReads = outputFilter.getNrGoodReads();
+	const unsigned long nGoodChars = outputFilter.getNrGoodChars();
 	
 	stringstream s; s << nReads;
 	int len = s.str().length();
@@ -298,7 +298,7 @@ void startProcessing(Options &o){
 	}
 	else *out << alignValue(len, uncalled) << endl;
 	
-	if(o.qTrim != QOFF)
+	if(o.qTrim != QOFF && ! o.qtrimPostRm)
 	*out << "  trimmed due to low quality      " << alignValue(len, inputFilter.getNrLowPhredReads()) << endl;
 	
 	if(o.barDetect != BOFF && ! o.writeUnassigned)
@@ -306,6 +306,9 @@ void startProcessing(Options &o){
 	
 	if(o.adapRm != AOFF)
 	*out << "  short prior adapter removal     " << alignValue(len, alignFilter.getNrPreShortReads()) << endl;
+	
+	if(o.qTrim != QOFF && o.qtrimPostRm)
+	*out << "  trimmed due to low quality      " << alignValue(len, outputFilter.getNrLowPhredReads()) << endl;
 	
 	*out << "  finally skipped short reads     " << alignValue(len, outputFilter.getNrShortReads()) << endl;
 	
