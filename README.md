@@ -23,7 +23,7 @@ Make sure that `cmake` is available, as well as development and runtime files of
 
 Decompress both and move SeqAn include folder to Flexbar:
 
-        mv seqan-library-1.4.2/include flexbar
+        mv seqan-library/include flexbar
 
 Use these commands for building:
 
