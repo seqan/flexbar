@@ -19,7 +19,7 @@
 #include "SeqRead.h"
 
 
-typedef std::pair< SeqRead<seqan::CharString, seqan::CharString>*,
+typedef std::pair< SeqRead<seqan::Dna5String, seqan::CharString>*,
                    std::pair< tbb::atomic<unsigned long>, tbb::atomic<unsigned long> > > TAdapter;
 
 struct Options{

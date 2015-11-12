@@ -28,7 +28,6 @@ private:
 	
 	const flexbar::QualTrimType m_qtrim;
 	flexbar::FileFormat m_format;
-	TString m_nextTag;
 	
 	// typedef seqan::String<char, seqan::MMap<> > TMMapString;
 	
@@ -54,19 +53,17 @@ public:
 		m_qtrimPostRm(o.qtrimPostRm),
 		m_format(o.format){
 		
-		m_nextTag   = "";
 		m_nrReads   = 0;
 		m_nrChars   = 0;
 		m_nLowPhred = 0;
 		
 		using namespace std;
-		using namespace flexbar;
 		
 		if(fastaFormat){
-			m_format = FASTA;
+			m_format = flexbar::FASTA;
 		}
 		else if(m_switch2Fasta){
-			m_format = FASTQ;
+			m_format = flexbar::FASTQ;
 		}
 		
 		if(m_useStdin){
@@ -81,9 +78,6 @@ public:
 				exit(1);
 			}
 		}
-		
-		// TMMapString mmapStr;
-		// if(! open(mmapStr, filePath.c_str(), seqan::OPEN_RDONLY)){
 	};
 	
 	

@@ -69,9 +69,9 @@ struct Window {
 // ============================================================================
 
 
-inline unsigned getQuality(const seqan::CharString& seq, unsigned i)
+inline unsigned getQuality(const seqan::CharString& qual, unsigned i)
 {
-	return static_cast<int>(seq[i]);
+	return static_cast<int>(qual[i]);
 }
 
 

@@ -34,7 +34,8 @@ void loadBarcodes(Options &o, const bool secondSet){
 	using namespace std;
 	using namespace flexbar;
 	
-	using seqan::CharString;
+	typedef seqan::Dna5String TSeqStr;
+	typedef seqan::CharString TString;
 	
 	if(o.barDetect != BOFF){
 		tbb::task_scheduler_init init_serial(1);
@@ -42,10 +43,10 @@ void loadBarcodes(Options &o, const bool secondSet){
 		
 		string barFile = secondSet ? o.barcode2File : o.barcodeFile;
 		
-		SeqInputFilter<CharString, CharString> adapter_filter(o, barFile, true, false, false);
+		SeqInputFilter<TSeqStr, TString> adapter_filter(o, barFile, true, false, false);
 		bpipeline.add_filter(adapter_filter);
 		
-		AdapterLoader<CharString, CharString> adapterLoader(o, false);
+		AdapterLoader<TSeqStr, TString> adapterLoader(o, false);
 		bpipeline.add_filter(adapterLoader);
 		bpipeline.run(1);
 		
@@ -76,11 +77,12 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 	using namespace std;
 	using namespace flexbar;
 	
-	using seqan::CharString;
+	typedef seqan::Dna5String TSeqStr;
+	typedef seqan::CharString TString;
 	
 	if(o.adapRm != AOFF){
 		
-		AdapterLoader<CharString, CharString> adapterLoader(o, true);
+		AdapterLoader<TSeqStr, TString> adapterLoader(o, true);
 		
 		if(useAdapterFile){
 			tbb::task_scheduler_init init_serial(1);
@@ -88,7 +90,7 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 			
 			string adapFile = secondSet ? o.adapter2File : o.adapterFile;
 			
-			SeqInputFilter<CharString, CharString> adapter_filter(o, adapFile, true, false, false);
+			SeqInputFilter<TSeqStr, TString> adapter_filter(o, adapFile, true, false, false);
 			prepipe.add_filter(adapter_filter);
 			prepipe.add_filter(adapterLoader);
 			prepipe.run(1);
@@ -111,21 +113,21 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 			}
 		}
 		else{
-			CharString adapterSeq = o.adapterSeq;
+			TSeqStr adapterSeq = o.adapterSeq;
 			
-			SeqRead<CharString, CharString> *myRead;
-			myRead = new SeqRead<CharString, CharString>(adapterSeq, "cmdline");
+			SeqRead<TSeqStr, TString> *myRead;
+			myRead = new SeqRead<TSeqStr, TString>(adapterSeq, "cmdline");
 			
 			TAdapter adap;
 			adap.first = myRead;
 			o.adapters.push_back(adap);
 			
 			if(o.revCompAdapter){
-				CharString adapterSeqRC = o.adapterSeq;
+				TSeqStr adapterSeqRC = o.adapterSeq;
 				seqan::reverseComplement(adapterSeqRC);
 				
-				SeqRead<CharString, CharString> *myReadRC;
-				myReadRC = new SeqRead<CharString, CharString>(adapterSeqRC, "cmdline revcomp");
+				SeqRead<TSeqStr, TString> *myReadRC;
+				myReadRC = new SeqRead<TSeqStr, TString>(adapterSeqRC, "cmdline revcomp");
 				
 				TAdapter adapRC;
 				adapRC.first = myReadRC;
@@ -221,8 +223,7 @@ void startProcessing(Options &o){
 	using namespace std;
 	using namespace flexbar;
 	
-	// typedef seqan::Dna5String TSeqStr;
-	typedef seqan::CharString TSeqStr;
+	typedef seqan::Dna5String TSeqStr;
 	typedef seqan::CharString TString;
 	
 	time_t start;

@@ -37,7 +37,6 @@ void openInputFile(std::fstream &strm, std::string path){
 	}
 }
 
-
 void openOutputFile(std::fstream &strm, std::string path){
 	using namespace std;
 	
@@ -48,7 +47,6 @@ void openOutputFile(std::fstream &strm, std::string path){
 		exit(1);
 	}
 }
-
 
 void closeFile(std::fstream &strm){
 	strm.close();
