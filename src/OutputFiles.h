@@ -1,17 +1,17 @@
 /*
- *   OutputFileStruct.h
+ *   OutputFiles.h
  *
  *   Author: mat and jtr
  */
 
-#ifndef FLEXBAR_OUTPUTFILESTRUCT_H
-#define FLEXBAR_OUTPUTFILESTRUCT_H
+#ifndef FLEXBAR_OUTPUTFILES_H
+#define FLEXBAR_OUTPUTFILES_H
 
 #include "SeqOutputFilter.h"
 
 
 template <typename TSeqStr, typename TString>
-class OutputFileStruct {
+class OutputFiles {
 	
 public:
 	
@@ -21,7 +21,7 @@ public:
 	
 	tbb::atomic<unsigned long> m_nShort_1, m_nShort_2;
 	
-	OutputFileStruct() :
+	OutputFiles() :
 		f1(0),
 		f2(0),
 		single1(0),
@@ -32,7 +32,7 @@ public:
 	};
 	
 	
-	virtual ~OutputFileStruct(){
+	virtual ~OutputFiles(){
     	delete f1;
     	delete f2;
     	delete single1;
@@ -43,9 +43,9 @@ public:
 private:
 	
 	// forbid copying this object to call destructor only once (pointing to unique objects)
-	OutputFileStruct(OutputFileStruct&);
+	OutputFiles(OutputFiles&);
 	
-	OutputFileStruct& operator =(const OutputFileStruct& rhs);
+	OutputFiles& operator =(const OutputFiles& rhs);
 	
 };
 

@@ -17,7 +17,7 @@
 #include "FlexbarIO.h"
 #include "PairedRead.h"
 #include "SeqOutputFilter.h"
-#include "OutputFileStruct.h"
+#include "OutputFiles.h"
 #include "AdapterLoader.h"
 #include "QualTrimming.h"
 
@@ -41,7 +41,7 @@ private:
 	const flexbar::QualTrimType   m_qtrim;
 	
 	typedef SeqOutputFilter<TSeqStr, TString>  TOutputFilter;
-	typedef OutputFileStruct<TSeqStr, TString> filters;
+	typedef OutputFiles<TSeqStr, TString> filters;
 	
 	filters *m_outMap;
 	std::ostream *out;
