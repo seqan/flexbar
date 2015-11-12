@@ -8,42 +8,29 @@
 #define FLEXBAR_SEQINPUTFILTER_H
 
 #include <string>
-#include <fstream>
 #include <iostream>
-#include <stdexcept>
 
 #include <tbb/pipeline.h>
-
-#include <seqan/file.h>
-#include <seqan/stream.h>
 #include <seqan/seq_io.h>
 
 #include "Enums.h"
 #include "Options.h"
-#include "FlexbarIO.h"
 #include "SeqRead.h"
 #include "QualTrimming.h"
 
 
-template <typename TSeqStr, typename TString, typename TStream>
+template <typename TSeqStr, typename TString>
 class SeqInputFilter : public tbb::filter {
 
 private:
 	
-	typedef seqan::RecordReader<TStream, seqan::SinglePass<> > TRecordReader;
-	TRecordReader *reader;
-	TStream fstrm;
-	
-	typedef seqan::RecordReader<std::istream, seqan::SinglePass<> > TRecordReaderCin;
-	TRecordReaderCin *readerCin;
-	
-	// typedef seqan::String<char, seqan::MMap<> > TMMapString;
-	// typedef seqan::RecordReader<TMMapString, seqan::SinglePass<seqan::StringReader> > TRecordReaderStr;
-	// TRecordReaderStr *strReader;
+	seqan::SeqFileIn seqFileIn;
 	
 	const flexbar::QualTrimType m_qtrim;
 	flexbar::FileFormat m_format;
 	TString m_nextTag;
+	
+	// typedef seqan::String<char, seqan::MMap<> > TMMapString;
 	
 	const bool m_switch2Fasta, m_preProcess, m_useStdin, m_qtrimPostRm;
 	const int m_maxUncalled, m_preTrimBegin, m_preTrimEnd, m_qtrimThresh, m_qtrimWinSize;
@@ -82,27 +69,26 @@ public:
 			m_format = FASTQ;
 		}
 		
-		if(m_useStdin) readerCin = new TRecordReaderCin(cin);
+		if(m_useStdin){
+			if(!open(seqFileIn, cin)){
+				cerr << "ERROR: Could not open input stream.\n" << endl;
+				exit(1);
+			}
+		}
 		else{
-			openInputFile(fstrm, filePath);
-			reader = new TRecordReader(fstrm);
-			// istream &f = fstrm;
+			if(!open(seqFileIn, filePath.c_str())){
+				cerr << "ERROR: Could not open file: " << filePath << "\n" << endl;
+				exit(1);
+			}
 		}
 		
 		// TMMapString mmapStr;
 		// if(! open(mmapStr, filePath.c_str(), seqan::OPEN_RDONLY)){
-		// cout << "Error opening File: " << filePath << endl; }
-		// strReader = new TRecordReaderStr(mmapStr);
 	};
 	
 	
 	virtual ~SeqInputFilter(){
-		
-		if(m_useStdin) delete readerCin;
-		else{
-			delete reader;
-			closeFile(fstrm);
-		}
+		close(seqFileIn);
 	};
 	
 	
@@ -118,35 +104,6 @@ public:
 	
 	unsigned long getNrProcessedChars() const {
 		return m_nrChars;
-	}
-	
-	
-	bool atStreamEnd(){
-		if(m_useStdin) return atEnd(*readerCin);
-		else           return atEnd(*reader);
-	}
-	
-	
-	void readOneLine(seqan::CharString &text){
-		using namespace std;
-		
-		text = "";
-		
-		if(! atStreamEnd()){
-			
-			if(m_useStdin){
-				if(readLine(text, *readerCin) != 0){
-					cerr << "File reading error occured.\n" << endl;
-					exit(1);
-				}
-			}
-			else{
-				if(readLine(text, *reader) != 0){
-					cerr << "File reading error occured.\n" << endl;
-					exit(1);
-				}
-			}
-		}
 	}
 	
 	
@@ -166,7 +123,7 @@ public:
 		TSeqStr rseq = "";
 		TString qual = "", tag = "", tmp = "";
 		
-		if(! atStreamEnd()){
+		if(! atEnd(seqFileIn)){
 			
 			isUncalled = false;
 			
@@ -174,42 +131,40 @@ public:
 				if(m_format == FASTA){
 					
 					// tag line is read in previous iteration
-					if(m_nextTag == "") readOneLine(tag);
-					else                tag = m_nextTag;
+					// if(m_nextTag == "") readOneLine(tag);
+					// else                tag = m_nextTag;
 					
-					if(length(tag) > 0){
-						if(getValue(tag, 0) != '>'){
-							stringstream error;
-							error << "Incorrect FASTA entry: missing > symbol for " << tag << endl;
-							throw runtime_error(error.str());
-						}
-						else tag = suffix(tag, 1);
-						
-						if(length(tag) == 0){
-							stringstream error;
-							error << "Incorrect FASTA entry: missing read name after > symbol." << endl;
-							throw runtime_error(error.str());
-						}
-					}
-					else return NULL;
+					// if(length(tag) > 0){
+					// 	if(getValue(tag, 0) != '>'){
+					// 		stringstream error;
+					// 		error << "Incorrect FASTA entry: missing > symbol for " << tag << endl;
+					// 		throw runtime_error(error.str());
+					// 	}
+					// 	else tag = suffix(tag, 1);
+					//
+					// 	if(length(tag) == 0){
+					// 		stringstream error;
+					// 		error << "Incorrect FASTA entry: missing read name after > symbol." << endl;
+					// 		throw runtime_error(error.str());
+					// 	}
+					// }
+					// else return NULL;
 					
+					// readOneLine(rseq);
+					// if(length(rseq) < 1){
+					// 	stringstream error;
+					// 	error << "Empty FASTA entry: found tag without read for " << tag << endl;
+					// 	throw runtime_error(error.str());
+					// }
 					
-					readOneLine(rseq);
-					
-					if(length(rseq) < 1){
-						stringstream error;
-						error << "Empty FASTA entry: found tag without read for " << tag << endl;
-						throw runtime_error(error.str());
-					}
-					
-					
-					readOneLine(m_nextTag);
-					
+					// readOneLine(m_nextTag);
 					// fasta files with sequences on multiple lines
-					while(! atStreamEnd() && length(m_nextTag) > 0 && getValue(m_nextTag, 0) != '>'){
-						append(rseq, m_nextTag);
-						readOneLine(m_nextTag);
-					}
+					// while(! atEnd(seqFileIn) && length(m_nextTag) > 0 && getValue(m_nextTag, 0) != '>'){
+					// 	append(rseq, m_nextTag);
+					// 	readOneLine(m_nextTag);
+					// }
+					
+					readRecord(tag, rseq, seqFileIn);
 					
 					m_nrChars += length(rseq);
 					
@@ -242,48 +197,25 @@ public:
 				// fastq
 				else{
 					
-					readOneLine(rseq);
+					// readOneLine(rseq);
 					
-					if(length(rseq) > 0){
-						if(getValue(rseq, 0) != '@'){
-							stringstream error;
-							error << "Incorrect FASTQ entry: missing @ symbol for " << rseq << endl;
-							throw runtime_error(error.str());
-						}
-						else tag = suffix(rseq, 1);
-						
-						if(length(tag) == 0){
-							stringstream error;
-							error << "Incorrect FASTQ entry: missing read name after @ symbol." << endl;
-							throw runtime_error(error.str());
-						}
-					}
-					else return NULL;
+					// if(length(rseq) > 0){
+					// 	if(getValue(rseq, 0) != '@'){
+					// 		stringstream error;
+					// 		error << "Incorrect FASTQ entry: missing @ symbol for " << rseq << endl;
+					// 		throw runtime_error(error.str());
+					// 	}
+					// 	else tag = suffix(rseq, 1);
+					//
+					// 	if(length(tag) == 0){
+					// 		stringstream error;
+					// 		error << "Incorrect FASTQ entry: missing read name after @ symbol." << endl;
+					// 		throw runtime_error(error.str());
+					// 	}
+					// }
+					// else return NULL;
 					
-					readOneLine(rseq);
-					
-					if(length(rseq) < 1){
-						stringstream error;
-						error << "Empty FASTQ entry: found tag without read for " << tag << endl;
-						throw runtime_error(error.str());
-					}
-					
-					
-					readOneLine(tmp);
-					
-					if(length(tmp) == 0 || seqan::isNotEqual(getValue(tmp, 0), '+')){
-							stringstream error;
-							error << "Incorrect FASTQ entry: missing + line for " << tag << endl;
-							throw runtime_error(error.str());
-					}
-					
-					readOneLine(qual);
-					
-					if(length(qual) < 1){
-						stringstream error;
-						error << "Empty FASTQ entry: found read without quality values for " << tag << endl;
-						throw runtime_error(error.str());
-					}
+					readRecord(tag, rseq, qual, seqFileIn);
 					
 					m_nrChars += length(rseq);
 					
@@ -323,14 +255,10 @@ public:
 				
 				return myRead;
 			}
-			catch(exception &e){
-				cerr << "\n\n" << e.what() << "\nProgram execution aborted.\n" << endl;
+			catch(seqan::Exception const &e){
+				cerr << "\n\n" << "ERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
 				
-				if(m_useStdin) delete readerCin;
-				else{
-					delete reader;
-					closeFile(fstrm);
-				}
+				close(seqFileIn);
 				exit(1);
 			}
 		}

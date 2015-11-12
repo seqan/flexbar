@@ -12,8 +12,6 @@
 #include <iostream>
 
 #include <seqan/basic.h>
-#include <seqan/file.h>
-#include <seqan/stream.h>
 #include <seqan/sequence.h>
 #include <seqan/seq_io.h>
 
@@ -32,7 +30,7 @@ void openInputFile(std::fstream &strm, std::string path){
 	using namespace std;
 	
 	strm.open(path.c_str(), ios::in | ios::binary);
-		
+	
 	if(! strm.good()){
 		cerr << "Error opening file: " << path << "\n" << endl;
 		exit(1);
@@ -55,60 +53,6 @@ void openOutputFile(std::fstream &strm, std::string path){
 void closeFile(std::fstream &strm){
 	strm.close();
 }
-
-
-// void openInputFile(std::istream &strm, std::string path){}
-// void closeFile(std::istream &strm){}
-
-
-#if SEQAN_HAS_ZLIB
-
-void openInputFile(seqan::Stream<seqan::GZFile> &strm, std::string path){
-	using namespace std;
-	
-	if(! open(strm, path.c_str(), "rb")){
-		cerr << "Error opening gzip file: " << path << "\n" << endl;
-		exit(1);
-	}
-}
-
-void openOutputFile(seqan::Stream<seqan::GZFile> &strm, std::string path){
-	using namespace std;
-	
-	if(! open(strm, path.c_str(), "wb")){
-		cerr << "Error opening gzip file: " << path << "\n" << endl;
-		exit(1);
-	}
-}
-
-void closeFile(seqan::Stream<seqan::GZFile> &strm){}
-
-#endif
-
-
-#if SEQAN_HAS_BZIP2
-
-void openInputFile(seqan::Stream<seqan::BZ2File> &strm, std::string path){
-	using namespace std;
-	
-	if(! open(strm, path.c_str(), "rb")){
-		cerr << "Error opening bz2 file: " << path << "\n" << endl;
-		exit(1);
-	}
-}
-
-void openOutputFile(seqan::Stream<seqan::BZ2File> &strm, std::string path){
-	using namespace std;
-	
-	if(! open(strm, path.c_str(), "wb")){
-		cerr << "Error opening bz2 file: " << path << "\n" << endl;
-		exit(1);
-	}
-}
-
-void closeFile(seqan::Stream<seqan::BZ2File> &strm){}
-
-#endif
 
 
 void checkFileCompression(std::string path, flexbar::CompressionType &cmprsType){
@@ -153,7 +97,6 @@ void checkFileCompression(std::string path, flexbar::CompressionType &cmprsType)
 }
 
 
-template <typename TStream>
 void checkInputType(std::string path, flexbar::FileFormat &format){
 	
 	using namespace std;
@@ -169,25 +112,19 @@ void checkInputType(std::string path, flexbar::FileFormat &format){
 		}
 	}
 	else{
-		TStream fstrm;
+		fstream fstrm;
+		
 		openInputFile(fstrm, path);
-		// streamPeek(c, fstrm);
 		
-		seqan::RecordReader<TStream, seqan::SinglePass<> > reader(fstrm);
-		
-		if(! atEnd(reader)){
-			c = value(reader);
-			
-			// seqan::CharString text;
-			// if(readDigits(text, reader) != 0){
-			// 	cerr << "File reading error occured.\n" << endl;
-			// 	exit(1); }; cout << text << endl;
+		if(fstrm.good()){
+			fstrm >> c;
+			closeFile(fstrm);
 		}
 		else{
-			cerr << "Reads file seems to be empty.\n" << endl;
+			cerr << "ERROR: Reads file seems to be empty.\n" << endl;
+			closeFile(fstrm);
 			exit(1);
 		}
-		closeFile(fstrm);
 	}
 	
 	     if(c == '>') format = FASTA;

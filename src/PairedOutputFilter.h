@@ -22,7 +22,7 @@
 #include "QualTrimming.h"
 
 
-template <typename TSeqStr, typename TString, typename TStream>
+template <typename TSeqStr, typename TString>
 class PairedOutputFilter : public tbb::filter {
 
 private:
@@ -40,8 +40,8 @@ private:
 	const flexbar::BarcodeDetect  m_barDetect;
 	const flexbar::QualTrimType   m_qtrim;
 	
-	typedef SeqOutputFilter<TSeqStr, TString, TStream> TOutputFilter;
-	typedef OutputFileStruct<TSeqStr, TString, TStream> filters;
+	typedef SeqOutputFilter<TSeqStr, TString>  TOutputFilter;
+	typedef OutputFileStruct<TSeqStr, TString> filters;
 	
 	filters *m_outMap;
 	std::ostream *out;

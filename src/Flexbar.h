@@ -8,7 +8,6 @@
 #define FLEXBAR_FLEXBAR_H
 
 #include <string>
-#include <fstream>
 #include <iostream>
 
 #include <tbb/pipeline.h>
@@ -16,7 +15,6 @@
 #include <tbb/concurrent_vector.h>
 
 #include <seqan/basic.h>
-#include <seqan/stream.h>
 #include <seqan/sequence.h>
 #include <seqan/arg_parse.h>
 
@@ -44,7 +42,7 @@ void loadBarcodes(Options &o, const bool secondSet){
 		
 		string barFile = secondSet ? o.barcode2File : o.barcodeFile;
 		
-		SeqInputFilter<CharString, CharString, fstream> adapter_filter(o, barFile, true, false, false);
+		SeqInputFilter<CharString, CharString> adapter_filter(o, barFile, true, false, false);
 		bpipeline.add_filter(adapter_filter);
 		
 		AdapterLoader<CharString, CharString> adapterLoader(o, false);
@@ -90,7 +88,7 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 			
 			string adapFile = secondSet ? o.adapter2File : o.adapterFile;
 			
-			SeqInputFilter<CharString, CharString, fstream> adapter_filter(o, adapFile, true, false, false);
+			SeqInputFilter<CharString, CharString> adapter_filter(o, adapFile, true, false, false);
 			prepipe.add_filter(adapter_filter);
 			prepipe.add_filter(adapterLoader);
 			prepipe.run(1);
@@ -218,15 +216,12 @@ void printCompletedMessage(Options &o){
 }
 
 
-template <typename TStreamR, typename TStreamP, typename TStreamB, typename TStreamOut>
 void startProcessing(Options &o){
 	
 	using namespace std;
 	using namespace flexbar;
 	
-	// Check TSeqStr everywhere, e.g. qual
 	// typedef seqan::Dna5String TSeqStr;
-	
 	typedef seqan::CharString TSeqStr;
 	typedef seqan::CharString TString;
 	
@@ -239,9 +234,9 @@ void startProcessing(Options &o){
 	
 	if(o.logLevel != NONE) *out << "\n\nLog level " << o.logLevelStr << " output generation:\n\n" << endl;
 	
-	PairedInputFilter<TSeqStr, TString, TStreamR, TStreamP, TStreamB> inputFilter(o);
-	PairedAlignmentFilter<TSeqStr, TString> alignFilter(o);
-	PairedOutputFilter<TSeqStr, TString, TStreamOut> outputFilter(o);
+	PairedInputFilter<TSeqStr, TString>      inputFilter(o);
+	PairedAlignmentFilter<TSeqStr, TString>  alignFilter(o);
+	PairedOutputFilter<TSeqStr, TString>     outputFilter(o);
 	
 	tbb::task_scheduler_init init_serial(o.nThreads);
 	tbb::pipeline pipe;
@@ -336,122 +331,6 @@ void startProcessing(Options &o){
 }
 
 
-template <typename TStreamR, typename TStreamP, typename TStreamB>
-void startProcessing(Options &o){
-	
-	using namespace std;
-	using namespace flexbar;
-	
-	if(o.cmprsType == GZ){
-		
-		#if SEQAN_HAS_ZLIB
-			startProcessing<TStreamR, TStreamP, TStreamB, seqan::Stream<seqan::GZFile> >(o);
-		#else
-			o.outCompression = "";
-			o.cmprsType = UNCOMPRESSED;
-			cerr << "Output file compression inactive.\n"
-			     << "This build does not support zlib!\n" << endl;
-		#endif
-	}
-	
-	else if(o.cmprsType == BZ2){
-		
-		#if SEQAN_HAS_BZIP2
-			startProcessing<TStreamR, TStreamP, TStreamB, seqan::Stream<seqan::BZ2File> >(o);
-		#else
-			o.outCompression = "";
-			o.cmprsType = UNCOMPRESSED;
-			cerr << "Output file compression inactive.\n"
-			     << "This build does not support bzip2!\n" << endl;
-		#endif
-	}
-	
-	if(o.cmprsType == UNCOMPRESSED){
-		startProcessing<TStreamR, TStreamP, TStreamB, fstream>(o);
-	}
-}
-
-
-template <typename TStreamR, typename TStreamP>
-void startProcessing(Options &o){
-	
-	using namespace flexbar;
-	
-	CompressionType cmprsType;
-	checkFileCompression(o.barReadsFile, cmprsType);
-	
-	#if SEQAN_HAS_ZLIB
-		if(cmprsType == GZ){
-			startProcessing<TStreamR, TStreamP, seqan::Stream<seqan::GZFile> >(o);
-		}
-	#endif
-	
-	#if SEQAN_HAS_BZIP2
-		if(cmprsType == BZ2){
-			startProcessing<TStreamR, TStreamP, seqan::Stream<seqan::BZ2File> >(o);
-		}
-	#endif
-	
-	if(cmprsType == UNCOMPRESSED){
-		startProcessing<TStreamR, TStreamP, std::fstream>(o);
-	}
-}
-
-
-template <typename TStreamR>
-void startProcessing(Options &o){
-	
-	using namespace flexbar;
-	
-	CompressionType cmprsType;
-	checkFileCompression(o.readsFile2, cmprsType);
-	
-	#if SEQAN_HAS_ZLIB
-		if(cmprsType == GZ){
-			startProcessing<TStreamR, seqan::Stream<seqan::GZFile> >(o);
-		}
-	#endif
-	
-	#if SEQAN_HAS_BZIP2
-		if(cmprsType == BZ2){
-			startProcessing<TStreamR, seqan::Stream<seqan::BZ2File> >(o);
-		}
-	#endif
-	
-	if(cmprsType == UNCOMPRESSED){
-		startProcessing<TStreamR, std::fstream>(o);
-	}
-}
-
-
-void startProcessing(Options &o, const bool start){
-	
-	using namespace flexbar;
-	
-	CompressionType cmprsType;
-	checkFileCompression(o.readsFile, cmprsType);
-	
-	#if SEQAN_HAS_ZLIB
-		if(cmprsType == GZ){
-			if(start) startProcessing<seqan::Stream<seqan::GZFile> >(o);
-			else      checkInputType<seqan::Stream<seqan::GZFile> >(o.readsFile, o.format);
-		}
-	#endif
-	
-	#if SEQAN_HAS_BZIP2
-		if(cmprsType == BZ2){
-			if(start) startProcessing<seqan::Stream<seqan::BZ2File> >(o);
-		  	else      checkInputType<seqan::Stream<seqan::BZ2File> >(o.readsFile, o.format);
-		}
-	#endif
-	
-	if(cmprsType == UNCOMPRESSED){
-		if(start) startProcessing<std::fstream>(o);
-		else      checkInputType<std::fstream>(o.readsFile, o.format);
-	}
-}
-
-
 void initOptions(Options &o, seqan::ArgumentParser &parser){
 	
 	using namespace std;
@@ -471,63 +350,53 @@ void initOptions(Options &o, seqan::ArgumentParser &parser){
 	}
 	
 	getOptionValue(o.readsFile, parser, "reads");
-	startProcessing(o, false);
+	checkInputType(o.readsFile, o.format);
 }
 
-
-// #include <seqan/find.h>
-// #include <seqan/align.h>
 
 void performTest(){
 	
 	using namespace std;
-	using namespace flexbar;
+	using namespace seqan;
+	// using namespace flexbar;
 	
-	using seqan::CharString;
-	
-	// typedef seqan::String<char, seqan::MMap<> > TMMapString;
-	// TMMapString mmapStr;
-	// 
-	// if(! open(mmapStr, "test/test.fasta", seqan::OPEN_RDONLY)){
-	// 	cout << "Error opening File." << std::endl;
-	// 	exit(1);
-	// }
-	// seqan::RecordReader<TMMapString, seqan::SinglePass<seqan::StringReader> > mmReader(mmapStr);
-	// string text2 = "";
-	// readLine(text2, mmReader);
-	// cout << text2 << endl;
-	
-	// CharString haystack = "ATGGATTGCG", needle = "ATGCAT";
-	// 
-	// seqan::Finder<CharString> finder(haystack);
-	// seqan::Pattern<CharString, seqan::DPSearch<seqan::SimpleScore, seqan::FindInfix> > pattern(needle, seqan::SimpleScore(0, -1, -7));
-	// 
-	// while (find(finder, pattern, -2)){
-	//     while (findBegin(finder, pattern, getScore(pattern))){
-	//         cout << '[' << beginPosition(finder) << ',' << endPosition(finder) << ")\t" << infix(finder) << endl;
-	//        // cout << end(finder) << endl; //',' << position(pattern) << endl;
-	// 	} }
-	// clear(finder);
-	// seqan::Pattern<CharString, seqan::AbndmAlgo > pattern2(needle, -2);
-	// 
-	// //seqan::Score<int> sc(0,-3,-2);  // = scoringScheme(pattern2);
-	// //setScoringScheme(pattern2, sc);
-	// 
-	// while (find(finder, pattern2)){
-	//     while (findBegin(finder, pattern2, getScore(pattern2))){
-	//         cout << '[' << beginPosition(finder) << ',' << endPosition(finder) << ")\t" << infix(finder) << endl;
-	// 	}
-	// }
 }
 
 
 void startComputation(Options &o){
 	
-	using namespace std;
-	
 	// performTest();
 	
-	startProcessing(o, true);
+	using namespace std;
+	using namespace flexbar;
+	
+	if(o.cmprsType == GZ){
+		
+		#if SEQAN_HAS_ZLIB
+			startProcessing(o);
+		#else
+			o.outCompression = "";
+			o.cmprsType = UNCOMPRESSED;
+			cerr << "Output file compression inactive.\n"
+			     << "This build does not support zlib!\n" << endl;
+		#endif
+	}
+	
+	else if(o.cmprsType == BZ2){
+		
+		#if SEQAN_HAS_BZIP2
+			startProcessing(o);
+		#else
+			o.outCompression = "";
+			o.cmprsType = UNCOMPRESSED;
+			cerr << "Output file compression inactive.\n"
+			     << "This build does not support bzip2!\n" << endl;
+		#endif
+	}
+	
+	if(o.cmprsType == UNCOMPRESSED){
+		startProcessing(o);
+	}
 }
 
 

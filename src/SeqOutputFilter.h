@@ -12,16 +12,15 @@
 #include <tbb/concurrent_vector.h>
 
 #include "Enums.h"
-#include "FlexbarIO.h"
 #include "SeqRead.h"
 
 
-template <typename TSeqStr, typename TString, typename TStream>
+template <typename TSeqStr, typename TString>
 class SeqOutputFilter {
 
 private:
 	
-	TStream m_targetStream;
+	seqan::SeqFileOut seqFileOut;
 	
 	const bool m_writeLenDist, m_useStdout;
 	const unsigned int m_minLength, m_cutLen_read;
@@ -48,6 +47,7 @@ public:
 		m_cmprsType(o.cmprsType),
 		m_filePath(filePath + o.outCompression){
 		
+		using namespace std;
 		using namespace flexbar;
 		
 		m_countGood      = 0;
@@ -55,16 +55,24 @@ public:
 		
 		m_lengthDist = new tbb::concurrent_vector<unsigned long>(MAX_READLENGTH + 1, 0);
 		
-		if(! m_useStdout) openOutputFile(m_targetStream, m_filePath);
-		
-		// if(m_useStdout && m_cmprsType != UNCOMPRESSED) openOutputFile(m_targetStream, "-");
-		// else if(! m_useStdout)                         openOutputFile(m_targetStream, m_filePath);
+		if(m_useStdout){
+			if(!open(seqFileOut, cout)){
+				cerr << "ERROR: Could not open output stream." << "\n" << endl;
+				exit(1);
+			}
+		}
+		else{
+			if(!open(seqFileOut, m_filePath.c_str())){
+				cerr << "ERROR: Could not open file: " << m_filePath << "\n" << endl;
+				exit(1);
+			}
+		}
 	};
 	
 	
 	virtual ~SeqOutputFilter(){
-		if(! m_useStdout) closeFile(m_targetStream);
 		delete m_lengthDist;
+		if(! m_useStdout) close(seqFileOut);
 	};
 	
 	
@@ -83,7 +91,7 @@ public:
 		lstream.open(fname.c_str(), ios::out | ios::binary);
 		
 		if(! lstream.is_open()){
-			cerr << "Error opening File: " << fname << "\n";
+			cerr << "ERROR: Could not open file: " << fname << "\n";
 		}
 		else{
 			lstream << "Readlength\tCount" << "\n";
@@ -97,51 +105,32 @@ public:
 	}
 	
 	
-	void writeFastString(const SeqRead<TSeqStr, TString>& myRead){
+	void writeSeqRead(const SeqRead<TSeqStr, TString>& myRead){
 		
 		using namespace std;
 		using namespace flexbar;
 		
-		seqan::CharString s = "";
+		TString tag = myRead.getSequenceTag();
 		
-		switch(m_format){
-			case FASTQ:
-				append(s, "@");
-				append(s, myRead.getSequenceTag());
-				
-				if(m_useStdout && m_tagStr != ""){
-					append(s, "_");
-					append(s, m_tagStr);
-				}
-				append(s, "\n");
-				
-				append(s, myRead.getSequence());
-				append(s, "\n+\n");
-				append(s, myRead.getQuality());
-				append(s, "\n");
-			break;
-			
-			case FASTA:
-				append(s, ">");
-				append(s, myRead.getSequenceTag());
-				
-				if(m_useStdout && m_tagStr != ""){
-					append(s, "_");
-					append(s, m_tagStr);
-				}
-				append(s, "\n");
-				
-				append(s, myRead.getSequence());
-				append(s, "\n");
+		if(m_useStdout && m_tagStr != ""){
+			append(tag, "_");
+			append(tag, m_tagStr);
 		}
 		
-		// if(m_useStdout && m_cmprsType == UNCOMPRESSED) cout << s;
-		if(m_useStdout) cout << s;
-		else{
-			if(streamPut(m_targetStream, s) != 0){
-				cerr << "File writing error occured!\n" << endl;
-				exit(1);
+		try{
+			if(m_format == FASTA){
+				writeRecord(seqFileOut, tag, myRead.getSequence());
 			}
+			else if(m_format == FASTQ){
+				writeRecord(seqFileOut, tag, myRead.getSequence(), myRead.getQuality());
+			}
+		}
+		catch(seqan::Exception const &e){
+			cerr << "\n\n" << "ERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
+			
+			close(seqFileOut);
+			delete m_lengthDist;
+			exit(1);
 		}
 	}
 	
@@ -187,7 +176,7 @@ public:
 			else if(m_writeLenDist)
 				cerr << "\nCompile Flexbar with larger max read length to get correct length dist.\n" << endl;
 			
-			writeFastString(*myRead);
+			writeSeqRead(*myRead);
 		}
 		
 		return NULL;

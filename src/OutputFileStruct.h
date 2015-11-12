@@ -10,12 +10,12 @@
 #include "SeqOutputFilter.h"
 
 
-template <typename TSeqStr, typename TString, typename TStream>
+template <typename TSeqStr, typename TString>
 class OutputFileStruct {
 	
 public:
 	
-	typedef SeqOutputFilter<TSeqStr, TString, TStream> TOutputFilter;
+	typedef SeqOutputFilter<TSeqStr, TString> TOutputFilter;
 	
 	TOutputFilter *f1, *f2, *single1, *single2;
 	
