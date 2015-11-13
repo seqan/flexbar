@@ -196,7 +196,7 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	
 	addSection(parser, "Quality-based trimming");
 	addOption(parser, ArgParseOption("q",  "qtrim", "Quality-based trimming mode.", ARG::STRING));
-	addOption(parser, ArgParseOption("qf", "qtrim-format", "Quality format: sanger, solexa, i1.3, i1.5, i1.8 (illumina).", ARG::STRING));
+	addOption(parser, ArgParseOption("qf", "qtrim-format", "Quality format.", ARG::STRING));
 	addOption(parser, ArgParseOption("qt", "qtrim-threshold", "Minimum quality as threshold for trimming.", ARG::INTEGER));
 	// addOption(parser, ArgParseOption("qm", "qtrim-win-mean", "Different threshold for min mean quality of window.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("qw", "qtrim-win-size", "Region size for sliding window approach.", ARG::INTEGER));
@@ -253,7 +253,6 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	setCategory(parser, "Trimming");
 	// setRequired(parser, "reads");
 	// setMinValue(parser, "threads", "1");
-	// setValidValues(parser, "qtrim-format", "sanger solexa i1.3 i1.5 i1.8");
 	
 	// setValidValues(parser, "target", "fasta fa fastq fq");
 	// setValidValues(parser, "reads", "fasta fa fastq fq");
@@ -287,6 +286,7 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	
 	
 	setValidValues(parser, "qtrim", "TAIL WIN BWA");
+	setValidValues(parser, "qtrim-format", "sanger solexa i1.3 i1.5 i1.8");
 	setValidValues(parser, "log-level", "ALL MOD TAB");
 	setValidValues(parser, "zip-output", "GZ BZ2");
 	setValidValues(parser, "adapter-read-set", "1 2");
@@ -529,10 +529,7 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 		     if(qt == "TAIL") o.qTrim = TAIL;
  		else if(qt == "WIN")  o.qTrim = WIN;
  		else if(qt == "BWA")  o.qTrim = BWA;
-		else{
-			cerr << "\n\n" << "Specified qtrim mode is unknown!\n" << endl;
-			exit(1);
-		}
+		
 		*out << "qtrim:                 " << qt << endl;
 		
 		if(isSet(parser, "qtrim-format")){
@@ -545,10 +542,10 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 			else if(quality == "i1.3")   o.qual = ILLUMINA13;
 			else if(quality == "i1.5")   o.qual = ILLUMINA13;
 			else if(quality == "i1.8")   o.qual = SANGER;
-			else{
-				cerr << "\n\n" << "Specified quality format is unknown!\n" << endl;
-				exit(1);
-			}
+			// else{
+			// 	cerr << "\n\n" << "Specified quality format is unknown!\n" << endl;
+			// 	exit(1);
+			// }
 			*out << "qtrim-format:          " << quality << endl;
 		}
 		else{
@@ -606,10 +603,6 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 		else if(o.outCompression == "BZ2"){
 			o.cmprsType = BZ2;
 			o.outCompression = ".bz2";
-		}
-		else{
-			o.outCompression = "";
-			cerr << "Specified zip-output is unknown.\n" << endl;
 		}
 	}
 	

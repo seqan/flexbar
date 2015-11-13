@@ -25,7 +25,7 @@ int main(int argc, const char* argv[]){
 	using seqan::ArgumentParser;
 	
 	const string version = "2.7 alpha";
-	const string date    = "November 12, 2015";
+	const string date    = "November 13, 2015";
 	
 	ArgumentParser parser("flexbar");
 	
