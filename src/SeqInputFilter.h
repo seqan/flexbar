@@ -124,10 +124,6 @@ public:
 			try{
 				if(m_format == FASTA){
 					
-					// tag line is read in previous iteration
-					// if(m_nextTag == "") readOneLine(tag);
-					// else                tag = m_nextTag;
-					
 					// if(length(tag) > 0){
 					// 	if(getValue(tag, 0) != '>'){
 					// 		stringstream error;
@@ -143,20 +139,6 @@ public:
 					// 	}
 					// }
 					// else return NULL;
-					
-					// readOneLine(rseq);
-					// if(length(rseq) < 1){
-					// 	stringstream error;
-					// 	error << "Empty FASTA entry: found tag without read for " << tag << endl;
-					// 	throw runtime_error(error.str());
-					// }
-					
-					// readOneLine(m_nextTag);
-					// fasta files with sequences on multiple lines
-					// while(! atEnd(seqFileIn) && length(m_nextTag) > 0 && getValue(m_nextTag, 0) != '>'){
-					// 	append(rseq, m_nextTag);
-					// 	readOneLine(m_nextTag);
-					// }
 					
 					readRecord(tag, rseq, seqFileIn);
 					

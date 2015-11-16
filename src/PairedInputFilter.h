@@ -22,9 +22,7 @@ private:
 	const bool m_isPaired, m_useBarcodeRead, m_useNumberTag;
 	tbb::atomic<unsigned long> m_uncalled, m_uncalledPairs, m_tagCounter;
 	
-	SeqInputFilter<TSeqStr, TString> *m_f1;
-	SeqInputFilter<TSeqStr, TString> *m_f2;
-	SeqInputFilter<TSeqStr, TString> *m_b;
+	SeqInputFilter<TSeqStr, TString> *m_f1, *m_f2, *m_b;
 	
 public:
 	

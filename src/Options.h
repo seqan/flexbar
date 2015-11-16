@@ -542,10 +542,7 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 			else if(quality == "i1.3")   o.qual = ILLUMINA13;
 			else if(quality == "i1.5")   o.qual = ILLUMINA13;
 			else if(quality == "i1.8")   o.qual = SANGER;
-			// else{
-			// 	cerr << "\n\n" << "Specified quality format is unknown!\n" << endl;
-			// 	exit(1);
-			// }
+			
 			*out << "qtrim-format:          " << quality << endl;
 		}
 		else{
