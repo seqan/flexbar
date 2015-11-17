@@ -19,7 +19,7 @@ Flexbar source code for building and precompiled binaries for Linux 64 and Mac O
 Make sure that `cmake` is available, as well as development and runtime files of the TBB library 4.0 or later (Intel Threading Building Blocks). Using a package manager is a simple way to install them. Furthermore, the SeqAn library is required.
 
 * Download Flexbar source code release
-* Get SeqAn library version 2.0.1 [here](https://github.com/seqan/seqan/releases)
+* Get SeqAn library version 1.4.2 [here](https://github.com/seqan/seqan/releases/download/seqan-v1.4.2/seqan-library-1.4.2.tar.bz2)
 
 Decompress both and move SeqAn include folder to Flexbar:
 
@@ -30,6 +30,8 @@ Use these commands for building:
         cd flexbar
         cmake .
         make
+
+For the latest Flexbar sources use SeqAn 2.0.1 release instead.
 
 ### Installation of binaries
 
