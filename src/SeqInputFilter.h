@@ -125,13 +125,6 @@ public:
 				if(m_format == FASTA){
 					
 					// if(length(tag) > 0){
-					// 	if(getValue(tag, 0) != '>'){
-					// 		stringstream error;
-					// 		error << "Incorrect FASTA entry: missing > symbol for " << tag << endl;
-					// 		throw runtime_error(error.str());
-					// 	}
-					// 	else tag = suffix(tag, 1);
-					//
 					// 	if(length(tag) == 0){
 					// 		stringstream error;
 					// 		error << "Incorrect FASTA entry: missing read name after > symbol." << endl;
@@ -141,6 +134,17 @@ public:
 					// else return NULL;
 					
 					readRecord(tag, rseq, seqFileIn);
+					
+					if(length(tag) < 1){
+						cerr << "\n\n" << "ERROR: Read without name in input.\n" << endl;
+						close(seqFileIn);
+						exit(1);
+					}
+					if(length(rseq) < 1){
+						cerr << "\n\n" << "ERROR: Read without sequence in input.\n" << endl;
+						close(seqFileIn);
+						exit(1);
+					}
 					
 					m_nrChars += length(rseq);
 					
@@ -173,25 +177,18 @@ public:
 				// fastq
 				else{
 					
-					// readOneLine(rseq);
-					
-					// if(length(rseq) > 0){
-					// 	if(getValue(rseq, 0) != '@'){
-					// 		stringstream error;
-					// 		error << "Incorrect FASTQ entry: missing @ symbol for " << rseq << endl;
-					// 		throw runtime_error(error.str());
-					// 	}
-					// 	else tag = suffix(rseq, 1);
-					//
-					// 	if(length(tag) == 0){
-					// 		stringstream error;
-					// 		error << "Incorrect FASTQ entry: missing read name after @ symbol." << endl;
-					// 		throw runtime_error(error.str());
-					// 	}
-					// }
-					// else return NULL;
-					
 					readRecord(tag, rseq, qual, seqFileIn);
+					
+					if(length(tag) < 1){
+						cerr << "\n\n" << "ERROR: Read without name in input.\n" << endl;
+						close(seqFileIn);
+						exit(1);
+					}
+					if(length(rseq) < 1){
+						cerr << "\n\n" << "ERROR: Read without sequence in input.\n" << endl;
+						close(seqFileIn);
+						exit(1);
+					}
 					
 					m_nrChars += length(rseq);
 					
@@ -233,7 +230,6 @@ public:
 			}
 			catch(seqan::Exception const &e){
 				cerr << "\n\n" << "ERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
-				
 				close(seqFileIn);
 				exit(1);
 			}
