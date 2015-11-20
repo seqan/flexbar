@@ -59,6 +59,7 @@ public:
 	}
 	
 	
+	// tbb filter operator
 	void* operator()(void*){
 		
 		using namespace std;

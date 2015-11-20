@@ -241,6 +241,7 @@ public:
 	};
 	
 	
+	// tbb filter operator
 	void* operator()(void* item){
 		
 		using namespace flexbar;

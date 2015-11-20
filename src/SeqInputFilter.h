@@ -101,8 +101,7 @@ public:
 	}
 	
 	
-	// returns single SeqRead or NULL if no more reads in file or error
-	
+	// returns SeqRead or NULL if end of file
 	void* getRead(bool &isUncalled){
 		
 		using namespace std;
@@ -123,15 +122,6 @@ public:
 			
 			try{
 				if(m_format == FASTA){
-					
-					// if(length(tag) > 0){
-					// 	if(length(tag) == 0){
-					// 		stringstream error;
-					// 		error << "Incorrect FASTA entry: missing read name after > symbol." << endl;
-					// 		throw runtime_error(error.str());
-					// 	}
-					// }
-					// else return NULL;
 					
 					readRecord(tag, rseq, seqFileIn);
 					
