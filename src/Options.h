@@ -17,6 +17,7 @@
 
 #include "Enums.h"
 #include "SeqRead.h"
+#include "FlexbarIO.h"
 
 
 typedef std::pair< SeqRead<seqan::Dna5String, seqan::CharString>*,
@@ -432,6 +433,8 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 	}
 	else *out << o.readsFile << endl;
 	
+	checkFileCompression(o.readsFile);
+	
 	o.runType = SINGLE;
 	
 	if(isSet(parser, "reads2")){
@@ -439,6 +442,7 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 		*out << "Reads file 2:          " << o.readsFile2 << "   (paired run)" << endl;
 		o.runType  = PAIRED;
 		o.isPaired = true;
+		checkFileCompression(o.readsFile2);
 	}
 	
 	
@@ -449,6 +453,8 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 		if(isSet(parser, "barcode-reads")){
 			getOptionValue(o.barReadsFile, parser, "barcode-reads");
 			*out << "Barcode reads file:    " << o.barReadsFile << endl;
+			
+			checkFileCompression(o.barReadsFile);
 			
 			o.barDetect = BARCODE_READ;
 		}

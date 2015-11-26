@@ -26,7 +26,6 @@ class AdapterLoader : public tbb::filter{
 private:
 	
 	std::ostream *out;
-	flexbar::FileFormat m_format;
 	tbb::concurrent_vector<TAdapter> adapters;
 	
 	bool m_revComp, m_isAdapter;
@@ -37,7 +36,6 @@ public:
 		
 		filter(serial),
 		out(o.out),
-		m_format(o.format),
 		m_isAdapter(isAdapter){
 			
 			m_revComp = o.revCompAdapter && isAdapter;

@@ -53,7 +53,7 @@ void closeFile(std::fstream &strm){
 }
 
 
-void checkFileCompression(std::string path, flexbar::CompressionType &cmprsType){
+void checkFileCompression(const std::string path){
 	
 	using namespace std;
 	using namespace flexbar;
@@ -62,7 +62,7 @@ void checkFileCompression(std::string path, flexbar::CompressionType &cmprsType)
 	using seqan::suffix;
 	using seqan::length;
 	
-	cmprsType = UNCOMPRESSED;
+	CompressionType cmprsType = UNCOMPRESSED;
 	
 	if(length(path) > 3){
 		CharString ending = suffix(path, length(path) - 3);
@@ -95,47 +95,73 @@ void checkFileCompression(std::string path, flexbar::CompressionType &cmprsType)
 }
 
 
-void checkInputType(std::string path, flexbar::FileFormat &format){
+void checkInputType(const std::string path, flexbar::FileFormat &format){
 	
 	using namespace std;
 	using namespace flexbar;
 	
-	char c;
+	checkFileCompression(path);
 	
 	if(path == "-"){
+		
+		char c;
+		
 		if(cin) c = cin.peek();
 		else{
 			cerr << "Standard input reading error.\n" << endl;
 			exit(1);
 		}
-	}
-	else{
-		fstream fstrm;
 		
-		openInputFile(fstrm, path);
-		
-		if(fstrm.good()){
-			fstrm >> c;
-			closeFile(fstrm);
-		}
+		     if(c == '>') format = FASTA;
+		else if(c == '@') format = FASTQ;
 		else{
-			cerr << "ERROR: Reads file seems to be empty.\n" << endl;
-			closeFile(fstrm);
+			cerr << "Reads file type not conform.\n";
+			cerr << "Uncompressed fasta or fastq for stdin.\n" << endl;
 			exit(1);
 		}
 	}
-	
-	     if(c == '>') format = FASTA;
-	else if(c == '@') format = FASTQ;
 	else{
-		cerr << "Reads file type not conform.\n";
-		cerr << "Neither fasta nor fastq header.\n" << endl;
-		exit(1);
+		
+		seqan::SeqFileIn seqFileIn;
+		
+		if(!open(seqFileIn, path.c_str())){
+			cerr << "ERROR: Could not open file: " << path << "\n" << endl;
+			exit(1);
+		}
+		
+		if(! atEnd(seqFileIn)){
+			
+			try{
+				seqan::Dna5String rseq;
+				seqan::CharString tag, qual;
+				
+				readRecord(tag, rseq, qual, seqFileIn);
+				
+				if(qual == ""){
+					format = FASTA;
+				}
+				else{
+					format = FASTQ;
+				}
+			}
+			catch(seqan::Exception const &e){
+				cerr << "\n\n" << "ERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
+				close(seqFileIn);
+				exit(1);
+			}
+		}
+		else{
+			cerr << "Reads file seems to be empty.\n\n" << endl;
+			close(seqFileIn);
+			exit(1);
+		}
+		
+		close(seqFileIn);
 	}
 }
 
 
-std::string toFormatString(flexbar::FileFormat format){
+std::string toFormatString(const flexbar::FileFormat format){
 	
 	using namespace flexbar;
 	
