@@ -351,7 +351,7 @@ void initOptions(Options &o, seqan::ArgumentParser &parser){
 	}
 	
 	getOptionValue(o.readsFile, parser, "reads");
-	checkInputType(o.readsFile, o.format);
+	checkInputType(o.readsFile, o.format, true);
 }
 
 

@@ -95,14 +95,14 @@ void checkFileCompression(const std::string path){
 }
 
 
-void checkInputType(const std::string path, flexbar::FileFormat &format){
+void checkInputType(const std::string path, flexbar::FileFormat &format, const bool isReadsFile){
 	
 	using namespace std;
 	using namespace flexbar;
 	
 	checkFileCompression(path);
 	
-	if(path == "-"){
+	if(path == "-" && isReadsFile){
 		
 		char c;
 		

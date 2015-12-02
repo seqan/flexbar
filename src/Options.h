@@ -433,8 +433,6 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 	}
 	else *out << o.readsFile << endl;
 	
-	checkFileCompression(o.readsFile);
-	
 	o.runType = SINGLE;
 	
 	if(isSet(parser, "reads2")){
@@ -442,7 +440,14 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 		*out << "Reads file 2:          " << o.readsFile2 << "   (paired run)" << endl;
 		o.runType  = PAIRED;
 		o.isPaired = true;
-		checkFileCompression(o.readsFile2);
+		
+		flexbar::FileFormat fformat;
+		checkInputType(o.readsFile2, fformat, false);
+		
+		if(o.format != fformat){
+			cerr << "\n\n" << "First and second reads file do not have same format.\n" << endl;
+			exit(1);
+		}
 	}
 	
 	
@@ -454,7 +459,13 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 			getOptionValue(o.barReadsFile, parser, "barcode-reads");
 			*out << "Barcode reads file:    " << o.barReadsFile << endl;
 			
-			checkFileCompression(o.barReadsFile);
+			flexbar::FileFormat fformat;
+			checkInputType(o.barReadsFile, fformat, false);
+			
+			if(o.format != fformat){
+				cerr << "\n\n" << "Barcode reads file does not have same format as reads.\n" << endl;
+				exit(1);
+			}
 			
 			o.barDetect = BARCODE_READ;
 		}
