@@ -308,8 +308,8 @@ void startProcessing(Options &o){
 	
 	*out << "  finally skipped short reads     " << alignValue(len, outputFilter.getNrShortReads()) << endl;
 	
-	if(o.isPaired && ! o.writeSingleReads)
-	*out << "  skipped single paired reads     " << alignValue(len, outputFilter.getNrSingleReads()) << endl;
+	if(o.isPaired && ! o.writeSingleReads && ! o.writeSingleReadsP)
+	*out << "  skipped paired single reads     " << alignValue(len, outputFilter.getNrSingleReads()) << endl;
 	
 	*out << "Discarded reads overall           " << alignValue(len, nReads - nGoodReads) << endl;
 	*out << "Remaining reads                   " << alignValue(len, nGoodReads);

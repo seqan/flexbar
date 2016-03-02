@@ -30,7 +30,7 @@ struct Options{
 	std::string adapterSeq, targetName, logLevelStr, outCompression;
 	
 	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, randTag;
-	bool switch2Fasta, writeUnassigned, writeSingleReads, writeLengthDist;
+	bool switch2Fasta, writeUnassigned, writeSingleReads, writeSingleReadsP, writeLengthDist;
 	bool useStdin, useStdout, relaxRegion, revCompAdapter, qtrimPostRm;
 	
 	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len;
@@ -65,20 +65,21 @@ struct Options{
 		adapter2File   = "";
 		outCompression = "";
 		
-		isPaired         = false;
-		useAdapterFile   = false;
-		useNumberTag     = false;
-		useRemovalTag    = false;
-		writeUnassigned  = false;
-		writeSingleReads = false;
-		writeLengthDist  = false;
-		switch2Fasta     = false;
-		randTag          = false;
-		useStdin         = false;
-		useStdout        = false;
-		relaxRegion      = false;
-		revCompAdapter   = false;
-		qtrimPostRm      = false;
+		isPaired          = false;
+		useAdapterFile    = false;
+		useNumberTag      = false;
+		useRemovalTag     = false;
+		writeUnassigned   = false;
+		writeSingleReads  = false;
+		writeSingleReadsP = false;
+		writeLengthDist   = false;
+		switch2Fasta      = false;
+		randTag           = false;
+		useStdin          = false;
+		useStdout         = false;
+		relaxRegion       = false;
+		revCompAdapter    = false;
+		qtrimPostRm       = false;
 		
 		cutLen_begin  = 0;
 		cutLen_end    = 0;
@@ -208,7 +209,8 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	addOption(parser, ArgParseOption("z", "zip-output", "Direct compression of output files.", ARG::STRING));
 	addOption(parser, ArgParseOption("1", "stdout-reads", "Write reads to stdout, tagged and interleaved if needed."));
 	addOption(parser, ArgParseOption("j", "length-dist", "Generate length distribution for read output files."));
-	addOption(parser, ArgParseOption("s", "single-reads", "Write single paired reads for too short counterparts."));
+	addOption(parser, ArgParseOption("s", "single-reads", "Write single reads for too short counterparts in pairs."));
+	addOption(parser, ArgParseOption("S", "single-reads-paired", "Write paired single reads with N for short counterparts."));
 	
 	addSection(parser, "Logging and tagging");
 	addOption(parser, ArgParseOption("l", "log-level", "Print chosen read alignments.", ARG::STRING));
@@ -247,6 +249,7 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	hideOption(parser, "version");
 	hideOption(parser, "stdout-reads");
 	hideOption(parser, "length-dist");
+	hideOption(parser, "single-reads-paired");
 	hideOption(parser, "number-tags");
 	hideOption(parser, "random-tags");
 	
@@ -379,12 +382,13 @@ void parseCommandLine(seqan::ArgumentParser &parser, std::string version, int ar
 		hideOption(parser, "qtrim-win-size",      false);
 		hideOption(parser, "qtrim-post-removal",  false);
 		
-		hideOption(parser, "adapters2",    false);
-		hideOption(parser, "version",      false);
-		hideOption(parser, "stdout-reads", false);
-		hideOption(parser, "length-dist",  false);
-		hideOption(parser, "number-tags",  false);
-		hideOption(parser, "random-tags",  false);
+		hideOption(parser, "adapters2",            false);
+		hideOption(parser, "version",              false);
+		hideOption(parser, "stdout-reads",         false);
+		hideOption(parser, "length-dist",          false);
+		hideOption(parser, "single-reads-paired",  false);
+		hideOption(parser, "number-tags",          false);
+		hideOption(parser, "random-tags",          false);
 		
 		if(isSet(parser, "man")) printHelp(parser, cerr, "man");
 		else{
@@ -627,11 +631,13 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 		}
 	}
 	
-	if(isSet(parser, "single-reads")) o.writeSingleReads = true;
-	if(isSet(parser, "length-dist"))  o.writeLengthDist  = true;
-	if(isSet(parser, "number-tags"))  o.useNumberTag     = true;
-	if(isSet(parser, "removal-tags")) o.useRemovalTag    = true;
-	if(isSet(parser, "random-tags"))  o.randTag          = true;
+	if(isSet(parser, "single-reads"))        o.writeSingleReads  = true;
+	if(isSet(parser, "single-reads-paired")) o.writeSingleReadsP = true;
+	
+	if(isSet(parser, "length-dist"))  o.writeLengthDist = true;
+	if(isSet(parser, "number-tags"))  o.useNumberTag    = true;
+	if(isSet(parser, "removal-tags")) o.useRemovalTag   = true;
+	if(isSet(parser, "random-tags"))  o.randTag         = true;
 	
 	*out << endl;
 	

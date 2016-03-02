@@ -29,7 +29,8 @@ private:
 	
 	int m_mapsize;
 	const int m_minLength, m_cutLen_read, m_qtrimThresh, m_qtrimWinSize;
-	const bool m_isPaired, m_writeUnassigned, m_writeSingleReads, m_twoBarcodes, m_qtrimPostRm;
+	const bool m_isPaired, m_writeUnassigned, m_writeSingleReads, m_writeSingleReadsP;
+	const bool m_twoBarcodes, m_qtrimPostRm;
 	
 	tbb::atomic<unsigned long> m_nSingleReads, m_nLowPhred;
 	
@@ -67,6 +68,7 @@ public:
 		m_isPaired(o.isPaired),
 		m_writeUnassigned(o.writeUnassigned),
 		m_writeSingleReads(o.writeSingleReads),
+		m_writeSingleReadsP(o.writeSingleReadsP),
 		m_twoBarcodes(o.barDetect == flexbar::WITHIN_READ_REMOVAL2 || o.barDetect == flexbar::WITHIN_READ2),
 		out(o.out){
 		
@@ -126,7 +128,7 @@ public:
 					f.f1       = of1;
 					f.f2       = of2;
 					
-					if(m_writeSingleReads){
+					if(m_writeSingleReads && ! m_writeSingleReadsP){
 						ss << m_target << "_barcode_" << barcode1 << "_single" << toFormatString(m_format);
 						TOutputFilter *osingle1 = new TOutputFilter(ss.str(), "", true, o);
 						ss.str("");
@@ -151,7 +153,7 @@ public:
 					f.f1       = of1;
 					f.f2       = of2;
 					
-					if(m_writeSingleReads){
+					if(m_writeSingleReads && ! m_writeSingleReadsP){
 						s = m_target + "_barcode_unassigned_1_single" + toFormatString(m_format);
 						TOutputFilter *osingle1 = new TOutputFilter(s, "", true, o);
 						
@@ -180,7 +182,7 @@ public:
 				f.f1       = of1;
 				f.f2       = of2;
 				
-				if(m_writeSingleReads){
+				if(m_writeSingleReads && ! m_writeSingleReadsP){
 					s = m_target + "_1_single" + toFormatString(m_format);
 					TOutputFilter *osingle1 = new TOutputFilter(s, "", true, o);
 					
@@ -303,15 +305,33 @@ public:
 						else if(l1ok && ! l2ok){
 							m_nSingleReads++;
 							
-							if(m_writeSingleReads){
+							if(m_writeSingleReads && ! m_writeSingleReadsP){
 								m_outMap[outIdx].single1->writeRead(pRead->m_r1);
+							}
+							else if(m_writeSingleReadsP){
+								
+								pRead->m_r2->setSequence("N");
+								
+								// setQuality()
+								
+								m_outMap[outIdx].f1->writeRead(pRead->m_r1);
+								m_outMap[outIdx].f2->writeRead(pRead->m_r2);
 							}
 						}
 						else if(! l1ok && l2ok){
 							m_nSingleReads++;
 							
-							if(m_writeSingleReads){
+							if(m_writeSingleReads && ! m_writeSingleReadsP){
 								m_outMap[outIdx].single2->writeRead(pRead->m_r2);
+							}
+							else if(m_writeSingleReadsP){
+								
+								pRead->m_r1->setSequence("N");
+								
+								// setQuality()
+								
+								m_outMap[outIdx].f1->writeRead(pRead->m_r1);
+								m_outMap[outIdx].f2->writeRead(pRead->m_r2);
 							}
 						}
 						
@@ -361,7 +381,7 @@ public:
 				if(m_outMap[i].f2 != NULL){
 					nGood += m_outMap[i].f2->getNrGoodReads();
 					
-					if(m_writeSingleReads){
+					if(m_writeSingleReads && ! m_writeSingleReadsP){
 						nGood += m_outMap[i].single1->getNrGoodReads();
 						nGood += m_outMap[i].single2->getNrGoodReads();
 					}
@@ -385,7 +405,7 @@ public:
 				if(m_outMap[i].f2 != NULL){
 					nGood += m_outMap[i].f2->getNrGoodChars();
 					
-					if(m_writeSingleReads){
+					if(m_writeSingleReads && ! m_writeSingleReadsP){
 						nGood += m_outMap[i].single1->getNrGoodChars();
 						nGood += m_outMap[i].single2->getNrGoodChars();
 					}
@@ -483,14 +503,14 @@ public:
 			if(m_barDetect == BOFF || m_writeUnassigned || i > 0){
 				*out << "Read file:               " << m_outMap[i].f1->getFileName()    << "\n";
 				*out << "  written reads          " << m_outMap[i].f1->getNrGoodReads() << "\n";
-				*out << "  skipped short reads    " << m_outMap[i].m_nShort_1           << "\n";
+				*out << "  short reads            " << m_outMap[i].m_nShort_1           << "\n";
 				
 				if(m_isPaired){
 					*out << "Read file 2:             " << m_outMap[i].f2->getFileName()    << "\n";
 					*out << "  written reads          " << m_outMap[i].f2->getNrGoodReads() << "\n";
-					*out << "  skipped short reads    " << m_outMap[i].m_nShort_2           << "\n";
+					*out << "  short reads            " << m_outMap[i].m_nShort_2           << "\n";
 					
-					if(m_writeSingleReads){
+					if(m_writeSingleReads && ! m_writeSingleReadsP){
 						*out << "Single read file:        " << m_outMap[i].single1->getFileName()    << "\n";
 						*out << "  written reads          " << m_outMap[i].single1->getNrGoodReads() << "\n";
 						*out << "Single read file 2:      " << m_outMap[i].single2->getFileName()    << "\n";
