@@ -116,6 +116,7 @@ const std::string getFlexbarBanner(const seqan::CharString version){
 	append(banner, version);
 	
 	banner += "\n";
+	banner += "Powered by SeqAn, the library for sequence analysis\n";
 	
 	return banner;
 }
@@ -225,6 +226,12 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	addText(parser._toolDoc, "LEFT_TAIL: consider first n bases of reads in alignment", false);
 	addText(parser._toolDoc, "RIGHT_TAIL: use only last n bases, see tail-length options", false);
 	
+	
+	// setCitation(parser, "...");
+	
+	// printHelp(parser, out, format, showAdvancedOptions);
+	
+	// setAdvanced(parser, "barcodes2", false);
 	
 	hideOption(parser, "barcodes2");
 	hideOption(parser, "barcode-tail-length");
@@ -631,8 +638,12 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 		}
 	}
 	
-	if(isSet(parser, "single-reads"))        o.writeSingleReads  = true;
-	if(isSet(parser, "single-reads-paired")) o.writeSingleReadsP = true;
+	if(isSet(parser, "single-reads")) o.writeSingleReads  = true;
+	
+	if(isSet(parser, "single-reads-paired")){
+		o.writeSingleReadsP = true;
+		o.writeSingleReads  = false;
+	}
 	
 	if(isSet(parser, "length-dist"))  o.writeLengthDist = true;
 	if(isSet(parser, "number-tags"))  o.useNumberTag    = true;

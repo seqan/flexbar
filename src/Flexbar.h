@@ -274,8 +274,14 @@ void startProcessing(Options &o){
 	const unsigned long nChars     = inputFilter.getNrProcessedChars();
 	const unsigned long uncalled   = inputFilter.getNrUncalledReads();
 	const unsigned long uPairs     = inputFilter.getNrUncalledPairedReads();
-	const unsigned long nGoodReads = outputFilter.getNrGoodReads();
-	const unsigned long nGoodChars = outputFilter.getNrGoodChars();
+	
+	unsigned long nGoodReads = outputFilter.getNrGoodReads();
+	unsigned long nGoodChars = outputFilter.getNrGoodChars();
+	
+	if(o.isPaired && o.writeSingleReadsP){
+		nGoodReads -= outputFilter.getNrSingleReads();
+		nGoodChars -= outputFilter.getNrSingleReads();
+	}
 	
 	stringstream s; s << nReads;
 	int len = s.str().length();

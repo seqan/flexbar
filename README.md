@@ -31,7 +31,7 @@ Use these commands for building:
         cmake .
         make
 
-For the latest Flexbar sources use SeqAn 2.0.1 [release](https://github.com/seqan/seqan/releases) instead.
+For the latest Flexbar sources use SeqAn 2.0.2 [release](https://github.com/seqan/seqan/releases) instead.
 
 ### Installation of binaries
 

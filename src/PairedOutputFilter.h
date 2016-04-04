@@ -114,12 +114,12 @@ public:
 					
 					stringstream ss;
 					
-					ss << m_target << "_barcode_" << barcode1 << toFormatString(m_format);
+					ss << m_target << "_barcode_" << barcode1 << toFormatStr(m_format);
 					TOutputFilter *of1 = new TOutputFilter(ss.str(), barcode1, false, o);
 					ss.str("");
 					ss.clear();
 					
-					ss << m_target << "_barcode_" << barcode2 << toFormatString(m_format);
+					ss << m_target << "_barcode_" << barcode2 << toFormatStr(m_format);
 					TOutputFilter *of2 = new TOutputFilter(ss.str(), barcode2, false, o);
 					ss.str("");
 					ss.clear();
@@ -128,13 +128,13 @@ public:
 					f.f1       = of1;
 					f.f2       = of2;
 					
-					if(m_writeSingleReads && ! m_writeSingleReadsP){
-						ss << m_target << "_barcode_" << barcode1 << "_single" << toFormatString(m_format);
+					if(m_writeSingleReads){
+						ss << m_target << "_barcode_" << barcode1 << "_single" << toFormatStr(m_format);
 						TOutputFilter *osingle1 = new TOutputFilter(ss.str(), "", true, o);
 						ss.str("");
 						ss.clear();
 						
-						ss << m_target << "_barcode_" << barcode2 << "_single"<< toFormatString(m_format);
+						ss << m_target << "_barcode_" << barcode2 << "_single" << toFormatStr(m_format);
 						TOutputFilter *osingle2 = new TOutputFilter(ss.str(), "", true, o);
 						
 						f.single1 = osingle1;
@@ -143,21 +143,21 @@ public:
 				}
 				
 				if(m_writeUnassigned){
-					string s = m_target + "_barcode_unassigned_1" + toFormatString(m_format);
+					string s = m_target + "_barcode_unassigned_1" + toFormatStr(m_format);
 					TOutputFilter *of1 = new TOutputFilter(s, "unassigned_1", false, o);
 					
-					s = m_target + "_barcode_unassigned_2" + toFormatString(m_format);
+					s = m_target + "_barcode_unassigned_2" + toFormatStr(m_format);
 					TOutputFilter *of2 = new TOutputFilter(s, "unassigned_2", false, o);
 					
 					filters& f = m_outMap[0];
 					f.f1       = of1;
 					f.f2       = of2;
 					
-					if(m_writeSingleReads && ! m_writeSingleReadsP){
-						s = m_target + "_barcode_unassigned_1_single" + toFormatString(m_format);
+					if(m_writeSingleReads){
+						s = m_target + "_barcode_unassigned_1_single" + toFormatStr(m_format);
 						TOutputFilter *osingle1 = new TOutputFilter(s, "", true, o);
 						
-						s = m_target + "_barcode_unassigned_2_single" + toFormatString(m_format);
+						s = m_target + "_barcode_unassigned_2_single" + toFormatStr(m_format);
 						TOutputFilter *osingle2 = new TOutputFilter(s, "", true, o);
 						
 						f.single1 = osingle1;
@@ -172,21 +172,21 @@ public:
 				m_mapsize = 1;
 				m_outMap = new filters[m_mapsize];
 				
-				string s = m_target + "_1" + toFormatString(m_format);
+				string s = m_target + "_1" + toFormatStr(m_format);
 				TOutputFilter *of1 = new TOutputFilter(s, "1", false, o);
 				
-				s = m_target + "_2" + toFormatString(m_format);
+				s = m_target + "_2" + toFormatStr(m_format);
 				TOutputFilter *of2 = new TOutputFilter(s, "2", false, o);
 				
 				filters& f = m_outMap[0];
 				f.f1       = of1;
 				f.f2       = of2;
 				
-				if(m_writeSingleReads && ! m_writeSingleReadsP){
-					s = m_target + "_1_single" + toFormatString(m_format);
+				if(m_writeSingleReads){
+					s = m_target + "_1_single" + toFormatStr(m_format);
 					TOutputFilter *osingle1 = new TOutputFilter(s, "", true, o);
 					
-					s = m_target + "_2_single" + toFormatString(m_format);
+					s = m_target + "_2_single" + toFormatStr(m_format);
 					TOutputFilter *osingle2 = new TOutputFilter(s, "", true, o);
 					
 					f.single1 = osingle1;
@@ -200,7 +200,7 @@ public:
 				m_mapsize = 1;
 				m_outMap = new filters[m_mapsize];
 				
-				string s = m_target + toFormatString(m_format);
+				string s = m_target + toFormatStr(m_format);
 				TOutputFilter *of1 = new TOutputFilter(s, "", false, o);
 				
 				filters& f = m_outMap[0];
@@ -219,7 +219,7 @@ public:
 					TString barcode = m_barcodes->at(i).first->getSequenceTag();
 					
 					stringstream ss;
-					ss << m_target << "_barcode_" << barcode << toFormatString(m_format);
+					ss << m_target << "_barcode_" << barcode << toFormatStr(m_format);
 					TOutputFilter *of1 = new TOutputFilter(ss.str(), barcode, false, o);
 					
 					filters& f = m_outMap[i + 1];
@@ -227,7 +227,7 @@ public:
 				}
 				
 				if(m_writeUnassigned){
-					string s = m_target + "_barcode_unassigned" + toFormatString(m_format);
+					string s = m_target + "_barcode_unassigned" + toFormatStr(m_format);
 					TOutputFilter *of1 = new TOutputFilter(s, "unassigned", false, o);
 					
 					filters& f = m_outMap[0];
@@ -305,14 +305,16 @@ public:
 						else if(l1ok && ! l2ok){
 							m_nSingleReads++;
 							
-							if(m_writeSingleReads && ! m_writeSingleReadsP){
+							if(m_writeSingleReads){
 								m_outMap[outIdx].single1->writeRead(pRead->m_r1);
 							}
 							else if(m_writeSingleReadsP){
 								
 								pRead->m_r2->setSequence("N");
 								
-								// setQuality()
+								if(m_format == FASTQ){
+									pRead->m_r2->setQuality(prefix(pRead->m_r1->getQuality(), 1));
+								}
 								
 								m_outMap[outIdx].f1->writeRead(pRead->m_r1);
 								m_outMap[outIdx].f2->writeRead(pRead->m_r2);
@@ -321,14 +323,16 @@ public:
 						else if(! l1ok && l2ok){
 							m_nSingleReads++;
 							
-							if(m_writeSingleReads && ! m_writeSingleReadsP){
+							if(m_writeSingleReads){
 								m_outMap[outIdx].single2->writeRead(pRead->m_r2);
 							}
 							else if(m_writeSingleReadsP){
 								
 								pRead->m_r1->setSequence("N");
 								
-								// setQuality()
+								if(m_format == FASTQ){
+									pRead->m_r1->setQuality(prefix(pRead->m_r2->getQuality(), 1));
+								}
 								
 								m_outMap[outIdx].f1->writeRead(pRead->m_r1);
 								m_outMap[outIdx].f2->writeRead(pRead->m_r2);
@@ -381,7 +385,7 @@ public:
 				if(m_outMap[i].f2 != NULL){
 					nGood += m_outMap[i].f2->getNrGoodReads();
 					
-					if(m_writeSingleReads && ! m_writeSingleReadsP){
+					if(m_writeSingleReads){
 						nGood += m_outMap[i].single1->getNrGoodReads();
 						nGood += m_outMap[i].single2->getNrGoodReads();
 					}
@@ -405,7 +409,7 @@ public:
 				if(m_outMap[i].f2 != NULL){
 					nGood += m_outMap[i].f2->getNrGoodChars();
 					
-					if(m_writeSingleReads && ! m_writeSingleReadsP){
+					if(m_writeSingleReads){
 						nGood += m_outMap[i].single1->getNrGoodChars();
 						nGood += m_outMap[i].single2->getNrGoodChars();
 					}
@@ -510,7 +514,7 @@ public:
 					*out << "  written reads          " << m_outMap[i].f2->getNrGoodReads() << "\n";
 					*out << "  short reads            " << m_outMap[i].m_nShort_2           << "\n";
 					
-					if(m_writeSingleReads && ! m_writeSingleReadsP){
+					if(m_writeSingleReads){
 						*out << "Single read file:        " << m_outMap[i].single1->getFileName()    << "\n";
 						*out << "  written reads          " << m_outMap[i].single1->getNrGoodReads() << "\n";
 						*out << "Single read file 2:      " << m_outMap[i].single2->getFileName()    << "\n";

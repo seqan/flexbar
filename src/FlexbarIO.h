@@ -161,7 +161,7 @@ void checkInputType(const std::string path, flexbar::FileFormat &format, const b
 }
 
 
-std::string toFormatString(const flexbar::FileFormat format){
+std::string toFormatStr(const flexbar::FileFormat format){
 	
 	using namespace flexbar;
 	
