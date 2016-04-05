@@ -116,7 +116,7 @@ const std::string getFlexbarBanner(const seqan::CharString version){
 	append(banner, version);
 	
 	banner += "\n";
-	banner += "Powered by SeqAn, the library for sequence analysis\n";
+	banner += "Developed with SeqAn, the library for sequence analysis\n";
 	
 	return banner;
 }
@@ -136,12 +136,13 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	setVersion(parser, version);
 	setDate(parser, date);
 	
+	// setCitation(parser, "...");
+	
 	setShortDescription(parser, "flexible barcode and adapter removal");
 	
 	addUsageLine(parser, "\\fB-r\\fP reads [\\fB-t\\fP target] [\\fB-b\\fP barcodes] [\\fB-a\\fP adapters] [options]");
 	
 	// addOption(parser, ArgParseOption("v", "version", "Display program version."));
-	addOption(parser, ArgParseOption("H", "advanced", "Print help with advanced options."));
 	addOption(parser, ArgParseOption("M", "man", "Print advanced options as man document."));
 	addOption(parser, ArgParseOption("c", "cite", "Show program reference for citation."));
 	
@@ -219,46 +220,34 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	addOption(parser, ArgParseOption("e", "number-tags", "Replace read tags by ascending number to save space."));
 	addOption(parser, ArgParseOption("d", "random-tags", "Capture read sequence at barcode or adapter N positions."));
 	
-	addSection(parser, "Trim-end modes");
-	addText(parser._toolDoc, "ANY: longer side of read remains after removal of overlap", false);
-	addText(parser._toolDoc, "LEFT: right side remains after removal, align <= read end", false);
-	addText(parser._toolDoc, "RIGHT: left part remains after removal, align >= read start", false);
-	addText(parser._toolDoc, "LEFT_TAIL: consider first n bases of reads in alignment", false);
-	addText(parser._toolDoc, "RIGHT_TAIL: use only last n bases, see tail-length options", false);
-	
-	
-	// setCitation(parser, "...");
-	
-	// printHelp(parser, out, format, showAdvancedOptions);
-	
-	// setAdvanced(parser, "barcodes2", false);
-	
-	hideOption(parser, "barcodes2");
-	hideOption(parser, "barcode-tail-length");
-	hideOption(parser, "barcode-keep");
-	hideOption(parser, "barcode-match");
-	hideOption(parser, "barcode-mismatch");
-	hideOption(parser, "barcode-gap");
-	
-	hideOption(parser, "adapters2");
-	hideOption(parser, "adapter-revcomp");
-	hideOption(parser, "adapter-tail-length");
-	hideOption(parser, "adapter-relaxed");
-	hideOption(parser, "adapter-read-set");
-	hideOption(parser, "adapter-match");
-	hideOption(parser, "adapter-mismatch");
-	hideOption(parser, "adapter-gap");
-	
-	hideOption(parser, "qtrim-win-size");
-	hideOption(parser, "qtrim-post-removal");
 	
 	hideOption(parser, "man");
-	hideOption(parser, "version");
-	hideOption(parser, "stdout-reads");
-	hideOption(parser, "length-dist");
-	hideOption(parser, "single-reads-paired");
-	hideOption(parser, "number-tags");
-	hideOption(parser, "random-tags");
+	
+	setAdvanced(parser, "barcodes2");
+	setAdvanced(parser, "barcode-tail-length");
+	setAdvanced(parser, "barcode-keep");
+	setAdvanced(parser, "barcode-match");
+	setAdvanced(parser, "barcode-mismatch");
+	setAdvanced(parser, "barcode-gap");
+	
+	setAdvanced(parser, "adapters2");
+	setAdvanced(parser, "adapter-revcomp");
+	setAdvanced(parser, "adapter-tail-length");
+	setAdvanced(parser, "adapter-relaxed");
+	setAdvanced(parser, "adapter-read-set");
+	setAdvanced(parser, "adapter-match");
+	setAdvanced(parser, "adapter-mismatch");
+	setAdvanced(parser, "adapter-gap");
+	
+	setAdvanced(parser, "qtrim-win-size");
+	setAdvanced(parser, "qtrim-post-removal");
+	
+	setAdvanced(parser, "version");
+	setAdvanced(parser, "stdout-reads");
+	setAdvanced(parser, "length-dist");
+	setAdvanced(parser, "single-reads-paired");
+	setAdvanced(parser, "number-tags");
+	setAdvanced(parser, "random-tags");
 	
 	
 	setCategory(parser, "Trimming");
@@ -323,6 +312,14 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	setDefaultValue(parser, "qtrim-threshold",    "20");
 	setDefaultValue(parser, "qtrim-win-size",     "5");
 	
+	
+	addTextSection(parser, "TRIM-END MODES");
+	addText(parser._toolDoc, "\\fBANY:\\fP longer side of read remains after removal of overlap", false);
+	addText(parser._toolDoc, "\\fBLEFT:\\fP right side remains after removal, align <= read end", false);
+	addText(parser._toolDoc, "\\fBRIGHT:\\fP left part remains after removal, align >= read start", false);
+	addText(parser._toolDoc, "\\fBLEFT_TAIL:\\fP consider first n bases of reads in alignment", false);
+	addText(parser._toolDoc, "\\fBRIGHT_TAIL:\\fP use only last n bases, see tail-length options", false);
+	
 	addTextSection(parser, "EXAMPLES");
 	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq \\fB-t\\fP target \\fB-b\\fP brc.fa \\fB-be\\fP LEFT_TAIL \\fB-a\\fP adp.fa", false);
 	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq.gz \\fB-q\\fP TAIL \\fB-qf\\fP i1.8 \\fB-a\\fP adp.fa \\fB-ao\\fP 5 \\fB-at\\fP 4");
@@ -342,7 +339,6 @@ void parseCommandLine(seqan::ArgumentParser &parser, std::string version, int ar
 	
 	using seqan::ArgumentParser;
 	
-	
 	bool useStdout = false;
 	
 	for (int i=0; i<argc; i++){
@@ -357,9 +353,9 @@ void parseCommandLine(seqan::ArgumentParser &parser, std::string version, int ar
 	if(res != ArgumentParser::PARSE_OK){
 		
 		if(isSet(parser, "help")){
-			cerr << "\nAdvanced options: flexbar -H\n";
+			cout << "\nAdvanced options: flexbar -hh";
 		}
-		cerr << endl;
+		cout << "\nDocumentation on: github.com/seqan/flexbar\n" << endl;
 		
 		exit(res == ArgumentParser::PARSE_ERROR);
 	}
@@ -368,46 +364,14 @@ void parseCommandLine(seqan::ArgumentParser &parser, std::string version, int ar
 		cout << getFlexbarBanner(version) << getFlexbarCitation() << endl;
 		exit(0);
 	}
-	
-	if(isSet(parser, "advanced") || isSet(parser, "man")){
-		
-		hideOption(parser, "barcodes2",           false);
-		hideOption(parser, "barcode-tail-length", false);
-		hideOption(parser, "barcode-keep",        false);
-		hideOption(parser, "barcode-match",       false);
-		hideOption(parser, "barcode-mismatch",    false);
-		hideOption(parser, "barcode-gap",         false);
-		
-		hideOption(parser, "adapter-revcomp",     false);
-		hideOption(parser, "adapter-tail-length", false);
-		hideOption(parser, "adapter-relaxed",     false);
-		hideOption(parser, "adapter-read-set",    false);
-		hideOption(parser, "adapter-match",       false);
-		hideOption(parser, "adapter-mismatch",    false);
-		hideOption(parser, "adapter-gap",         false);
-		
-		hideOption(parser, "qtrim-win-size",      false);
-		hideOption(parser, "qtrim-post-removal",  false);
-		
-		hideOption(parser, "adapters2",            false);
-		hideOption(parser, "version",              false);
-		hideOption(parser, "stdout-reads",         false);
-		hideOption(parser, "length-dist",          false);
-		hideOption(parser, "single-reads-paired",  false);
-		hideOption(parser, "number-tags",          false);
-		hideOption(parser, "random-tags",          false);
-		
-		if(isSet(parser, "man")) printHelp(parser, cerr, "man");
-		else{
-			printHelp(parser);
-			cerr << "\nFurther documentation on github.com/seqan/flexbar\n" << endl;
-		}
+	else if(isSet(parser, "man")){
+		printHelp(parser, cout, "man", true);
 		exit(0);
 	}
-	
-	if(! isSet(parser, "reads")){
+	else if(! isSet(parser, "reads")){
 		printShortHelp(parser);
-		cerr << "\nPlease set required input file.\n" << endl;
+		
+		cerr << "\nPlease specify reads input file.\n" << endl;
 		exit(1);
 	}
 }
