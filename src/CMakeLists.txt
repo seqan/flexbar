@@ -1,4 +1,14 @@
-cmake_minimum_required( VERSION 2.8.2 )
+cmake_minimum_required( VERSION 3.0.0 )
+
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+
+if(COMPILER_SUPPORTS_CXX11)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+else()
+	message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Use a different compiler.")
+endif()
+
 
 if( CMAKE_SIZEOF_VOID_P MATCHES "8" )
 	message( STATUS "Flexbar 64 bit architecture" )
