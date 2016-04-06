@@ -1,8 +1,8 @@
 ## Flexbar — flexible barcode and adapter removal
 
-The program Flexbar preprocesses high-throughput sequencing data efficiently. It demultiplexes barcoded runs and removes adapter sequences. Moreover, trimming and filtering features are provided. Flexbar increases read mapping rates and improves genome as well as transcriptome assemblies. It supports next-generation sequencing data in fasta and fastq format, e.g. from Illumina and the Roche 454 platform.
+The program Flexbar preprocesses high-throughput sequencing data efficiently. It demultiplexes barcoded runs and removes adapter sequences. Moreover, trimming and filtering features are provided. Flexbar increases read mapping rates and improves genome as well as transcriptome assemblies. It supports next-generation sequencing data in fasta and fastq format, e.g. from Roche 454 and the Illumina platform.
 
-This is the Flexbar repository by Johannes Roehr. Flexbar is in the process of being adapted to SeqAn and will incorporate features and changes from the seqan flexcat repository. Refer to the [manual](https://github.com/seqan/flexbar/wiki) or contact [jtroehr](https://github.com/jtroehr) for support with this SeqAn application.
+This is the Flexbar repository by Johannes Roehr. Flexbar is being adapted to SeqAn and will incorporate features and changes from seqan flexcat. Refer to the [manual](https://github.com/seqan/flexbar/wiki) or contact [jtroehr](https://github.com/jtroehr) for support with this SeqAn application.
 
 ### Reference
 
@@ -16,10 +16,10 @@ Flexbar source code for building and precompiled binaries for Linux 64 and Mac O
 
 ### Building from source
 
-Make sure that `cmake` is available, as well as development and runtime files of the TBB library 4.0 or later (Intel Threading Building Blocks). Using a package manager is a simple way to install them. Furthermore, the SeqAn library is required.
+Make sure that `cmake` is available, as well as development and runtime files of the TBB library 4.0 or later (Intel Threading Building Blocks). Using a package manager is a simple way to install them. Furthermore, the SeqAn library is required:
 
-* Download Flexbar source code release
 * Get SeqAn library version 1.4.2 [here](https://github.com/seqan/seqan/releases/download/seqan-v1.4.2/seqan-library-1.4.2.tar.bz2)
+* Download Flexbar source code release
 
 Decompress both and move SeqAn include folder to Flexbar:
 

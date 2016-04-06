@@ -123,7 +123,7 @@ const std::string getFlexbarBanner(const seqan::CharString version){
 
 
 const std::string getFlexbarCitation(){
-	return "\nMatthias Dodt, Johannes T. Roehr, Rina Ahmed, Christoph Dieterich:\nFlexbar - flexible barcode and adapter processing for next-generation\nsequencing platforms. Biology 2012, 1(3):895-905.\n";
+	return "\nMatthias Dodt, Johannes T. Roehr, Rina Ahmed, Christoph Dieterich:\nFlexbar - flexible barcode and adapter processing for next-generation\nsequencing platforms. Biology 2012, 1(3):895-905.";
 }
 
 
@@ -136,17 +136,21 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	setVersion(parser, version);
 	setDate(parser, date);
 	
-	// setCitation(parser, "...");
+	// setCitation(parser, "\n" + getFlexbarCitation());
+	
+	// setShortCopyright(parser, "");
+	// setLongCopyright(parser, "");
 	
 	setShortDescription(parser, "flexible barcode and adapter removal");
 	
 	addUsageLine(parser, "\\fB-r\\fP reads [\\fB-t\\fP target] [\\fB-b\\fP barcodes] [\\fB-a\\fP adapters] [options]");
 	
+	// ARG::OUTPUTPREFIX
 	// addOption(parser, ArgParseOption("v", "version", "Display program version."));
+	
 	addOption(parser, ArgParseOption("M", "man", "Print advanced options as man document."));
 	addOption(parser, ArgParseOption("c", "cite", "Show program reference for citation."));
 	
-	// OUTPUTPREFIX
 	addSection(parser, "Basic options");
 	addOption(parser, ArgParseOption("n", "threads", "Number of threads to employ.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("t", "target", "Prefix for output file names or paths.", ARG::STRING));
@@ -314,11 +318,11 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	
 	
 	addTextSection(parser, "TRIM-END MODES");
-	addText(parser._toolDoc, "\\fBANY:\\fP longer side of read remains after removal of overlap", false);
-	addText(parser._toolDoc, "\\fBLEFT:\\fP right side remains after removal, align <= read end", false);
+	addText(parser._toolDoc, "\\fBANY:\\fP longer side of read remains after removal of overlap",   false);
+	addText(parser._toolDoc, "\\fBLEFT:\\fP right side remains after removal, align <= read end",   false);
 	addText(parser._toolDoc, "\\fBRIGHT:\\fP left part remains after removal, align >= read start", false);
-	addText(parser._toolDoc, "\\fBLEFT_TAIL:\\fP consider first n bases of reads in alignment", false);
-	addText(parser._toolDoc, "\\fBRIGHT_TAIL:\\fP use only last n bases, see tail-length options", false);
+	addText(parser._toolDoc, "\\fBLEFT_TAIL:\\fP consider first n bases of reads in alignment",     false);
+	addText(parser._toolDoc, "\\fBRIGHT_TAIL:\\fP use only last n bases, see tail-length options",  false);
 	
 	addTextSection(parser, "EXAMPLES");
 	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq \\fB-t\\fP target \\fB-b\\fP brc.fa \\fB-be\\fP LEFT_TAIL \\fB-a\\fP adp.fa", false);
@@ -361,7 +365,7 @@ void parseCommandLine(seqan::ArgumentParser &parser, std::string version, int ar
 	}
 	
 	if(isSet(parser, "cite")){
-		cout << getFlexbarBanner(version) << getFlexbarCitation() << endl;
+		cout << getFlexbarBanner(version) << getFlexbarCitation() << endl << endl;
 		exit(0);
 	}
 	else if(isSet(parser, "man")){
