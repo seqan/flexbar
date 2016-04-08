@@ -20,6 +20,8 @@ class PairedInputFilter : public tbb::filter {
 private:
 	
 	const bool m_isPaired, m_useBarcodeRead, m_useNumberTag;
+	const unsigned int m_perThread;
+	
 	tbb::atomic<unsigned long> m_uncalled, m_uncalledPairs, m_tagCounter;
 	
 	SeqInputFilter<TSeqStr, TString> *m_f1, *m_f2, *m_b;
@@ -31,7 +33,8 @@ public:
 		filter(serial_in_order),
 		m_useNumberTag(o.useNumberTag),
 		m_isPaired(o.isPaired),
-		m_useBarcodeRead(o.barDetect == flexbar::BARCODE_READ){
+		m_useBarcodeRead(o.barDetect == flexbar::BARCODE_READ),
+		m_perThread(o.perThread){
 		
 		m_tagCounter    = 0;
 		m_uncalled      = 0;

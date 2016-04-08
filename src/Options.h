@@ -35,7 +35,7 @@ struct Options{
 	
 	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len;
 	int qtrimThresh, qtrimWinSize;
-	int maxUncalled, min_readLen, a_min_overlap, b_min_overlap, nThreads;
+	int maxUncalled, min_readLen, a_min_overlap, b_min_overlap, nThreads, perThread;
 	int match, mismatch, gapCost, b_match, b_mismatch, b_gapCost;
 	
 	float a_threshold, b_threshold;
@@ -153,6 +153,7 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	
 	addSection(parser, "Basic options");
 	addOption(parser, ArgParseOption("n", "threads", "Number of threads to employ.", ARG::INTEGER));
+	addOption(parser, ArgParseOption("N", "per-thread", "Number of read pairs per thread.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("t", "target", "Prefix for output file names or paths.", ARG::STRING));
 	addOption(parser, ArgParseOption("r", "reads", "Fasta/q file or stdin (-) with reads that may contain barcodes.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("p", "reads2", "Second input file of paired reads, gz and bz2 files supported.", ARG::INPUT_FILE));
@@ -247,6 +248,7 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	setAdvanced(parser, "qtrim-post-removal");
 	
 	setAdvanced(parser, "version");
+	setAdvanced(parser, "per-thread");
 	setAdvanced(parser, "stdout-reads");
 	setAdvanced(parser, "length-dist");
 	setAdvanced(parser, "single-reads-paired");
@@ -295,8 +297,9 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	setValidValues(parser, "zip-output", "GZ BZ2");
 	setValidValues(parser, "adapter-read-set", "1 2");
 	
-	setDefaultValue(parser, "target",          "flexbar");
+	setDefaultValue(parser, "target",          "flexbarOut");
 	setDefaultValue(parser, "threads",         "1");
+	setDefaultValue(parser, "per-thread",      "16");
 	setDefaultValue(parser, "max-uncalled",    "0");
 	setDefaultValue(parser, "min-read-length", "18");
 	
@@ -492,6 +495,9 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 	
 	getOptionValue(o.nThreads, parser, "threads");
 	*out << "threads:               " << o.nThreads << endl;
+	
+	getOptionValue(o.perThread, parser, "per-thread");
+	*out << "per-thread:            " << o.perThread << endl;
 	
 	getOptionValue(o.maxUncalled, parser, "max-uncalled");
 	*out << "max-uncalled:          " << o.maxUncalled << endl;
