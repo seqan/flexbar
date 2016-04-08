@@ -1,4 +1,4 @@
-cmake_minimum_required( VERSION 3.0.0 )
+cmake_minimum_required( VERSION 2.8.2 )
 
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
@@ -29,7 +29,7 @@ else()
 endif()
 
 add_executable( flexbar Flexbar.cpp )
-target_link_libraries( flexbar tbb )
+target_link_libraries( flexbar tbb -lpthread )
 
 
 find_package( ZLIB )
