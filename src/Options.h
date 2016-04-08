@@ -248,7 +248,7 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	setAdvanced(parser, "qtrim-post-removal");
 	
 	setAdvanced(parser, "version");
-	setAdvanced(parser, "per-thread");
+	hideOption(parser, "per-thread");
 	setAdvanced(parser, "stdout-reads");
 	setAdvanced(parser, "length-dist");
 	setAdvanced(parser, "single-reads-paired");
@@ -497,7 +497,7 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 	*out << "threads:               " << o.nThreads << endl;
 	
 	getOptionValue(o.perThread, parser, "per-thread");
-	*out << "per-thread:            " << o.perThread << endl;
+	// *out << "per-thread:            " << o.perThread << endl;
 	
 	getOptionValue(o.maxUncalled, parser, "max-uncalled");
 	*out << "max-uncalled:          " << o.maxUncalled << endl;
