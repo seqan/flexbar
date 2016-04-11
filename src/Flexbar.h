@@ -365,7 +365,6 @@ void performTest(){
 	
 	using namespace std;
 	using namespace seqan;
-	// using namespace flexbar;
 	
 }
 
