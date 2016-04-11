@@ -4,17 +4,22 @@
    
    Version 2.7
    
-   Uses SeqAn library release 2.1.1
-    and TBB library 4.0 or later
+   uses SeqAn library release 2.1.1
+   and TBB library 4.0 or later
    
-   Authors: Matthias Dodt and Johannes Roehr
+   
+           Developer:  Johannes Roehr
+   
+   Former developers:  Matthias Dodt
+                       Benjamin Menkuec
+                       Sebastian Roskosch
+   
    
    https://github.com/seqan/flexbar
    
 ===================================================*/
 
 #include "Flexbar.h"
-#include "Options.h"
 
 
 int main(int argc, const char* argv[]){

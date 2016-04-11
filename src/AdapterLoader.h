@@ -16,8 +16,6 @@
 #include <seqan/basic.h>
 
 #include "Enums.h"
-#include "Options.h"
-#include "SeqRead.h"
 
 
 template <typename TSeqStr, typename TString>
@@ -26,7 +24,7 @@ class AdapterLoader : public tbb::filter{
 private:
 	
 	std::ostream *out;
-	tbb::concurrent_vector<TAdapter> adapters;
+	tbb::concurrent_vector<flexbar::TAdapter> adapters;
 	
 	bool m_revComp, m_isAdapter;
 	
@@ -95,12 +93,12 @@ public:
 	};
 	
 	
-	tbb::concurrent_vector<TAdapter> getAdapters(){
+	tbb::concurrent_vector<flexbar::TAdapter> getAdapters(){
 		return adapters;
 	}
 	
 	
-	void setAdapters(tbb::concurrent_vector<TAdapter> &adapterVec){
+	void setAdapters(tbb::concurrent_vector<flexbar::TAdapter> &adapterVec){
 		adapters = adapterVec;
 	}
 	

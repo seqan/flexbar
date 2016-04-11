@@ -10,18 +10,14 @@
 #include <string>
 #include <iostream>
 
-#include <tbb/concurrent_vector.h>
-
 #include <seqan/basic.h>
 #include <seqan/arg_parse.h>
 
+#include <tbb/concurrent_vector.h>
+
 #include "Enums.h"
-#include "SeqRead.h"
 #include "FlexbarIO.h"
 
-
-typedef std::pair< SeqRead<seqan::Dna5String, seqan::CharString>*,
-                   std::pair< tbb::atomic<unsigned long>, tbb::atomic<unsigned long> > > TAdapter;
 
 struct Options{
 	
@@ -50,7 +46,7 @@ struct Options{
 	flexbar::BarcodeDetect   barDetect;
 	flexbar::AdapterRemoval  adapRm;
 	
-	tbb::concurrent_vector<TAdapter> barcodes, adapters, barcodes2, adapters2;
+	tbb::concurrent_vector<flexbar::TAdapter> barcodes, adapters, barcodes2, adapters2;
 	
 	std::ostream *out;
 	std::fstream fstrmOut;
@@ -115,8 +111,7 @@ const std::string getFlexbarBanner(const seqan::CharString version){
 	
 	append(banner, version);
 	
-	banner += "\n";
-	banner += "Developed with SeqAn, the library for sequence analysis\n";
+	banner += "\nDeveloped with SeqAn, the library for sequence analysis\n";
 	
 	return banner;
 }

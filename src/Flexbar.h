@@ -22,7 +22,6 @@
 #include "Options.h"
 #include "FlexbarIO.h"
 #include "AdapterLoader.h"
-#include "SeqRead.h"
 #include "SeqInputFilter.h"
 #include "PairedInputFilter.h"
 #include "PairedOutputFilter.h"

@@ -14,8 +14,6 @@
 #include <seqan/seq_io.h>
 
 #include "Enums.h"
-#include "Options.h"
-#include "SeqRead.h"
 #include "QualTrimming.h"
 
 

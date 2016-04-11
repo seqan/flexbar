@@ -9,8 +9,6 @@
 
 #include <tbb/pipeline.h>
 
-#include "Options.h"
-#include "PairedRead.h"
 #include "SeqInputFilter.h"
 
 

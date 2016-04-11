@@ -29,16 +29,15 @@
 // DAMAGE.
 //
 // ==========================================================================
-// Author: Benjamin Menkuec <benjamin@menkuec.de>
-// Author: Sebastian Roskosch <serosko@zedat.fu-berlin.de>
-// Author: Johannes Roehr <johannes.roehr@fu-berlin.de>
+// Authors:  Sebastian Roskosch
+//           Benjamin Menkuec
+//           Johannes Roehr
 // ==========================================================================
 
 #ifndef FLEXBAR_QUALTRIMMING_H
 #define FLEXBAR_QUALTRIMMING_H
 
 #include "Enums.h"
-#include "SeqRead.h"
 
 
 // ============================================================================

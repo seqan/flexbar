@@ -7,10 +7,17 @@
 #ifndef FLEXBAR_ENUMS_H
 #define FLEXBAR_ENUMS_H
 
+#include "SeqRead.h"
+#include "PairedRead.h"
+
 
 namespace flexbar{
 	
 	const unsigned int MAX_READLENGTH = 2048;
+	
+	typedef std::pair< SeqRead<seqan::Dna5String, seqan::CharString>*,
+	                   std::pair< tbb::atomic<unsigned long>, tbb::atomic<unsigned long> > > TAdapter;
+	
 	
 	enum LogLevel {
 		NONE,

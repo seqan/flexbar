@@ -13,11 +13,8 @@
 #include <tbb/concurrent_vector.h>
 
 #include "Enums.h"
-#include "Options.h"
-#include "PairedRead.h"
 #include "AlignmentFilter.h"
 #include "AlignmentAlgorithm.h"
-#include "AdapterLoader.h"
 
 
 template <typename TSeqStr, typename TString>
@@ -34,8 +31,8 @@ private:
 	
 	tbb::atomic<unsigned long> m_unassigned;
 	
-	tbb::concurrent_vector<TAdapter> *m_adapters, *m_adapters2;
-	tbb::concurrent_vector<TAdapter> *m_barcodes, *m_barcodes2;
+	tbb::concurrent_vector<flexbar::TAdapter> *m_adapters, *m_adapters2;
+	tbb::concurrent_vector<flexbar::TAdapter> *m_barcodes, *m_barcodes2;
 	
 	typedef AlignmentFilter<TSeqStr, TString, AlignmentAlgorithm<TSeqStr> > AlignFilter;
 	AlignFilter *m_afilter, *m_bfilter, *m_a2filter, *m_b2filter;

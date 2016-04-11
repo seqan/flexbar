@@ -13,12 +13,9 @@
 #include <seqan/basic.h>
 
 #include "Enums.h"
-#include "Options.h"
 #include "FlexbarIO.h"
-#include "PairedRead.h"
 #include "SeqOutputFilter.h"
 #include "OutputFiles.h"
-#include "AdapterLoader.h"
 #include "QualTrimming.h"
 
 
@@ -47,8 +44,8 @@ private:
 	filters *m_outMap;
 	std::ostream *out;
 	
-	tbb::concurrent_vector<TAdapter> *m_adapters,  *m_barcodes;
-	tbb::concurrent_vector<TAdapter> *m_adapters2, *m_barcodes2;
+	tbb::concurrent_vector<flexbar::TAdapter> *m_adapters,  *m_barcodes;
+	tbb::concurrent_vector<flexbar::TAdapter> *m_adapters2, *m_barcodes2;
 	
 public:
 	
@@ -441,7 +438,7 @@ public:
 		
 		using namespace std;
 		
-		tbb::concurrent_vector<TAdapter> *adapters;
+		tbb::concurrent_vector<flexbar::TAdapter> *adapters;
 		const unsigned int maxSpaceLen = 20;
 		
 		int startLen = 8;

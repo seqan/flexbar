@@ -12,7 +12,6 @@
 #include <tbb/concurrent_vector.h>
 
 #include "Enums.h"
-#include "SeqRead.h"
 
 
 template <typename TSeqStr, typename TString>
