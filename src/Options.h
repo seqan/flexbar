@@ -25,7 +25,7 @@ struct Options{
 	std::string barcodeFile, adapterFile, barcode2File, adapter2File;
 	std::string adapterSeq, targetName, logLevelStr, outCompression;
 	
-	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, randTag;
+	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, randTag, logFile;
 	bool switch2Fasta, writeUnassigned, writeSingleReads, writeSingleReadsP, writeLengthDist;
 	bool useStdin, useStdout, relaxRegion, revCompAdapter, qtrimPostRm;
 	
@@ -70,6 +70,7 @@ struct Options{
 		writeSingleReadsP = false;
 		writeLengthDist   = false;
 		switch2Fasta      = false;
+		logFile           = false;
 		randTag           = false;
 		useStdin          = false;
 		useStdout         = false;
@@ -102,10 +103,10 @@ const std::string getFlexbarBanner(const seqan::CharString version){
 	std::string banner = "";
 	
 	banner += "               ________          __              \n";
-	banner += "              / ____/ /__  _  __/ /_  ____ ______\n";
+	banner += "              / ____/ /__  _  __/ /_  ____  _____\n";
 	banner += "             / /_  / / _ \\| |/ / __ \\/ __ `/ ___/\n";
 	banner += "            / __/ / /  __/>  </ /_/ / /_/ / /    \n";
-	banner += "           /_/   /_/\\___/_/|_/_.___/\\__,_/_/     \n\n";
+	banner += "           /_/   /_/\\___/_/|_/_.___/\\__._/_/     \n\n";
 	
 	banner += "Flexbar - flexible barcode and adapter removal, version ";
 	
@@ -221,7 +222,7 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	
 	addSection(parser, "Logging and tagging");
 	addOption(parser, ArgParseOption("l", "log-level", "Print chosen read alignments.", ARG::STRING));
-	// addOption(parser, ArgParseOption("f", "log-file", "Always write program statistics to target log file."));
+	addOption(parser, ArgParseOption("f", "log-file", "Always write program statistics to target log file."));
 	addOption(parser, ArgParseOption("g", "removal-tags", "Tag reads that are subject to adapter or barcode removal."));
 	addOption(parser, ArgParseOption("e", "number-tags", "Replace read tags by ascending number to save space."));
 	addOption(parser, ArgParseOption("d", "random-tags", "Capture read sequence at barcode or adapter N positions."));
@@ -253,7 +254,7 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	setAdvanced(parser, "stdout-reads");
 	setAdvanced(parser, "length-dist");
 	setAdvanced(parser, "single-reads-paired");
-	// setAdvanced(parser, "log-file");
+	setAdvanced(parser, "log-file");
 	setAdvanced(parser, "number-tags");
 	setAdvanced(parser, "random-tags");
 	
@@ -348,13 +349,15 @@ void parseCommandLine(seqan::ArgumentParser &parser, std::string version, int ar
 	
 	using seqan::ArgumentParser;
 	
-	bool useStdout = false;
+	bool useLogFile = false;
 	
 	for (int i=0; i<argc; i++){
-		if(strncmp(argv[i], "-1", 2) == 0 || strncmp(argv[i], "--stdout-reads", 14) == 0)
-			useStdout = true;
+		if(strncmp(argv[i], "-1", 2) == 0 || strncmp(argv[i], "--stdout-reads", 14) == 0 ||
+		   strncmp(argv[i], "-l", 2) == 0 || strncmp(argv[i], "--log-level",    11) == 0 ||
+		   strncmp(argv[i], "-f", 2) == 0 || strncmp(argv[i], "--log-file",     10) == 0)
+			useLogFile = true;
 	}
-	if(! useStdout) cout << endl;
+	if(! useLogFile) cout << endl;
 	
 	
 	ArgumentParser::ParseResult res = parse(parser, argc, argv);
@@ -636,6 +639,8 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 		o.writeSingleReads  = false;
 	}
 	
+	if(isSet(parser, "stdout-reads")) o.useStdout       = true;
+	if(isSet(parser, "log-file"))     o.logFile         = true;
 	if(isSet(parser, "length-dist"))  o.writeLengthDist = true;
 	if(isSet(parser, "number-tags"))  o.useNumberTag    = true;
 	if(isSet(parser, "removal-tags")) o.useRemovalTag   = true;

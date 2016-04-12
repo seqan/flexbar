@@ -332,14 +332,19 @@ void initOptions(Options &o, seqan::ArgumentParser &parser){
 	
 	using namespace std;
 	
-	if(isSet(parser, "stdout-reads")){
+	bool stdOut   = isSet(parser, "stdout-reads");
+	bool logLevel = isSet(parser, "log-level");
+	bool logFile  = isSet(parser, "log-file");
+	
+	if(stdOut) o.useStdout = true;
+	
+	if(stdOut || logLevel || logFile){
 		
 		string s;
 		getOptionValue(s, parser, "target");
 		openOutputFile(o.fstrmOut, s + ".log");
 		
 		o.out = &o.fstrmOut;
-		o.useStdout = true;
 		*o.out << endl;
 	}
 	else{
