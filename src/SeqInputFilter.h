@@ -13,7 +13,7 @@
 #include <tbb/pipeline.h>
 #include <seqan/seq_io.h>
 
-#include "Enums.h"
+#include "Types.h"
 #include "QualTrimming.h"
 
 

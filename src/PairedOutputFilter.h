@@ -12,7 +12,7 @@
 
 #include <seqan/basic.h>
 
-#include "Enums.h"
+#include "Types.h"
 #include "FlexbarIO.h"
 #include "SeqOutputFilter.h"
 #include "OutputFiles.h"

@@ -15,7 +15,7 @@
 #include <seqan/sequence.h>
 #include <seqan/seq_io.h>
 
-#include "Enums.h"
+#include "Types.h"
 
 #if SEQAN_HAS_ZLIB
 #include <zlib.h>
@@ -132,8 +132,8 @@ void checkInputType(const std::string path, flexbar::FileFormat &format, const b
 		if(! atEnd(seqFileIn)){
 			
 			try{
-				seqan::Dna5String rseq;
-				seqan::CharString tag, qual;
+				TSeqStr rseq;
+				TString tag, qual;
 				
 				readRecord(tag, rseq, qual, seqFileIn);
 				

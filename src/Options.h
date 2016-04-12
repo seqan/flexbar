@@ -15,7 +15,7 @@
 
 #include <tbb/concurrent_vector.h>
 
-#include "Enums.h"
+#include "Types.h"
 #include "FlexbarIO.h"
 
 
@@ -138,7 +138,7 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	
 	setShortDescription(parser, "flexible barcode and adapter removal");
 	
-	addUsageLine(parser, "\\fB-r\\fP reads [\\fB-t\\fP target] [\\fB-b\\fP barcodes] [\\fB-a\\fP adapters] [options]");
+	addUsageLine(parser, "\\fB-r\\fP reads [\\fB-b\\fP barcodes] [\\fB-a\\fP adapters] [options]");
 	
 	// ARG::OUTPUTPREFIX
 	// addOption(parser, ArgParseOption("v", "version", "Display program version."));

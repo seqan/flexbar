@@ -37,7 +37,7 @@
 #ifndef FLEXBAR_QUALTRIMMING_H
 #define FLEXBAR_QUALTRIMMING_H
 
-#include "Enums.h"
+#include "Types.h"
 
 
 // ============================================================================

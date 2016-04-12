@@ -1,11 +1,10 @@
 /*
- *   Enums.h
+ *   Types.h
  *
- *   Authors: mat and jtr
  */
 
-#ifndef FLEXBAR_ENUMS_H
-#define FLEXBAR_ENUMS_H
+#ifndef FLEXBAR_TYPES_H
+#define FLEXBAR_TYPES_H
 
 #include "SeqRead.h"
 #include "PairedRead.h"
@@ -15,7 +14,10 @@ namespace flexbar{
 	
 	const unsigned int MAX_READLENGTH = 2048;
 	
-	typedef std::pair< SeqRead<seqan::Dna5String, seqan::CharString>*,
+	typedef seqan::Dna5String TSeqStr;
+	typedef seqan::CharString TString;
+	
+	typedef std::pair< SeqRead<TSeqStr, TString>*,
 	                   std::pair< tbb::atomic<unsigned long>, tbb::atomic<unsigned long> > > TAdapter;
 	
 	

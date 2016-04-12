@@ -12,7 +12,7 @@
 #include <tbb/pipeline.h>
 #include <tbb/concurrent_vector.h>
 
-#include "Enums.h"
+#include "Types.h"
 #include "AlignmentFilter.h"
 #include "AlignmentAlgorithm.h"
 

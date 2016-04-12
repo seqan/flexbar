@@ -13,7 +13,7 @@
 #include <tbb/pipeline.h>
 #include <tbb/concurrent_vector.h>
 
-#include "Enums.h"
+#include "Types.h"
 
 
 template <typename TSeqStr, typename TString, class TAlgorithm>
