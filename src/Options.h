@@ -118,7 +118,12 @@ const std::string getFlexbarBanner(const seqan::CharString version){
 
 
 const std::string getFlexbarCitation(){
-	return "\nMatthias Dodt, Johannes T. Roehr, Rina Ahmed, Christoph Dieterich:\nFlexbar - flexible barcode and adapter processing for next-generation\nsequencing platforms. Biology 2012, 1(3):895-905.";
+	return "Matthias Dodt, Johannes T. Roehr, Rina Ahmed, Christoph Dieterich:\nFlexbar - flexible barcode and adapter processing for next-generation\nsequencing platforms. Biology 2012, 1(3):895-905.\n";
+}
+
+
+const std::string getFlexbarURL(){
+	return "Available on: github.com/seqan/flexbar\n";
 }
 
 
@@ -131,19 +136,19 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	setVersion(parser, version);
 	setDate(parser, date);
 	
-	// setCitation(parser, "\n" + getFlexbarCitation());
+	// setCitation(parser, "\n\n" + getFlexbarCitation());
 	
+	// setAppName(parser, "");
 	// setShortCopyright(parser, "");
 	// setLongCopyright(parser, "");
+	// ARG::OUTPUTPREFIX
 	
 	setShortDescription(parser, "flexible barcode and adapter removal");
 	
 	addUsageLine(parser, "\\fB-r\\fP reads [\\fB-b\\fP barcodes] [\\fB-a\\fP adapters] [options]");
 	
-	// ARG::OUTPUTPREFIX
-	// addOption(parser, ArgParseOption("v", "version", "Display program version."));
-	
-	addOption(parser, ArgParseOption("M", "man", "Print advanced options as man document."));
+	addOption(parser, ArgParseOption("hm", "man-help", "Print advanced options as man document."));
+	addOption(parser, ArgParseOption("v", "versions", "Print Flexbar and SeqAn version numbers."));
 	addOption(parser, ArgParseOption("c", "cite", "Show program reference for citation."));
 	
 	addSection(parser, "Basic options");
@@ -216,12 +221,13 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	
 	addSection(parser, "Logging and tagging");
 	addOption(parser, ArgParseOption("l", "log-level", "Print chosen read alignments.", ARG::STRING));
+	// addOption(parser, ArgParseOption("f", "log-file", "Always write program statistics to target log file."));
 	addOption(parser, ArgParseOption("g", "removal-tags", "Tag reads that are subject to adapter or barcode removal."));
 	addOption(parser, ArgParseOption("e", "number-tags", "Replace read tags by ascending number to save space."));
 	addOption(parser, ArgParseOption("d", "random-tags", "Capture read sequence at barcode or adapter N positions."));
 	
 	
-	hideOption(parser, "man");
+	hideOption(parser, "version");
 	
 	setAdvanced(parser, "barcodes2");
 	setAdvanced(parser, "barcode-tail-length");
@@ -242,11 +248,12 @@ void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string versi
 	setAdvanced(parser, "qtrim-win-size");
 	setAdvanced(parser, "qtrim-post-removal");
 	
-	setAdvanced(parser, "version");
+	setAdvanced(parser, "man-help");
 	hideOption(parser, "per-thread");
 	setAdvanced(parser, "stdout-reads");
 	setAdvanced(parser, "length-dist");
 	setAdvanced(parser, "single-reads-paired");
+	// setAdvanced(parser, "log-file");
 	setAdvanced(parser, "number-tags");
 	setAdvanced(parser, "random-tags");
 	
@@ -354,24 +361,37 @@ void parseCommandLine(seqan::ArgumentParser &parser, std::string version, int ar
 	
 	if(res != ArgumentParser::PARSE_OK){
 		
-		if(isSet(parser, "help")){
-			cout << "\nAdvanced options: flexbar -hh";
+		if(! isSet(parser, "version")){
+			cout << endl << getFlexbarURL() << endl;
+			
+			if(isSet(parser, "help")){
+				cout << "Show advanced options: flexbar -hh\n" << endl;
+			}
 		}
-		cout << "\nDocumentation on: github.com/seqan/flexbar\n" << endl;
+		else{ cout << endl; }
 		
 		exit(res == ArgumentParser::PARSE_ERROR);
 	}
 	
-	if(isSet(parser, "cite")){
-		cout << getFlexbarBanner(version) << getFlexbarCitation() << endl << endl;
+	
+	if(isSet(parser, "versions")){
+		printVersion(parser, cout);
+		cout << endl;
 		exit(0);
 	}
-	else if(isSet(parser, "man")){
+	else if(isSet(parser, "cite")){
+		cout << getFlexbarBanner(version) << endl;
+		cout << getFlexbarCitation()      << endl;
+		cout << getFlexbarURL()           << endl;
+		exit(0);
+	}
+	else if(isSet(parser, "man-help")){
 		printHelp(parser, cout, "man", true);
 		exit(0);
 	}
 	else if(! isSet(parser, "reads")){
 		printShortHelp(parser);
+		cout << endl << getFlexbarURL();
 		
 		cerr << "\nPlease specify reads input file.\n" << endl;
 		exit(1);
@@ -386,7 +406,9 @@ void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
 	
 	ostream *out = o.out;
 	
-	*out << getFlexbarBanner(getVersion(parser)) << "\n" << endl;
+	*out << getFlexbarBanner(getVersion(parser)) << endl;
+	*out << getFlexbarURL() << endl << endl;
+	
 	printLocalTime(o);
 	
 	

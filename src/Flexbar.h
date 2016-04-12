@@ -336,7 +336,7 @@ void initOptions(Options &o, seqan::ArgumentParser &parser){
 		
 		string s;
 		getOptionValue(s, parser, "target");
-		openOutputFile(o.fstrmOut, s + ".out");
+		openOutputFile(o.fstrmOut, s + ".log");
 		
 		o.out = &o.fstrmOut;
 		o.useStdout = true;
