@@ -55,13 +55,21 @@ public:
 		m_lengthDist = new tbb::concurrent_vector<unsigned long>(MAX_READLENGTH + 1, 0);
 		
 		if(m_useStdout){
-			if(!open(seqFileOut, cout)){
+			
+			if(m_format == FASTA){
+				setFormat(seqFileOut, seqan::Fasta());
+			}
+			else if(m_format == FASTQ){
+				setFormat(seqFileOut, seqan::Fastq());
+			}
+			
+			if(! open(seqFileOut, cout)){
 				cerr << "ERROR: Could not open output stream." << "\n" << endl;
 				exit(1);
 			}
 		}
 		else{
-			if(!open(seqFileOut, m_filePath.c_str())){
+			if(! open(seqFileOut, m_filePath.c_str())){
 				cerr << "ERROR: Could not open file: " << m_filePath << "\n" << endl;
 				exit(1);
 			}
