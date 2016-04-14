@@ -100,6 +100,9 @@ void checkInputType(const std::string path, flexbar::FileFormat &format, const b
 	using namespace std;
 	using namespace flexbar;
 	
+	typedef seqan::Dna5String TSeqStr;
+	typedef seqan::CharString TString;
+	
 	checkFileCompression(path);
 	
 	if(path == "-" && isReadsFile){

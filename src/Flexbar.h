@@ -33,6 +33,9 @@ void loadBarcodes(Options &o, const bool secondSet){
 	using namespace std;
 	using namespace flexbar;
 	
+	typedef seqan::Dna5String TSeqStr;
+	typedef seqan::CharString TString;
+	
 	if(o.barDetect != BOFF){
 		tbb::task_scheduler_init init_serial(1);
 		tbb::pipeline bpipeline;
@@ -72,6 +75,9 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 	
 	using namespace std;
 	using namespace flexbar;
+	
+	typedef seqan::Dna5String TSeqStr;
+	typedef seqan::CharString TString;
 	
 	if(o.adapRm != AOFF){
 		
@@ -215,6 +221,9 @@ void startProcessing(Options &o){
 	
 	using namespace std;
 	using namespace flexbar;
+	
+	typedef seqan::Dna5String TSeqStr;
+	typedef seqan::CharString TString;
 	
 	time_t start;
 	time(&start);

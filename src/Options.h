@@ -13,8 +13,6 @@
 #include <seqan/basic.h>
 #include <seqan/arg_parse.h>
 
-#include <tbb/concurrent_vector.h>
-
 #include "Types.h"
 #include "FlexbarIO.h"
 

@@ -10,9 +10,6 @@
 #include <string>
 #include <sstream>
 
-#include <tbb/pipeline.h>
-#include <tbb/concurrent_vector.h>
-
 #include "Types.h"
 
 
