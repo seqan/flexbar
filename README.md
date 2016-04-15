@@ -63,6 +63,10 @@ In this example, reads that are barcoded on left side are demultiplexed by speci
 
 		flexbar -r reads.fq -t target -b brc.fa -be LEFT_TAIL -a adp.fa
 
+The second example shows how to trim compressed reads based on their quality scores in illumina version 1.8 format. Afterwards, provided adapters are removed in right trim-end mode, only if the overlap of adapter and read has at least length five with at most four errors per ten base pairs.
+
+		flexbar -r reads.fq.gz -q TAIL -qf i1.8 -a adp.fa -ao 5 -at 4
+
 ### Test data
 
 To run Flexbar with the test datasets, make sure `flexbar` is reachable via the path variable and run `flexbar_validate.sh` within the test folder. Although default parameters of Flexbar are optimized to deliver good results in many scenarios, the adjustment of parameters might improve results, e.g. `--adapter-min-overlap` and `--adapter-threshold`.
