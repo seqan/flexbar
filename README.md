@@ -2,7 +2,7 @@
 
 The program Flexbar preprocesses high-throughput sequencing data efficiently. It demultiplexes barcoded runs and removes adapter sequences. Moreover, trimming and filtering features are provided. Flexbar increases read mapping rates and improves genome as well as transcriptome assemblies. It supports next-generation sequencing data in fasta and fastq format, e.g. from Roche 454 and the Illumina platform.
 
-This is the Flexbar repository by Johannes Roehr. Flexbar is being adapted to SeqAn and will incorporate features and changes from seqan flexcat. Refer to the [manual](https://github.com/seqan/flexbar/wiki) or contact [jtroehr](https://github.com/jtroehr) for support with this SeqAn application.
+This is the Flexbar repository by Johannes Roehr. Flexbar is in the process of being adapted to SeqAn and incorporates features from the seqan flexcat repository. Refer to the [manual](https://github.com/seqan/flexbar/wiki) or contact [jtroehr](https://github.com/jtroehr) for support with this application.
 
 ### Reference
 
@@ -12,14 +12,14 @@ See article on [PubMed](http://www.ncbi.nlm.nih.gov/pubmed/24832523).
 
 ### Download
 
-Flexbar source code for building and precompiled binaries for Linux 64 and Mac OS X can be obtained on the release [download](https://github.com/seqan/flexbar/releases) page. Follow instructions for building or installation of binaries below. Versions older than 2.4 can be found [here](https://sourceforge.net/projects/flexbar). Additionally, Flexbar is available via package manager on Debian systems.
+Flexbar source code as well as precompiled binaries for Linux and Mac OS X can be downloaded on the [release](https://github.com/seqan/flexbar/releases) page. Please follow instructions for building or installation of binaries below. Additionally, Flexbar is available via package manager on Debian systems. Versions before 2.4 can be found on the [old](https://sourceforge.net/projects/flexbar) page.
 
 ### Building from source
 
 Make sure that `cmake` is available, as well as development and runtime files of the TBB library 4.0 or later (Intel Threading Building Blocks). Using a package manager is a simple way to install them. Furthermore, the SeqAn library is required:
 
-* Get SeqAn library version 1.4.2 [here](https://github.com/seqan/seqan/releases/download/seqan-v1.4.2/seqan-library-1.4.2.tar.bz2)
-* Download Flexbar source code release
+* Get SeqAn library version 2.1.1 [here](https://github.com/seqan/seqan/releases)
+* Download Flexbar source code [release](https://github.com/seqan/flexbar/releases)
 
 Decompress both and move SeqAn include folder to Flexbar:
 
@@ -31,7 +31,7 @@ Use these commands for building:
         cmake .
         make
 
-For the latest Flexbar sources use SeqAn 2.1.1 [release](https://github.com/seqan/seqan/releases) instead.
+For releases prior to 2.7 use SeqAn library 1.4.2 instead.
 
 ### Installation of binaries
 
@@ -53,7 +53,7 @@ Flexbar needs at least one file with sequencing reads in fasta or fastq format a
 
 #### Synopsis
 
-        flexbar -r reads [-t target] [-b barcodes] [-a adapters] [options]
+        flexbar -r reads [-b barcodes] [-a adapters] [options]
 
 Please refer to the help screen `flexbar -h` or [manual](https://github.com/seqan/flexbar/wiki).
 
