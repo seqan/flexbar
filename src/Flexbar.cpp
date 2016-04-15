@@ -34,17 +34,15 @@ int main(int argc, const char* argv[]){
 	
 	ArgumentParser parser("flexbar");
 	
-	defineOptionsAndHelp(parser, version, date);
-	parseCommandLine(parser, version, argc, argv);
+	defineOptions(parser, version, date);
+	parseCmdLine(parser, version, argc, argv);
 	
 	Options o;
-	initOptions(o, parser);
 	
-	loadProgramOptions(o, parser);
-	loadBarcodesAndAdapters(o);
+	initOptions(o, parser);
+	loadOptions(o, parser);
 	
 	startComputation(o);
-	printCompletedMessage(o);
 	
 	return 0;
 }

@@ -126,7 +126,7 @@ const std::string getFlexbarURL(){
 }
 
 
-void defineOptionsAndHelp(seqan::ArgumentParser &parser, const std::string version, const std::string date){
+void defineOptions(seqan::ArgumentParser &parser, const std::string version, const std::string date){
 	
 	using namespace seqan;
 	
@@ -341,7 +341,7 @@ void printLocalTime(Options &o){
 }
 
 
-void parseCommandLine(seqan::ArgumentParser &parser, std::string version, int argc, char const ** argv){
+void parseCmdLine(seqan::ArgumentParser &parser, std::string version, int argc, char const ** argv){
 	
 	using namespace std;
 	
@@ -400,7 +400,7 @@ void parseCommandLine(seqan::ArgumentParser &parser, std::string version, int ar
 }
 
 
-void loadProgramOptions(Options &o, seqan::ArgumentParser &parser){
+void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	
 	using namespace std;
 	using namespace flexbar;

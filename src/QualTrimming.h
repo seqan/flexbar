@@ -40,10 +40,6 @@
 #include "Types.h"
 
 
-// ============================================================================
-// Tags, Classes, Enums
-// ============================================================================
-
 // Tags for choosing quality-based trimming method
 
 struct Tail {};
@@ -55,33 +51,25 @@ struct Window {
 	Window(unsigned s) : size(s) {}
 };
 
-// ============================================================================
-// Forwards
-// ============================================================================
-
-// ============================================================================
-// Metafunctions
-// ============================================================================
 
 // ============================================================================
 // Functions
 // ============================================================================
 
 
-inline unsigned getQuality(const seqan::CharString& qual, unsigned i)
-{
+template <typename TString>
+inline unsigned getQuality(const TString& qual, unsigned i){
 	return static_cast<int>(qual[i]);
 }
 
 
 // Tail trimming method
-template <typename TSeq>
-unsigned qualTrimming(const TSeq& seq, unsigned const cutoff, Tail const &)
-{
-	for (int i = length(seq) - 1; i >= 0; --i)
-    {
-		if (getQuality(seq, i) >= cutoff)
-        {
+template <typename TString>
+unsigned qualTrimming(const TString& qual, unsigned const cutoff, Tail const &){
+	
+	for (int i = length(qual) - 1; i >= 0; --i){
+		
+		if(getQuality(qual, i) >= cutoff){
 			return i + 1;
         }
     }
@@ -90,9 +78,9 @@ unsigned qualTrimming(const TSeq& seq, unsigned const cutoff, Tail const &)
 
 
 // Trim by shifting a window over the seq and cut where avg qual in window turns bad first.
-template <typename TSeq>
-unsigned qualTrimming(const TSeq& seq, unsigned const _cutoff, Window const & spec)
-{
+template <typename TString>
+unsigned qualTrimming(const TString& qual, unsigned const _cutoff, Window const & spec){
+	
 	unsigned window = spec.size;
 	unsigned avg = 0, i = 0;
 
@@ -100,37 +88,36 @@ unsigned qualTrimming(const TSeq& seq, unsigned const _cutoff, Window const & sp
 	unsigned cutoff = _cutoff * window;
 
 	// Calculate average quality of initial window.
-	for (i = 0; i < window; ++i)
-    {
-		avg += getQuality(seq, i);
+	for (i = 0; i < window; ++i){
+		avg += getQuality(qual, i);
     }
-
+	
 	// Shift window over read and keep mean quality, update in constant time.
-	for (i = 0; i < length(seq) && avg >= cutoff; ++i)
-	{
+	for (i = 0; i < length(qual) && avg >= cutoff; ++i){
+		
 		// Take care only not to go over the end of the sequence. Shorten window near the end.
-		avg -= getQuality(seq, i);
-		avg += i + window < length(seq) ? getQuality(seq, i + window) : 0;
+		avg -= getQuality(qual, i);
+		avg += i + window < length(qual) ? getQuality(qual, i + window) : 0;
 	}
 	return i;   // i holds start of first window that turned bad.
 }
 
 
 // Trimming mechanism using BWA. Trim to argmax_x sum_{i=x+1}^l {cutoff - q_i}
-template <typename TSeq>
-unsigned qualTrimming(const TSeq& seq, unsigned const cutoff, BWA const &)
-{
-	int max_arg = length(seq) - 1, sum = 0, max = 0;
-
-	for (int i = length(seq) - 1; i >= 0; --i)
-	{
-		sum += cutoff - getQuality(seq, i);
-		if (sum < 0)
-        {
+template <typename TString>
+unsigned qualTrimming(const TString& qual, unsigned const cutoff, BWA const &){
+	
+	int max_arg = length(qual) - 1, sum = 0, max = 0;
+	
+	for (int i = length(qual) - 1; i >= 0; --i){
+		
+		sum += cutoff - getQuality(qual, i);
+		
+		if(sum < 0){
 			break;
         }
-		if (sum > max)
-		{
+		
+		if(sum > max){
 			max = sum;
 			max_arg = i;
 		}
@@ -140,8 +127,8 @@ unsigned qualTrimming(const TSeq& seq, unsigned const cutoff, BWA const &)
 
 
 template <typename TSeqStr, typename TString>
-bool qualTrim(TSeqStr &seq, TString &qual, const flexbar::QualTrimType qtrim, const int cutoff, const int wSize)
-{
+bool qualTrim(TSeqStr &seq, TString &qual, const flexbar::QualTrimType qtrim, const int cutoff, const int wSize){
+	
 	unsigned cutPos;
 	
 	if(qtrim == flexbar::TAIL){
@@ -170,8 +157,8 @@ bool qualTrim(TSeqStr &seq, TString &qual, const flexbar::QualTrimType qtrim, co
 
 
 template <typename TSeqStr, typename TString>
-bool qualTrim(SeqRead<TSeqStr, TString> *seqRead, const flexbar::QualTrimType qtrim, const int cutoff, const int wSize)
-{
+bool qualTrim(SeqRead<TSeqStr, TString> *seqRead, const flexbar::QualTrimType qtrim, const int cutoff, const int wSize){
+	
 	TSeqStr seq  = seqRead->getSequence();
 	TString qual = seqRead->getQuality();
 	

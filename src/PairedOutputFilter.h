@@ -460,21 +460,21 @@ public:
 		
 		for(unsigned int i = 0; i < adapters->size(); i++){
 			
-			seqan::CharString seqTag = adapters->at(i).first->getSequenceTag();
-
+			TString seqTag = adapters->at(i).first->getSequenceTag();
+			
 			int wsLen = maxSpaceLen - length(seqTag);
 			if(wsLen < 2) wsLen = 2;
 			string whiteSpace = string(wsLen, ' ');
-
+			
 			unsigned long nAdapOvl  = adapters->at(i).second.first;
 			unsigned long nAdapFull = adapters->at(i).second.second;
-
+			
 			stringstream ss;  ss << nAdapOvl;
-
+			
 			int wsLen2 = maxSpaceLen - ss.str().length();
 			if(wsLen2 < 2) wsLen2 = 2;
 			string whiteSpace2 = string(wsLen2, ' ');
-
+			
 			*out << seqTag << whiteSpace << nAdapOvl << whiteSpace2 << nAdapFull << "\n";
 		}
 		*out << endl;

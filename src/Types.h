@@ -14,7 +14,10 @@ namespace flexbar{
 	
 	const unsigned int MAX_READLENGTH = 2048;
 	
-	typedef std::pair< SeqRead<seqan::Dna5String, seqan::CharString>*,
+	typedef seqan::Dna5String FSeqStr;
+	typedef seqan::CharString FString;
+	
+	typedef std::pair< SeqRead<FSeqStr, FString>*,
 	                   std::pair< tbb::atomic<unsigned long>, tbb::atomic<unsigned long> > > TAdapter;
 	
 	

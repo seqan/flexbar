@@ -28,13 +28,11 @@
 #include "PairedAlignmentFilter.h"
 
 
+template <typename TSeqStr, typename TString>
 void loadBarcodes(Options &o, const bool secondSet){
 	
 	using namespace std;
 	using namespace flexbar;
-	
-	typedef seqan::Dna5String TSeqStr;
-	typedef seqan::CharString TString;
 	
 	if(o.barDetect != BOFF){
 		tbb::task_scheduler_init init_serial(1);
@@ -71,13 +69,11 @@ void loadBarcodes(Options &o, const bool secondSet){
 }
 
 	
+template <typename TSeqStr, typename TString>
 void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 	
 	using namespace std;
 	using namespace flexbar;
-	
-	typedef seqan::Dna5String TSeqStr;
-	typedef seqan::CharString TString;
 	
 	if(o.adapRm != AOFF){
 		
@@ -142,20 +138,21 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 }
 
 
+template <typename TSeqStr, typename TString>
 void loadBarcodesAndAdapters(Options &o){
 	
 	using namespace std;
 	using namespace flexbar;
 	
-	loadBarcodes(o, false);
+	loadBarcodes<TSeqStr, TString>(o, false);
 	
 	if(o.barDetect == WITHIN_READ2 || o.barDetect == WITHIN_READ_REMOVAL2)
-	loadBarcodes(o, true);
+	loadBarcodes<TSeqStr, TString>(o, true);
 	
-	loadAdapters(o, false, o.useAdapterFile);
+	loadAdapters<TSeqStr, TString>(o, false, o.useAdapterFile);
 	
 	if(o.adapRm == NORMAL2)
-	loadAdapters(o, true, true);
+	loadAdapters<TSeqStr, TString>(o, true, true);
 }
 
 
@@ -195,12 +192,11 @@ std::string alignValue(const int refLength, const unsigned long value){
 }
 
 
-void printCompletedMessage(Options &o){
+void printMessage(Options &o){
 	
-	using namespace std;
 	using namespace flexbar;
 	
-	stringstream s;
+	std::stringstream s;
 	s << "Flexbar completed ";
 	
 	if(o.barDetect != BOFF)                      s << "barcode";
@@ -211,19 +207,17 @@ void printCompletedMessage(Options &o){
 	if(o.barDetect == BOFF && o.adapRm == AOFF)  s << "basic processing";
 	if(o.adapRm    != AOFF)                      s << "adapter removal";
 	
-	*o.out << s.str() << ".\n" << endl;
+	*o.out << s.str() << ".\n" << std::endl;
 	
 	if(o.useStdout) closeFile(o.fstrmOut);
 }
 
 
+template <typename TSeqStr, typename TString>
 void startProcessing(Options &o){
 	
 	using namespace std;
 	using namespace flexbar;
-	
-	typedef seqan::Dna5String TSeqStr;
-	typedef seqan::CharString TString;
 	
 	time_t start;
 	time(&start);
@@ -334,6 +328,8 @@ void startProcessing(Options &o){
 	*out << "   (" << fixed << setprecision(2) << 100 * nGoodChars / nChars << "% of input)";
 	
 	*out << "\n\n" << endl;
+	
+	printMessage(o);
 }
 
 
@@ -380,10 +376,12 @@ void startComputation(Options &o){
 	using namespace std;
 	using namespace flexbar;
 	
+	loadBarcodesAndAdapters<FSeqStr, FString>(o);
+	
 	if(o.cmprsType == GZ){
 		
 		#if SEQAN_HAS_ZLIB
-			startProcessing(o);
+			startProcessing<FSeqStr, FString>(o);
 		#else
 			o.outCompression = "";
 			o.cmprsType = UNCOMPRESSED;
@@ -395,7 +393,7 @@ void startComputation(Options &o){
 	else if(o.cmprsType == BZ2){
 		
 		#if SEQAN_HAS_BZIP2
-			startProcessing(o);
+			startProcessing<FSeqStr, FString>(o);
 		#else
 			o.outCompression = "";
 			o.cmprsType = UNCOMPRESSED;
@@ -405,7 +403,7 @@ void startComputation(Options &o){
 	}
 	
 	if(o.cmprsType == UNCOMPRESSED){
-		startProcessing(o);
+		startProcessing<FSeqStr, FString>(o);
 	}
 }
 
