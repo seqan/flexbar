@@ -2,7 +2,7 @@ cmake_minimum_required( VERSION 2.8.2 )
 
 project( FLEXBAR )
 
-set( SEQAN_APP_VERSION "2.8.0" )
+set( SEQAN_APP_VERSION "2.7.0" )
 
 include_directories( ${FLEXBAR_SOURCE_DIR}/include )
 # link_directories( ${FLEXBAR_SOURCE_DIR}/lib )
