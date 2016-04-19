@@ -122,7 +122,7 @@ const std::string getFlexbarCitation(){
 
 
 const std::string getFlexbarURL(){
-	return "Available on: github.com/seqan/flexbar\n";
+	return "Available on github.com/seqan/flexbar\n";
 }
 
 
@@ -196,7 +196,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	// addOption(parser, ArgParseOption("jg", "join-gap", "Alignment gap score.", ARG::INTEGER));
 	
 	addSection(parser, "Filtering and trimming");
-	addOption(parser, ArgParseOption("u", "max-uncalled", "Allowed uncalled bases (N or .) for each read.", ARG::INTEGER));
+	addOption(parser, ArgParseOption("u", "max-uncalled", "Allowed uncalled bases N for each read.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("x", "pre-trim-left", "Trim given number of bases on 5' read end before detection.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("y", "pre-trim-right", "Trim specified number of bases on 3' end prior to detection.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("k", "post-trim-length", "Trim to specified read length from 3' end after removal.", ARG::INTEGER));

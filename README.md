@@ -59,7 +59,7 @@ Please refer to the help screen `flexbar -h` or [manual](https://github.com/seqa
 
 #### Examples
 
-In this example, reads that are barcoded on left side are demultiplexed by specifying a file with barcodes in fasta format. After separation of reads, given adapters are removed from the right side if they do not align before read start. Subsequently, the left side of reads is kept if long enough. Remaining reads are written to the file `target.fastq` in same format as the input.
+In this example, reads that are barcoded on left side are demultiplexed by specifying a file with barcodes in fasta format. After separation of reads, given adapters are removed from the right side if they do not align before read start. The left side of reads is kept if long enough. Remaining reads are written to the file `target.fastq` in same format as the input.
 
 		flexbar -r reads.fq -t target -b brc.fa -be LEFT_TAIL -a adp.fa
 
