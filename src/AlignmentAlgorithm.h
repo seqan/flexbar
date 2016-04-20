@@ -7,10 +7,6 @@
 #ifndef FLEXBAR_ALIGNMENTALGORITHM_H
 #define FLEXBAR_ALIGNMENTALGORITHM_H
 
-#include <iostream>
-#include <string>
-
-#include <seqan/basic.h>
 #include <seqan/align.h>
 
 

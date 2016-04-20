@@ -9,8 +9,6 @@
 
 #include <fstream>
 
-#include "Types.h"
-
 
 template <typename TSeqStr, typename TString>
 class SeqOutputFilter {

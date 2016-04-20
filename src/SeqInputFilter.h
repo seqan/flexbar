@@ -7,12 +7,8 @@
 #ifndef FLEXBAR_SEQINPUTFILTER_H
 #define FLEXBAR_SEQINPUTFILTER_H
 
-#include <string>
-#include <iostream>
-
 #include <seqan/seq_io.h>
 
-#include "Types.h"
 #include "QualTrimming.h"
 
 
@@ -245,7 +241,7 @@ public:
 	}
  	
 	
-	// override
+	// tbb filter operator
 	void* operator()(void*){
 		
 		bool isUncalled = false;

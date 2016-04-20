@@ -7,11 +7,6 @@
 #ifndef FLEXBAR_ALIGNMENTFILTER_H
 #define FLEXBAR_ALIGNMENTFILTER_H
 
-#include <string>
-#include <sstream>
-
-#include "Types.h"
-
 
 template <typename TSeqStr, typename TString, class TAlgorithm>
 class AlignmentFilter {

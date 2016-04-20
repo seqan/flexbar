@@ -37,8 +37,6 @@
 #ifndef FLEXBAR_QUALTRIMMING_H
 #define FLEXBAR_QUALTRIMMING_H
 
-#include "Types.h"
-
 
 // Tags for choosing quality-based trimming method
 

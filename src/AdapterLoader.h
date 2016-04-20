@@ -7,16 +7,6 @@
 #ifndef FLEXBAR_ADAPTERLOADER_H
 #define FLEXBAR_ADAPTERLOADER_H
 
-#include <sstream>
-#include <string>
-
-#include <tbb/pipeline.h>
-#include <tbb/concurrent_vector.h>
-
-#include <seqan/basic.h>
-
-#include "Types.h"
-
 
 template <typename TSeqStr, typename TString>
 class AdapterLoader : public tbb::filter{

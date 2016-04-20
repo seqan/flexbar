@@ -7,15 +7,10 @@
 #ifndef FLEXBAR_FLEXBARIO_H
 #define FLEXBAR_FLEXBARIO_H
 
-#include <string>
 #include <fstream>
 #include <iostream>
 
-#include <seqan/basic.h>
-#include <seqan/sequence.h>
 #include <seqan/seq_io.h>
-
-#include "Types.h"
 
 #if SEQAN_HAS_ZLIB
 #include <zlib.h>

@@ -8,6 +8,7 @@
 #define FLEXBAR_FLEXBAR_H
 
 #include <string>
+#include <sstream>
 #include <iostream>
 
 #include <tbb/pipeline.h>
