@@ -8,6 +8,7 @@
 
 #include "SeqRead.h"
 #include "PairedRead.h"
+#include "PairedReadBundle.h"
 
 
 namespace flexbar{
