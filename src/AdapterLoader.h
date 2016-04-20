@@ -43,7 +43,7 @@ public:
 	virtual ~AdapterLoader(){};
 	
 	
-	void* operator()( void* item ){
+	void* operator()(void* item){
 		
 		using namespace std;
 		using namespace flexbar;

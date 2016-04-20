@@ -10,7 +10,6 @@
 #include <string>
 #include <iostream>
 
-#include <tbb/pipeline.h>
 #include <seqan/seq_io.h>
 
 #include "Types.h"

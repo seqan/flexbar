@@ -40,8 +40,8 @@ void loadBarcodes(Options &o, const bool secondSet){
 		
 		string barFile = secondSet ? o.barcode2File : o.barcodeFile;
 		
-		SeqInputFilter<TSeqStr, TString> adapter_filter(o, barFile, true, false, false);
-		bpipeline.add_filter(adapter_filter);
+		SeqInputFilter<TSeqStr, TString> inputFilter(o, barFile, true, false, false);
+		bpipeline.add_filter(inputFilter);
 		
 		AdapterLoader<TSeqStr, TString> adapterLoader(o, false);
 		bpipeline.add_filter(adapterLoader);
@@ -85,8 +85,8 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 			
 			string adapFile = secondSet ? o.adapter2File : o.adapterFile;
 			
-			SeqInputFilter<TSeqStr, TString> adapter_filter(o, adapFile, true, false, false);
-			prepipe.add_filter(adapter_filter);
+			SeqInputFilter<TSeqStr, TString> inputFilter(o, adapFile, true, false, false);
+			prepipe.add_filter(inputFilter);
 			prepipe.add_filter(adapterLoader);
 			prepipe.run(1);
 			
