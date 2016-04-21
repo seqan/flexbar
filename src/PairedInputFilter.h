@@ -153,6 +153,8 @@ public:
 		
 		vector<PairedRead<TSeqStr, TString>* > *bundle = new vector<PairedRead<TSeqStr, TString>* >();
 		
+		bundle->reserve(m_bundleSize);
+		
 		for(unsigned int i = 0; i < m_bundleSize; ++i){
 			
 			PairedRead<TSeqStr, TString> *pRead = NULL;
@@ -162,6 +164,9 @@ public:
 			     if(pRead == NULL && i == 0) return NULL;
 			else if(pRead == NULL)           break;
 			else                             bundle->push_back(pRead);
+			
+			// cout << "Bundle slot: " << i << endl;
+			// cout << "Capacity:    " << bundle->capacity() << endl;
 		}
 		return new PairedReadBundle<TSeqStr, TString>(bundle);
 	}
