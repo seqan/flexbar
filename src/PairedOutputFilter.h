@@ -7,13 +7,6 @@
 #ifndef FLEXBAR_PAIREDOUTPUTFILTER_H
 #define FLEXBAR_PAIREDOUTPUTFILTER_H
 
-#include <tbb/pipeline.h>
-#include <tbb/concurrent_vector.h>
-
-#include <seqan/basic.h>
-
-#include "Types.h"
-#include "FlexbarIO.h"
 #include "SeqOutputFilter.h"
 #include "OutputFiles.h"
 #include "QualTrimming.h"
@@ -240,8 +233,7 @@ public:
 	};
 	
 	
-	// tbb filter operator
-	void* operator()(void* item){
+	void writePairedRead(void* item){
 		
 		using namespace flexbar;
 		
@@ -343,7 +335,26 @@ public:
 			}
 		}
 		
-		delete pRead;
+		// delete pRead;
+		// return NULL;
+	}
+	
+	
+	// tbb filter operator
+	void* operator()(void* item){
+		
+		if(item != NULL){
+			PairedReadBundle<TSeqStr, TString> *prBundle;
+			
+			prBundle = static_cast< PairedReadBundle<TSeqStr, TString>* >(item);
+			
+			for(unsigned int i = 0; i < prBundle->m_bundle->size(); ++i){
+				
+				writePairedRead(prBundle->m_bundle->at(i));
+			}
+			
+			delete prBundle;
+		}
 		
 		return NULL;
 	}

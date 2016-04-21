@@ -7,6 +7,8 @@
 #ifndef FLEXBAR_PAIREDREADBUNDLE_H
 #define FLEXBAR_PAIREDREADBUNDLE_H
 
+#include <vector>
+
 
 template <typename TSeqStr, typename TString>
 class PairedReadBundle {

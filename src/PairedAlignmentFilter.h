@@ -7,12 +7,6 @@
 #ifndef FLEXBAR_PAIREDALIGNMENTFILTER_H
 #define FLEXBAR_PAIREDALIGNMENTFILTER_H
 
-#include <string>
-
-#include <tbb/pipeline.h>
-#include <tbb/concurrent_vector.h>
-
-#include "Types.h"
 #include "AlignmentFilter.h"
 #include "AlignmentAlgorithm.h"
 
@@ -78,28 +72,27 @@ public:
 	};
 	
 	
-	// tbb filter operator
-	void* operator()(void* item){
+	void alignPairedRead(void* item){
 		
 		using namespace flexbar;
 		
 		if(item != NULL){
-			PairedRead<TSeqStr, TString> *myRead = static_cast< PairedRead<TSeqStr, TString>* >(item);
+			PairedRead<TSeqStr, TString> *pRead = static_cast< PairedRead<TSeqStr, TString>* >(item);
 			
 			bool skipAdapRem = false;
 			
 			// barcode detection
 			if(m_barType != BOFF){
 				switch(m_barType){
-					case BARCODE_READ:         myRead->m_barcode_id  =  m_bfilter->align(myRead->m_b,   false); break;
-					case WITHIN_READ_REMOVAL2: myRead->m_barcode_id2 = m_b2filter->align(myRead->m_r2,  true);
-					case WITHIN_READ_REMOVAL:  myRead->m_barcode_id  =  m_bfilter->align(myRead->m_r1,  true);  break;
-					case WITHIN_READ2:         myRead->m_barcode_id2 = m_b2filter->align(myRead->m_r2,  false);
-					case WITHIN_READ:          myRead->m_barcode_id  =  m_bfilter->align(myRead->m_r1,  false); break;
-					case BOFF:                                                                                  break;
+					case BARCODE_READ:         pRead->m_barcode_id  = m_bfilter->align(pRead->m_b,   false); break;
+					case WITHIN_READ_REMOVAL2: pRead->m_barcode_id2 = m_b2filter->align(pRead->m_r2, true);
+					case WITHIN_READ_REMOVAL:  pRead->m_barcode_id  = m_bfilter->align(pRead->m_r1,  true);  break;
+					case WITHIN_READ2:         pRead->m_barcode_id2 = m_b2filter->align(pRead->m_r2, false);
+					case WITHIN_READ:          pRead->m_barcode_id  = m_bfilter->align(pRead->m_r1,  false); break;
+					case BOFF:                                                                               break;
 				}
 				
-				if(myRead->m_barcode_id == 0 || (m_twoBarcodes && myRead->m_barcode_id2 == 0)){
+				if(pRead->m_barcode_id == 0 || (m_twoBarcodes && pRead->m_barcode_id2 == 0)){
 					m_unassigned++;
 					
 					if(! m_writeUnassigned) skipAdapRem = true;
@@ -109,14 +102,30 @@ public:
 			// adapter removal
 			if(m_adapRem != AOFF && ! skipAdapRem){
 				if(m_adapRem != ATWO)
-				m_afilter->align(myRead->m_r1, true);
+				m_afilter->align(pRead->m_r1, true);
 				
-				if(myRead->m_r2 != NULL && m_adapRem != AONE){
-					if(m_adapRem != NORMAL2) m_afilter->align(myRead->m_r2,  true);
-					else                     m_a2filter->align(myRead->m_r2, true);
+				if(pRead->m_r2 != NULL && m_adapRem != AONE){
+					if(m_adapRem != NORMAL2) m_afilter->align(pRead->m_r2,  true);
+					else                     m_a2filter->align(pRead->m_r2, true);
 				}
 			}
-			return myRead;
+			// return pRead;
+		}
+		// else return NULL;
+	}
+	
+	
+	// tbb filter operator
+	void* operator()(void* item){
+		
+		if(item != NULL){
+			PairedReadBundle<TSeqStr, TString> *prBundle = static_cast< PairedReadBundle<TSeqStr, TString>* >(item);
+			
+			for(unsigned int i = 0; i < prBundle->m_bundle->size(); ++i){
+				
+				alignPairedRead(prBundle->m_bundle->at(i));
+			}
+			return prBundle;
 		}
 		else return NULL;
 	}

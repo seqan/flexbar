@@ -7,13 +7,8 @@
 #ifndef FLEXBAR_OPTIONS_H
 #define FLEXBAR_OPTIONS_H
 
-#include <string>
-#include <iostream>
-
-#include <seqan/basic.h>
 #include <seqan/arg_parse.h>
 
-#include "Types.h"
 #include "FlexbarIO.h"
 
 
@@ -29,7 +24,7 @@ struct Options{
 	
 	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len;
 	int qtrimThresh, qtrimWinSize;
-	int maxUncalled, min_readLen, a_min_overlap, b_min_overlap, nThreads, batchSize;
+	int maxUncalled, min_readLen, a_min_overlap, b_min_overlap, nThreads, bundleSize;
 	int match, mismatch, gapCost, b_match, b_mismatch, b_gapCost;
 	
 	float a_threshold, b_threshold;
@@ -152,7 +147,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	addSection(parser, "Basic options");
 	addOption(parser, ArgParseOption("n", "threads", "Number of threads to employ.", ARG::INTEGER));
-	addOption(parser, ArgParseOption("N", "batch", "Number of read pairs per thread.", ARG::INTEGER));
+	addOption(parser, ArgParseOption("N", "bundle", "Number of read pairs per thread.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("t", "target", "Prefix for output file names or paths.", ARG::STRING));
 	addOption(parser, ArgParseOption("r", "reads", "Fasta/q file or stdin (-) with reads that may contain barcodes.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("p", "reads2", "Second input file of paired reads, gz and bz2 files supported.", ARG::INPUT_FILE));
@@ -250,7 +245,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "qtrim-post-removal");
 	
 	setAdvanced(parser, "man-help");
-	setAdvanced(parser, "batch");
+	setAdvanced(parser, "bundle");
 	setAdvanced(parser, "stdout-reads");
 	setAdvanced(parser, "length-dist");
 	setAdvanced(parser, "single-reads-paired");
@@ -301,7 +296,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	setDefaultValue(parser, "target",          "flexbarOut");
 	setDefaultValue(parser, "threads",         "1");
-	setDefaultValue(parser, "batch",           "16");
+	setDefaultValue(parser, "bundle",          "16");
 	setDefaultValue(parser, "max-uncalled",    "0");
 	setDefaultValue(parser, "min-read-length", "18");
 	
@@ -514,8 +509,8 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	getOptionValue(o.nThreads, parser, "threads");
 	*out << "threads:               " << o.nThreads << endl;
 	
-	getOptionValue(o.batchSize, parser, "batch");
-	*out << "batch:                 " << o.batchSize << endl;
+	getOptionValue(o.bundleSize, parser, "bundle");
+	*out << "bundle:                " << o.bundleSize << endl;
 	
 	getOptionValue(o.maxUncalled, parser, "max-uncalled");
 	*out << "max-uncalled:          " << o.maxUncalled << endl;
