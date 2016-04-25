@@ -1,6 +1,6 @@
 #!/bin/sh -e
 
-flexbar --reads test.fasta --target result_right --adapter-min-overlap 4 --adapters adapters.fasta --min-read-length 10 --adapter-threshold 1 --adapter-trim-end RIGHT > /dev/null
+flexbar --reads reads.fasta --target result_right --adapter-min-overlap 4 --adapters adapters.fasta --min-read-length 10 --adapter-threshold 1 --adapter-trim-end RIGHT > /dev/null
 
 a=`diff correct_result_right.fasta result_right.fasta`
 
@@ -13,7 +13,7 @@ echo "Test 1 OK"
 fi
 
 
-flexbar --reads test.fasta --target result_left --adapter-min-overlap 4 --adapters adapters.fasta --min-read-length 10 --adapter-threshold 1 --adapter-trim-end LEFT > /dev/null
+flexbar --reads reads.fasta --target result_left --adapter-min-overlap 4 --adapters adapters.fasta --min-read-length 10 --adapter-threshold 1 --adapter-trim-end LEFT > /dev/null
 
 a=`diff correct_result_left.fasta result_left.fasta`
 
@@ -26,7 +26,7 @@ echo "Test 2 OK"
 fi
 
 
-flexbar --reads test.fasta --target result_any --adapter-min-overlap 4 --adapters adapters.fasta --min-read-length 10 --adapter-threshold 1 --adapter-trim-end ANY > /dev/null
+flexbar --reads reads.fasta --target result_any --adapter-min-overlap 4 --adapters adapters.fasta --min-read-length 10 --adapter-threshold 1 --adapter-trim-end ANY > /dev/null
 
 a=`diff correct_result_any.fasta result_any.fasta`
 
@@ -39,7 +39,7 @@ echo "Test 3 OK"
 fi
 
 
-flexbar --reads test.fasta --target result_left_tail --adapter-min-overlap 4 --adapters adapters.fasta --min-read-length 10 --adapter-threshold 1 --adapter-trim-end LEFT_TAIL > /dev/null
+flexbar --reads reads.fasta --target result_left_tail --adapter-min-overlap 4 --adapters adapters.fasta --min-read-length 10 --adapter-threshold 1 --adapter-trim-end LEFT_TAIL > /dev/null
 
 a=`diff correct_result_left_tail.fasta result_left_tail.fasta`
 
@@ -52,7 +52,7 @@ echo "Test 4 OK"
 fi
 
 
-flexbar --reads test.fasta --target result_right_tail --adapter-min-overlap 4 --adapters adapters.fasta --min-read-length 10 --adapter-threshold 1 --adapter-trim-end RIGHT_TAIL > /dev/null
+flexbar --reads reads.fasta --target result_right_tail --adapter-min-overlap 4 --adapters adapters.fasta --min-read-length 10 --adapter-threshold 1 --adapter-trim-end RIGHT_TAIL > /dev/null
 
 a=`diff correct_result_right_tail.fasta result_right_tail.fasta`
 
