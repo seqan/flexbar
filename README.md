@@ -17,7 +17,7 @@ See article on [PubMed](http://www.ncbi.nlm.nih.gov/pubmed/24832523).
 Flexbar source code as well as pre-compiled binaries for Linux and Mac OS X can be downloaded on the [release](https://github.com/seqan/flexbar/releases) page. Please follow instructions for building or setup of binaries below. Additionally, Flexbar is available via package manager on Debian systems. Versions before 2.4 can be found on the [old](https://sourceforge.net/projects/flexbar) page.
 
 
-### Building from source
+#### Building from source
 
 Make sure that `cmake` is available, as well as development and runtime files of the TBB library 4.0 or later (Intel Threading Building Blocks). Using a package manager is a simple way to install them. Furthermore, the SeqAn library is required:
 
@@ -37,16 +37,16 @@ Use these commands for building:
 Releases prior to 2.7 use SeqAn library 1.4.2 instead.
 
 
-### Pre-compiled binaries
+#### Pre-compiled binaries
 
 For execution of provided Flexbar binaries after download, the corresponding TBB library has to be available. Downloads contain the library file for runtime. Follow the platform specific instructions below.
 
-#### Linux
+##### Linux
 Adjust lib search path to include the absolute path of the Flexbar directory containing the lib file libtbb.so.2 for the current terminal session, or permanently in shell startup scripts:
 
         export LD_LIBRARY_PATH=/path/FlexbarDir:$LD_LIBRARY_PATH
 
-#### Mac OS X
+##### Mac OS X
 It applies the same as for Linux. Make the file libtbb.dylib available by setting the lib search path:
 
         export DYLD_LIBRARY_PATH=/path/FlexbarDir:$DYLD_LIBRARY_PATH
@@ -55,8 +55,6 @@ It applies the same as for Linux. Make the file libtbb.dylib available by settin
 ### Program usage
 
 Flexbar needs at least one file with sequencing reads in fasta or fastq format as input. Additionally, the target name and further options can be specified. For read separation based on barcodes and for adapter removal, a file in fasta format with barcode or adapter sequences should be provided.
-
-#### Synopsis
 
         flexbar -r reads [-b barcodes] [-a adapters] [options]
 
