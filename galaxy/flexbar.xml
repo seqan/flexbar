@@ -1,14 +1,14 @@
 
-<!-- Flexbar tool definition for Galaxy, version 2.5 -->
+<!-- Flexbar tool definition for Galaxy, version 2.7 -->
 <!-- Author: Johannes Roehr -->
 
 
-<tool id="flexbar" name="Flexbar" version="2.5" force_history_refresh="True">
+<tool id="flexbar" name="Flexbar" version="2.7" force_history_refresh="True">
 	
 	<description>flexible barcode and adapter removal</description>
     
 	<requirements>
-        <requirement type="binary" version="2.5">flexbar</requirement>
+        <requirement type="binary" version="2.7">flexbar</requirement>
     </requirements>
 	
 	<version_command>flexbar --version</version_command>
@@ -28,19 +28,13 @@
 		#end if
 		
 		#if $reads.ext == "fastqsanger":
-			--format sanger
+			--qtrim-format sanger
 		#end if
 		#if $reads.ext == "fastqsolexa":
-			--format solexa
+			--qtrim-format solexa
 		#end if
 		#if $reads.ext == "fastqillumina":
-			--format i1.3
-		#end if
-		#if $reads.ext == "csfasta":
-			--color-space
-		#end if
-		#if $reads.ext == "fastqcssanger":
-			--color-space
+			--qtrim-format i1.3
 		#end if
 		
 		
@@ -53,7 +47,7 @@
 		#end if
 		
 		#if $cTrimPhred.select == "on":
-			--pre-trim-phred $cTrimPhred.trimPhred
+			--qtrim TAIL --qtrim-threshold $cTrimPhred.trimPhred
 		#end if
 		
 		#if $cTrimLen.select == "on":
@@ -144,7 +138,7 @@
 	
 	<inputs>
 		
-		<param format="fasta,fastq,fastqsanger,fastqsolexa,fastqillumina,csfasta,fastqcssanger" name="reads" type="data" label="Sequencing reads" optional="false"/>
+		<param format="fasta,fastq,fastqsanger,fastqsolexa,fastqillumina" name="reads" type="data" label="Sequencing reads" optional="false"/>
 		
 		
 		<conditional name="cReads2">
@@ -155,7 +149,7 @@
 			<when value="off">
 			</when>
 			<when value="on">
-				<param format="fasta,fastq,fastqsanger,fastqsolexa,fastqillumina,csfasta,fastqcssanger" name="reads2" type="data" label="Reads 2" optional="false" help="same format as first read set"/>
+				<param format="fasta,fastq,fastqsanger,fastqsolexa,fastqillumina" name="reads2" type="data" label="Reads 2" optional="false" help="same format as first read set"/>
 			</when>
 		</conditional>
 		
@@ -204,7 +198,7 @@
 						<option value="yes">Yes</option>
 					</param>
 					<when value="yes">
-						<param format="fasta,fastq,fastqsanger,fastqsolexa,fastqillumina,csfasta,fastqcssanger" name="bReads" type="data" label="Separate barcode reads" optional="false"/>
+						<param format="fasta,fastq,fastqsanger,fastqsolexa,fastqillumina" name="bReads" type="data" label="Separate barcode reads" optional="false"/>
 					</when>
 					<when value="no">
 						<param name="bKeep" type="select" label="Remove barcodes within reads">
@@ -428,7 +422,7 @@
 
 **Description**
 
-Flexbar preprocesses high-throughput sequencing data efficiently. It demultiplexes barcoded runs and removes adapter sequences. Moreover, trimming and filtering features are provided. Flexbar increases read mapping rates and improves genome and transcriptome assemblies. It supports next-generation sequencing data in fasta/q and csfasta/q format from Illumina, Roche 454, and the SOLiD platform. Flexbar is available on the project_ page.
+Flexbar processes high-throughput sequencing data efficiently. It demultiplexes barcoded runs and removes adapter sequences. Moreover, trimming and filtering features are provided. Flexbar increases read mapping rates and improves genome as well as transcriptome assemblies. It supports next-generation sequencing data in fasta and fastq format, e.g. from Roche 454 and the Illumina platform. Flexbar is available on the project_ page.
 
 .. _project: https://github.com/seqan/flexbar
 

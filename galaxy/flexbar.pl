@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# Flexbar wrapper for Galaxy tool definition, version 2.5
+# Flexbar wrapper for Galaxy tool definition, version 2.7
 # Author: Johannes Roehr
 
 use warnings;
@@ -20,7 +20,6 @@ foreach(<FlexbarTargetFile*>){
 	$fileType = $1         if /\.(\w+)$/;
 	$fileType = $format    if /\.\w*fast\w$/;
 	$fileType = 'fasta'    if /\.fasta$/;
-	$fileType = 'csfasta'  if /\.csfasta$/;
 	$fileType = 'tabular'  if /\.lengthdist$/;
 	
 	my $file = $_;
