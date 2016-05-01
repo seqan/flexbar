@@ -39,7 +39,7 @@ Releases prior to 2.7 use SeqAn library 1.4.2 instead.
 
 #### Pre-compiled binaries
 
-For execution of provided Flexbar binaries after download, the corresponding TBB library has to be available. Downloads contain the library file for runtime. Follow the platform specific instructions below.
+For execution of provided Flexbar binaries, the corresponding TBB library has to be available. Downloads contain the library file for runtime. Follow the platform specific instructions below.
 
 ##### Linux
 Adjust lib search path to include the absolute path of the Flexbar directory containing the lib file libtbb.so.2 for the current terminal session, or permanently in shell startup scripts:
