@@ -63,7 +63,7 @@ public:
 	};
 	
 	
-	int align(void* item, const bool performRemoval){
+	int align(void* item, const bool performRemoval, flexbar::TAlignments &alignments, const bool preCompute){
 		
 		using namespace std;
 		using namespace flexbar;
@@ -339,7 +339,7 @@ public:
 			   << "read      " << seqread << "\n\n" << endl;
 		}
 		
-		// bundeled output for multi-threading
+		// output for multi-threading
 		if(m_verb != NONE) *m_out << ss.str();
 		
 		return ++qIndex;

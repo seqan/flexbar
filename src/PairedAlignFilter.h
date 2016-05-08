@@ -31,9 +31,6 @@ private:
 	typedef SeqAlignFilter<TSeqStr, TString, SeqAlignAlgorithm<TSeqStr> > AlignFilter;
 	AlignFilter *m_afilter, *m_bfilter, *m_a2filter, *m_b2filter;
 	
-	typedef seqan::Align<TSeqStr, seqan::ArrayGaps> TAlign;
-	typedef seqan::StringSet<seqan::StringSet<TAlign> > TAlignBundle;
-	
 	std::ostream *out;
 	
 public:
@@ -75,24 +72,30 @@ public:
 	};
 	
 	
-	void alignPairedRead(void* item, TAlignBundle &alignBundle, bool preCompute){
+	void alignPairedRead(void* item, flexbar::TAlignBundle &alignBundle, const bool preCompute){
 		
 		using namespace flexbar;
 		
 		if(item != NULL){
 			PairedRead<TSeqStr, TString> *pRead = static_cast< PairedRead<TSeqStr, TString>* >(item);
 			
+			TAlignments r1Alignments, r2Alignments, bAlignments;
+			
+			appendValue(alignBundle,  bAlignments);
+			appendValue(alignBundle, r1Alignments);
+			appendValue(alignBundle, r2Alignments);
+			
 			bool skipAdapRem = false;
 			
 			// barcode detection
 			if(m_barType != BOFF){
 				switch(m_barType){
-					case BARCODE_READ:         pRead->m_barcode_id  = m_bfilter->align(pRead->m_b,   false); break;
-					case WITHIN_READ_REMOVAL2: pRead->m_barcode_id2 = m_b2filter->align(pRead->m_r2, true);
-					case WITHIN_READ_REMOVAL:  pRead->m_barcode_id  = m_bfilter->align(pRead->m_r1,  true);  break;
-					case WITHIN_READ2:         pRead->m_barcode_id2 = m_b2filter->align(pRead->m_r2, false);
-					case WITHIN_READ:          pRead->m_barcode_id  = m_bfilter->align(pRead->m_r1,  false); break;
-					case BOFF:                                                                               break;
+					case BARCODE_READ:         pRead->m_barcode_id  = m_bfilter->align(pRead->m_b,   false, value(alignBundle, 0), preCompute); break;
+					case WITHIN_READ_REMOVAL2: pRead->m_barcode_id2 = m_b2filter->align(pRead->m_r2, true,  value(alignBundle, 2), preCompute);
+					case WITHIN_READ_REMOVAL:  pRead->m_barcode_id  = m_bfilter->align(pRead->m_r1,  true,  value(alignBundle, 1), preCompute); break;
+					case WITHIN_READ2:         pRead->m_barcode_id2 = m_b2filter->align(pRead->m_r2, false, value(alignBundle, 2), preCompute);
+					case WITHIN_READ:          pRead->m_barcode_id  = m_bfilter->align(pRead->m_r1,  false, value(alignBundle, 1), preCompute); break;
+					case BOFF:                                                                                                                  break;
 				}
 				
 				if(pRead->m_barcode_id == 0 || (m_twoBarcodes && pRead->m_barcode_id2 == 0)){
@@ -106,11 +109,11 @@ public:
 			// adapter removal
 			if(m_adapRem != AOFF && ! skipAdapRem){
 				if(m_adapRem != ATWO)
-				m_afilter->align(pRead->m_r1, true);
+				m_afilter->align(pRead->m_r1, true, value(alignBundle, 1), preCompute);
 				
 				if(pRead->m_r2 != NULL && m_adapRem != AONE){
-					if(m_adapRem != NORMAL2) m_afilter->align(pRead->m_r2,  true);
-					else                     m_a2filter->align(pRead->m_r2, true);
+					if(m_adapRem != NORMAL2) m_afilter->align(pRead->m_r2,  true, value(alignBundle, 2), preCompute);
+					else                     m_a2filter->align(pRead->m_r2, true, value(alignBundle, 2), preCompute);
 				}
 			}
 		}
