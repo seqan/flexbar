@@ -1,11 +1,11 @@
 /*
- *   PairedAlignmentFilter.h
+ *   PairedAlignFilter.h
  *
  *   Authors: mat and jtr
  */
 
-#ifndef FLEXBAR_PAIREDALIGNMENTFILTER_H
-#define FLEXBAR_PAIREDALIGNMENTFILTER_H
+#ifndef FLEXBAR_PAIREDALIGNFILTER_H
+#define FLEXBAR_PAIREDALIGNFILTER_H
 
 #include "AlignmentFilter.h"
 #include "AlignmentAlgorithm.h"

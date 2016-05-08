@@ -26,7 +26,7 @@
 #include "SeqInputFilter.h"
 #include "PairedInputFilter.h"
 #include "PairedOutputFilter.h"
-#include "PairedAlignmentFilter.h"
+#include "PairedAlignFilter.h"
 
 
 template <typename TSeqStr, typename TString>
@@ -230,7 +230,7 @@ void startProcessing(Options &o){
 	if(o.logLevel != NONE) *out << "\n\nLog level " << o.logLevelStr << " output generation:\n\n" << endl;
 	
 	PairedInputFilter<TSeqStr, TString>      inputFilter(o);
-	PairedAlignmentFilter<TSeqStr, TString>  alignFilter(o);
+	PairedAlignFilter<TSeqStr, TString>  alignFilter(o);
 	PairedOutputFilter<TSeqStr, TString>     outputFilter(o);
 	
 	tbb::task_scheduler_init init_serial(o.nThreads);
