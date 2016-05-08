@@ -78,7 +78,7 @@ public:
 	};
 	
 	
-	void align(const TSeqStr &querySeq, const TSeqStr &seqread, int &gapsR, int &gapsA, int &mismatches, int &startPos, int &endPos, int &startPosA, int &endPosA, int &startPosS, int &endPosS, int &aliScore, std::stringstream &aliString, TSeqStr &tagSeq){
+	void align(const TSeqStr &querySeq, const TSeqStr &readSeq, int &gapsR, int &gapsA, int &mismatches, int &startPos, int &endPos, int &startPosA, int &endPosA, int &startPosS, int &endPosS, int &aliScore, std::stringstream &aliString, TSeqStr &tagSeq){
 		
 		using namespace std;
 		using namespace seqan;
@@ -86,8 +86,33 @@ public:
 		
 		TAlign align;
 		resize(rows(align), 2);
-		assignSource(row(align, 0), seqread);
+		assignSource(row(align, 0), readSeq);
 		assignSource(row(align, 1), querySeq);
+		
+		
+		// typedef String<char> TSequence;
+		// typedef Align<TSequence, ArrayGaps> TAlign;
+		
+		// StringSet<TAlign> alignments;
+		
+		// appendValue(alignments, align);
+		// appendValue(alignments, align);
+		// value(alignments, 0)
+		
+		// AlignConfig<true, false, true, true> ac;
+		
+		// String<int> results  = globalAlignment(alignments, Score<int, Simple>(1,-1,-2));
+		// String<int> results2 = globalAlignment(alignments, m_scoreDna5, ac);
+		
+		// cout << results << endl << endl;
+		// cout << value(alignments, 0) << endl << endl;
+		// cout << value(alignments, 1) << endl << endl;
+		
+		
+		// String<int> results;
+		// reserve(results, alignments.size());
+		// for(unsigned int i = 0; i < alignments.size(); ++i)
+		//    results[i] = globalAlignment(alignments[i], Score<int, Simple>(1,-1,-2));
 		
 		
 		if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
