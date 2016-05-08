@@ -6,9 +6,10 @@
 #ifndef FLEXBAR_TYPES_H
 #define FLEXBAR_TYPES_H
 
+#include <vector>
+
 #include "SeqRead.h"
 #include "PairedRead.h"
-#include "PairedReadBundle.h"
 
 
 namespace flexbar{
@@ -17,6 +18,8 @@ namespace flexbar{
 	
 	typedef seqan::Dna5String FSeqStr;
 	typedef seqan::CharString FString;
+	
+	typedef std::vector<PairedRead<FSeqStr, FString>* > TPairedReadBundle;
 	
 	typedef std::pair< SeqRead<FSeqStr, FString>*,
 	                   std::pair< tbb::atomic<unsigned long>, tbb::atomic<unsigned long> > > TAdapter;

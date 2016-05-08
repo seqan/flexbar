@@ -109,21 +109,35 @@ public:
 					else                     m_a2filter->align(pRead->m_r2, true);
 				}
 			}
-			// return pRead;
 		}
-		// else return NULL;
 	}
 	
 	
 	// tbb filter operator
 	void* operator()(void* item){
 		
+		using namespace flexbar;
+		
 		if(item != NULL){
-			PairedReadBundle<TSeqStr, TString> *prBundle = static_cast< PairedReadBundle<TSeqStr, TString>* >(item);
 			
-			for(unsigned int i = 0; i < prBundle->m_bundle->size(); ++i){
+			TPairedReadBundle *prBundle = static_cast< TPairedReadBundle* >(item);
+			
+			typedef seqan::Align<TSeqStr, seqan::ArrayGaps> TAlign;
+			typedef seqan::StringSet<TAlign> TAlignments;
+			
+			TAlignments alignments;
+			
+			for(unsigned int i = 0; i < prBundle->size(); ++i){
 				
-				alignPairedRead(prBundle->m_bundle->at(i));
+				// bool preComputeAlign = true;
+				//
+				// alignPairedRead(prBundle->at(i), preComputeAlign);
+				//
+				// preComputeAlign = false;
+				//
+				// alignPairedRead(prBundle->at(i), preComputeAlign);
+				
+				alignPairedRead(prBundle->at(i));
 			}
 			return prBundle;
 		}

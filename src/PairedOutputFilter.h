@@ -334,25 +334,23 @@ public:
 				}
 			}
 		}
-		
-		// delete pRead;
-		// return NULL;
 	}
 	
 	
 	// tbb filter operator
 	void* operator()(void* item){
 		
+		using namespace flexbar;
+		
 		if(item != NULL){
-			PairedReadBundle<TSeqStr, TString> *prBundle;
 			
-			prBundle = static_cast< PairedReadBundle<TSeqStr, TString>* >(item);
+			TPairedReadBundle *prBundle = static_cast< TPairedReadBundle* >(item);
 			
-			for(unsigned int i = 0; i < prBundle->m_bundle->size(); ++i){
+			for(unsigned int i = 0; i < prBundle->size(); ++i){
 				
-				writePairedRead(prBundle->m_bundle->at(i));
+				writePairedRead(prBundle->at(i));
+				delete prBundle->at(i);
 			}
-			
 			delete prBundle;
 		}
 		

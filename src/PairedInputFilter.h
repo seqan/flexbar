@@ -149,11 +149,11 @@ public:
 	// tbb filter operator
 	void* operator()(void*){
 		
-		using namespace std;
+		using namespace flexbar;
 		
-		vector<PairedRead<TSeqStr, TString>* > *bundle = new vector<PairedRead<TSeqStr, TString>* >();
+		TPairedReadBundle *prBundle = new TPairedReadBundle();
 		
-		bundle->reserve(m_bundleSize);
+		prBundle->reserve(m_bundleSize);
 		
 		for(unsigned int i = 0; i < m_bundleSize; ++i){
 			
@@ -163,12 +163,9 @@ public:
 			
 			     if(pRead == NULL && i == 0) return NULL;
 			else if(pRead == NULL)           break;
-			else                             bundle->push_back(pRead);
-			
-			// cout << "Bundle slot: " << i << endl;
-			// cout << "Capacity:    " << bundle->capacity() << endl;
+			else                             prBundle->push_back(pRead);
 		}
-		return new PairedReadBundle<TSeqStr, TString>(bundle);
+		return prBundle;
 	}
 	
 	
