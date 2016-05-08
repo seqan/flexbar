@@ -31,6 +31,9 @@ private:
 	typedef SeqAlignFilter<TSeqStr, TString, SeqAlignAlgorithm<TSeqStr> > AlignFilter;
 	AlignFilter *m_afilter, *m_bfilter, *m_a2filter, *m_b2filter;
 	
+	typedef seqan::Align<TSeqStr, seqan::ArrayGaps> TAlign;
+	typedef seqan::StringSet<seqan::StringSet<TAlign> > TAlignBundle;
+	
 	std::ostream *out;
 	
 public:
@@ -72,7 +75,7 @@ public:
 	};
 	
 	
-	void alignPairedRead(void* item){
+	void alignPairedRead(void* item, TAlignBundle &alignBundle, bool preCompute){
 		
 		using namespace flexbar;
 		
@@ -93,7 +96,8 @@ public:
 				}
 				
 				if(pRead->m_barcode_id == 0 || (m_twoBarcodes && pRead->m_barcode_id2 == 0)){
-					m_unassigned++;
+					
+					if(! preCompute) m_unassigned++;
 					
 					if(! m_writeUnassigned) skipAdapRem = true;
 				}
@@ -122,22 +126,14 @@ public:
 			
 			TPairedReadBundle *prBundle = static_cast< TPairedReadBundle* >(item);
 			
-			typedef seqan::Align<TSeqStr, seqan::ArrayGaps> TAlign;
-			typedef seqan::StringSet<TAlign> TAlignments;
-			
-			TAlignments alignments;
+			TAlignBundle alignBundle;
 			
 			for(unsigned int i = 0; i < prBundle->size(); ++i){
 				
-				// bool preComputeAlign = true;
-				//
-				// alignPairedRead(prBundle->at(i), preComputeAlign);
-				//
-				// preComputeAlign = false;
-				//
-				// alignPairedRead(prBundle->at(i), preComputeAlign);
+				// alignPairedRead(prBundle->at(i), alignBundle, true);
+				// alignPairedRead(prBundle->at(i), alignBundle, false);
 				
-				alignPairedRead(prBundle->at(i));
+				alignPairedRead(prBundle->at(i), alignBundle, false);
 			}
 			return prBundle;
 		}
