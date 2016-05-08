@@ -8,6 +8,8 @@
 
 #include <vector>
 
+#include <seqan/align.h>
+
 #include "SeqRead.h"
 #include "PairedRead.h"
 
@@ -20,6 +22,11 @@ namespace flexbar{
 	typedef seqan::CharString FString;
 	
 	typedef std::vector<PairedRead<FSeqStr, FString>* > TPairedReadBundle;
+	
+	typedef seqan::Align<FSeqStr, seqan::ArrayGaps> TAlign;
+	typedef seqan::StringSet<TAlign>                TAlignments;
+	typedef seqan::StringSet<TAlignments>           TAlignBundle;
+	
 	
 	typedef std::pair< SeqRead<FSeqStr, FString>*,
 	                   std::pair< tbb::atomic<unsigned long>, tbb::atomic<unsigned long> > > TAdapter;
