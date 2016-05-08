@@ -1,17 +1,17 @@
 /*
- *   AlignmentAlgorithm.h
+ *   SeqAlignAlgorithm.h
  *
  *   Authors: mat and jtr
  */
 
-#ifndef FLEXBAR_ALIGNMENTALGORITHM_H
-#define FLEXBAR_ALIGNMENTALGORITHM_H
+#ifndef FLEXBAR_SEQALIGNALGORITHM_H
+#define FLEXBAR_SEQALIGNALGORITHM_H
 
 #include <seqan/align.h>
 
 
 template <typename TSeqStr>
-class AlignmentAlgorithm {
+class SeqAlignAlgorithm {
 
 private:
 	
@@ -33,7 +33,7 @@ private:
 	
 public:
 	
-	AlignmentAlgorithm(const Options &o, const int match, const int mismatch, const int gapCost, const flexbar::TrimEnd trimEnd):
+	SeqAlignAlgorithm(const Options &o, const int match, const int mismatch, const int gapCost, const flexbar::TrimEnd trimEnd):
 			m_randTag(o.randTag),
 			m_verb(o.logLevel),
 			m_trimEnd(trimEnd){
@@ -74,7 +74,7 @@ public:
 	};
 	
 	
-	virtual ~AlignmentAlgorithm(){
+	virtual ~SeqAlignAlgorithm(){
 	};
 	
 	

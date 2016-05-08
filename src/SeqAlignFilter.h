@@ -1,15 +1,15 @@
 /*
- *   AlignmentFilter.h
+ *   SeqAlignFilter.h
  *
  *   Authors: mat and jtr
  */
 
-#ifndef FLEXBAR_ALIGNMENTFILTER_H
-#define FLEXBAR_ALIGNMENTFILTER_H
+#ifndef FLEXBAR_SEQALIGNFILTER_H
+#define FLEXBAR_SEQALIGNFILTER_H
 
 
 template <typename TSeqStr, typename TString, class TAlgorithm>
-class AlignmentFilter {
+class SeqAlignFilter {
 
 private:
 	
@@ -31,7 +31,7 @@ private:
 	
 public:
 	
-	AlignmentFilter(tbb::concurrent_vector<flexbar::TAdapter> *queries, const Options &o, int minOverlap, float threshold, const int tailLength, const int match, const int mismatch, const int gapCost, const flexbar::TrimEnd end, const bool isBarcoding):
+	SeqAlignFilter(tbb::concurrent_vector<flexbar::TAdapter> *queries, const Options &o, int minOverlap, float threshold, const int tailLength, const int match, const int mismatch, const int gapCost, const flexbar::TrimEnd end, const bool isBarcoding):
 			
 			m_minOverlap(minOverlap),
 			m_threshold(threshold),
@@ -57,7 +57,7 @@ public:
 	};
 	
 	
-	virtual ~AlignmentFilter(){
+	virtual ~SeqAlignFilter(){
 		delete algo;
 		delete m_rmOverlaps;
 	};
