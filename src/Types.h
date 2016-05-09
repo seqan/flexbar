@@ -21,12 +21,11 @@ namespace flexbar{
 	typedef seqan::Dna5String FSeqStr;
 	typedef seqan::CharString FString;
 	
-	typedef std::vector<PairedRead<FSeqStr, FString>* > TPairedReadBundle;
-	
 	typedef seqan::Align<FSeqStr, seqan::ArrayGaps> TAlign;
 	typedef seqan::StringSet<TAlign>                TAlignments;
-	typedef std::vector<TAlignments>                TAlignBundle;
 	
+	typedef std::vector<TAlignments>                    TAlignBundle;
+	typedef std::vector<PairedRead<FSeqStr, FString>* > TPairedReadBundle;
 	
 	typedef std::pair< SeqRead<FSeqStr, FString>*,
 	                   std::pair< tbb::atomic<unsigned long>, tbb::atomic<unsigned long> > > TAdapter;

@@ -63,7 +63,7 @@ public:
 	};
 	
 	
-	int align(void* item, const bool performRemoval, flexbar::TAlignments &alignments, const bool preCompute){
+	int align(void* item, const bool performRemoval, flexbar::TAlignments &alignments, const bool preCycle){
 		
 		using namespace std;
 		using namespace flexbar;
@@ -99,6 +99,7 @@ public:
 		int readLength   = length(seqread);
 		
 		if(! m_isBarcoding && readLength < m_minLength){
+			// if(! preCycle) 
 			++m_nPreShortReads;
 			return ++qIndex;
 		}
@@ -136,7 +137,7 @@ public:
 			
 			// align query with specified algorithm
 			algo->align(query, sequence, gapsR, gapsA, mismatches, startPos, endPos,
-			            startPosA, endPosA, startPosS, endPosS, aliScore, aliString, randTag);
+			            startPosA, endPosA, startPosS, endPosS, aliScore, aliString, randTag, alignments, preCycle);
 			
 			int overlapLength = endPos - startPos;
 			

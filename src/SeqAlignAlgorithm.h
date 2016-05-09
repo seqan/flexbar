@@ -18,9 +18,7 @@ private:
 	typedef typename seqan::Dna5 TChar;
 	typedef typename seqan::Value<TSeqStr>::Type TSeqStrChar;
 	
-	typedef seqan::Align<TSeqStr, seqan::ArrayGaps> TAlign;
-	
-	typedef typename seqan::Row<TAlign>::Type TRow;
+	typedef typename seqan::Row<flexbar::TAlign>::Type TRow;
 	typedef typename seqan::Iterator<TRow>::Type TRowIterator;
 	
 	typedef seqan::Score<int, seqan::ScoreMatrix<TChar, seqan::Default> > TScoreDna5;
@@ -78,7 +76,7 @@ public:
 	};
 	
 	
-	void align(const TSeqStr &querySeq, const TSeqStr &readSeq, int &gapsR, int &gapsA, int &mismatches, int &startPos, int &endPos, int &startPosA, int &endPosA, int &startPosS, int &endPosS, int &aliScore, std::stringstream &aliString, TSeqStr &tagSeq){
+	void align(const TSeqStr &querySeq, const TSeqStr &readSeq, int &gapsR, int &gapsA, int &mismatches, int &startPos, int &endPos, int &startPosA, int &endPosA, int &startPosS, int &endPosS, int &aliScore, std::stringstream &aliString, TSeqStr &tagSeq, flexbar::TAlignments &alignments, const bool preCycle){
 		
 		using namespace std;
 		using namespace seqan;
@@ -90,29 +88,26 @@ public:
 		assignSource(row(align, 1), querySeq);
 		
 		
-		// typedef String<char> TSequence;
-		// typedef Align<TSequence, ArrayGaps> TAlign;
+		StringSet<TAlign> aligns;
 		
-		// StringSet<TAlign> alignments;
+		appendValue(aligns, align);
+		appendValue(aligns, align);
+		// value(aligns, 0)
 		
-		// appendValue(alignments, align);
-		// appendValue(alignments, align);
-		// value(alignments, 0)
+		AlignConfig<true, false, true, true> ac;
 		
-		// AlignConfig<true, false, true, true> ac;
-		
-		// String<int> results  = globalAlignment(alignments, Score<int, Simple>(1,-1,-2));
-		// String<int> results2 = globalAlignment(alignments, m_scoreDna5, ac);
+		// String<int> results  = globalAlignment(aligns, Score<int, Simple>(1,-1,-2), ac, 2, 2);
+		// String<int> results2 = globalAlignment(aligns, m_scoreDna5, ac);
 		
 		// cout << results << endl << endl;
-		// cout << value(alignments, 0) << endl << endl;
-		// cout << value(alignments, 1) << endl << endl;
+		// cout << value(aligns, 0) << endl << endl;
+		// cout << value(aligns, 1) << endl << endl;
 		
 		
 		// String<int> results;
-		// reserve(results, alignments.size());
-		// for(unsigned int i = 0; i < alignments.size(); ++i)
-		//    results[i] = globalAlignment(alignments[i], Score<int, Simple>(1,-1,-2));
+		// reserve(results, aligns.size());
+		// for(unsigned int i = 0; i < aligns.size(); ++i)
+		//    results[i] = globalAlignment(aligns[i], Score<int, Simple>(1,-1,-2));
 		
 		
 		if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
