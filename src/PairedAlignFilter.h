@@ -72,35 +72,29 @@ public:
 	};
 	
 	
-	void alignPairedRead(void* item, flexbar::TAlignBundle &alignBundle, const bool preCompute){
+	void alignPairedRead(void* item, flexbar::TAlignBundle &alignBundle, const bool preCycle){
 		
 		using namespace flexbar;
 		
 		if(item != NULL){
 			PairedRead<TSeqStr, TString> *pRead = static_cast< PairedRead<TSeqStr, TString>* >(item);
 			
-			TAlignments r1Alignments, r2Alignments, bAlignments;
-			
-			appendValue(alignBundle,  bAlignments);
-			appendValue(alignBundle, r1Alignments);
-			appendValue(alignBundle, r2Alignments);
-			
 			bool skipAdapRem = false;
 			
 			// barcode detection
 			if(m_barType != BOFF){
 				switch(m_barType){
-					case BARCODE_READ:         pRead->m_barcode_id  = m_bfilter->align(pRead->m_b,   false, value(alignBundle, 0), preCompute); break;
-					case WITHIN_READ_REMOVAL2: pRead->m_barcode_id2 = m_b2filter->align(pRead->m_r2, true,  value(alignBundle, 2), preCompute);
-					case WITHIN_READ_REMOVAL:  pRead->m_barcode_id  = m_bfilter->align(pRead->m_r1,  true,  value(alignBundle, 1), preCompute); break;
-					case WITHIN_READ2:         pRead->m_barcode_id2 = m_b2filter->align(pRead->m_r2, false, value(alignBundle, 2), preCompute);
-					case WITHIN_READ:          pRead->m_barcode_id  = m_bfilter->align(pRead->m_r1,  false, value(alignBundle, 1), preCompute); break;
-					case BOFF:                                                                                                                  break;
+					case BARCODE_READ:         pRead->m_barcode_id  = m_bfilter->align(pRead->m_b,   false, alignBundle.at(0), preCycle); break;
+					case WITHIN_READ_REMOVAL2: pRead->m_barcode_id2 = m_b2filter->align(pRead->m_r2, true,  alignBundle.at(2), preCycle);
+					case WITHIN_READ_REMOVAL:  pRead->m_barcode_id  = m_bfilter->align(pRead->m_r1,  true,  alignBundle.at(1), preCycle); break;
+					case WITHIN_READ2:         pRead->m_barcode_id2 = m_b2filter->align(pRead->m_r2, false, alignBundle.at(2), preCycle);
+					case WITHIN_READ:          pRead->m_barcode_id  = m_bfilter->align(pRead->m_r1,  false, alignBundle.at(1), preCycle); break;
+					case BOFF:                                                                                                            break;
 				}
 				
 				if(pRead->m_barcode_id == 0 || (m_twoBarcodes && pRead->m_barcode_id2 == 0)){
 					
-					if(! preCompute) m_unassigned++;
+					if(! preCycle) m_unassigned++;
 					
 					if(! m_writeUnassigned) skipAdapRem = true;
 				}
@@ -109,11 +103,11 @@ public:
 			// adapter removal
 			if(m_adapRem != AOFF && ! skipAdapRem){
 				if(m_adapRem != ATWO)
-				m_afilter->align(pRead->m_r1, true, value(alignBundle, 1), preCompute);
+				m_afilter->align(pRead->m_r1, true, alignBundle.at(3), preCycle);
 				
 				if(pRead->m_r2 != NULL && m_adapRem != AONE){
-					if(m_adapRem != NORMAL2) m_afilter->align(pRead->m_r2,  true, value(alignBundle, 2), preCompute);
-					else                     m_a2filter->align(pRead->m_r2, true, value(alignBundle, 2), preCompute);
+					if(m_adapRem != NORMAL2) m_afilter->align(pRead->m_r2,  true, alignBundle.at(4), preCycle);
+					else                     m_a2filter->align(pRead->m_r2, true, alignBundle.at(4), preCycle);
 				}
 			}
 		}
@@ -130,6 +124,16 @@ public:
 			TPairedReadBundle *prBundle = static_cast< TPairedReadBundle* >(item);
 			
 			TAlignBundle alignBundle;
+			alignBundle.reserve(5);
+			
+			TAlignments r1AlignmentsB, r2AlignmentsB, bAlignmentsB;
+			TAlignments r1AlignmentsA, r2AlignmentsA;
+			
+			alignBundle.push_back(bAlignmentsB);
+			alignBundle.push_back(r1AlignmentsB);
+			alignBundle.push_back(r2AlignmentsB);
+			alignBundle.push_back(r1AlignmentsA);
+			alignBundle.push_back(r2AlignmentsA);
 			
 			for(unsigned int i = 0; i < prBundle->size(); ++i){
 				

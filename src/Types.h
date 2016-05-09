@@ -25,7 +25,7 @@ namespace flexbar{
 	
 	typedef seqan::Align<FSeqStr, seqan::ArrayGaps> TAlign;
 	typedef seqan::StringSet<TAlign>                TAlignments;
-	typedef seqan::StringSet<TAlignments>           TAlignBundle;
+	typedef std::vector<TAlignments>                TAlignBundle;
 	
 	
 	typedef std::pair< SeqRead<FSeqStr, FString>*,
