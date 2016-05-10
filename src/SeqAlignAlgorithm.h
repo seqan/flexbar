@@ -22,6 +22,8 @@ private:
 	
 	TScoreDna5 m_scoreDna5;
 	
+	seqan::Score<int, seqan::Simple> m_score;
+	
 	const bool m_randTag;
 	const flexbar::LogLevel m_verb;
 	const flexbar::TrimEnd m_trimEnd;
@@ -35,6 +37,8 @@ public:
 		
 		using namespace std;
 		using namespace seqan;
+		
+		m_score = Score<int, Simple>(match, mismatch, gapCost);
 		
 		m_scoreDna5 = TScoreDna5(gapCost);
 		
@@ -73,7 +77,7 @@ public:
 	};
 	
 	
-	void alignGlobal(const TSeqStr &querySeq, const TSeqStr &readSeq, int &gapsR, int &gapsA, int &mismatches, int &startPos, int &endPos, int &startPosA, int &endPosA, int &startPosS, int &endPosS, int &aliScore, std::stringstream &aliString, TSeqStr &tagSeq, flexbar::TAlignments &alignments, const flexbar::ComputeCycle cycle, unsigned int &aIdx){
+	void alignGlobal(const TSeqStr &querySeq, const TSeqStr &readSeq, int &gapsR, int &gapsA, int &mismatches, int &startPos, int &endPos, int &startPosA, int &endPosA, int &startPosS, int &endPosS, int &alScore, std::stringstream &alString, TSeqStr &tagSeq, flexbar::TAlignments &alignments, const flexbar::ComputeCycle cycle, unsigned int &aIdx){
 		
 		using namespace std;
 		using namespace seqan;
@@ -91,43 +95,57 @@ public:
 		}
 		else{
 			
-			if(cycle == COMPUTE){
+			TAlign align;
+			
+			if(m_randTag){
 				
-				// String<int> results = globalAlignment(aligns, m_scoreDna5, ac);
-				// cout << results[0] << endl << results[1] << endl << endl;
-				// cout << value(aligns, 0) << endl << endl;
-				// cout << value(aligns, 1) << endl << endl;
-				
+				resize(rows(align), 2);
+				assignSource(row(align, 0), readSeq);
+				assignSource(row(align, 1), querySeq);
 				
 				if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
 					
 					AlignConfig<true, false, true, true> ac;
-					alignments.second = globalAlignment(alignments.first, m_scoreDna5, ac);
+					alScore = globalAlignment(align, m_scoreDna5, ac);
 				}
 				else if(m_trimEnd == LEFT || m_trimEnd == LEFT_TAIL){
 					
 					AlignConfig<true, true, false, true> ac;
-					alignments.second = globalAlignment(alignments.first, m_scoreDna5, ac);
+					alScore = globalAlignment(align, m_scoreDna5, ac);
 				}
 				else{
 					AlignConfig<true, true, true, true> ac;
-					alignments.second = globalAlignment(alignments.first, m_scoreDna5, ac);
+					alScore = globalAlignment(align, m_scoreDna5, ac);
 				}
+				
+				// cout << "Score: " << alScore << endl;
+				// cout << "Align: " << align << endl;
 			}
-			
-			// TAlign align;
-			// resize(rows(align), 2);
-			// assignSource(row(align, 0), readSeq);
-			// assignSource(row(align, 1), querySeq);
-			//
-			// AlignConfig<true, false, true, true> ac;
-			// aliScore = globalAlignment(align, m_scoreDna5, ac);
-			
-			TAlign align = value(alignments.first, aIdx);
-
-			aliScore = alignments.second[aIdx];
-			
-			std::cout << "Score: " << aliScore << std::endl;
+			else{
+				if(cycle == COMPUTE){
+					
+					if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
+				
+						AlignConfig<true, false, true, true> ac;
+						alignments.second = globalAlignment(alignments.first, m_score, ac);
+					}
+					else if(m_trimEnd == LEFT || m_trimEnd == LEFT_TAIL){
+				
+						AlignConfig<true, true, false, true> ac;
+						alignments.second = globalAlignment(alignments.first, m_score, ac);
+					}
+					else{
+						AlignConfig<true, true, true, true> ac;
+						alignments.second = globalAlignment(alignments.first, m_score, ac);
+					}
+				}
+				
+				align   = value(alignments.first,  aIdx);
+				alScore = value(alignments.second, aIdx);
+				
+				// cout << "Score: " << alScore << endl;
+				// cout << "Align: " << align << endl;
+			}
 			
 			
 			TRow &row1 = row(align, 0);
@@ -146,9 +164,9 @@ public:
 			
 			
 			// cout << "\n\n" << startPosS << endl << startPosA << endl << endPosS << endl << endPosA;
-			// cout << align << endl << aliScore << endl;
+			// cout << align << endl << alScore << endl;
 			
-			if(m_verb != flexbar::NONE) aliString << align;
+			if(m_verb != flexbar::NONE) alString << align;
 			
 			
 			TRowIterator it1 = begin(row1);
@@ -171,7 +189,7 @@ public:
 				++it2;
 			}
 			
-			// cout << "\n\n" << gapsR << endl << gapsA << endl << mismatches << endl << align;
+			// cout << "\n\n" << gapsR << endl << gapsA << endl << mismatches << endl;
 			
 		}
 		
