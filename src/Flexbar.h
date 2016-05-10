@@ -301,7 +301,7 @@ void startProcessing(Options &o){
 	*out << "  skipped unassigned reads        " << alignValue(len, alignFilter.getNrUnassignedReads()) << endl;
 	
 	if(o.adapRm != AOFF)
-	*out << "  short prior adapter removal     " << alignValue(len, alignFilter.getNrPreShortReads()) << endl;
+	*out << "  short prior to adapter removal  " << alignValue(len, alignFilter.getNrPreShortReads()) << endl;
 	
 	if(o.qTrim != QOFF && o.qtrimPostRm)
 	*out << "  trimmed due to low quality      " << alignValue(len, outputFilter.getNrLowPhredReads()) << endl;
