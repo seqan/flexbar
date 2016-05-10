@@ -63,7 +63,7 @@ public:
 	};
 	
 	
-	int alignSeqRead(void* item, const bool performRemoval, flexbar::TAlignments &alignments, flexbar::ComputeCycle cycle){
+	int alignSeqRead(void* item, const bool performRemoval, flexbar::TAlignments &alignments, flexbar::ComputeCycle cycle, unsigned int &aIdx){
 		
 		using namespace std;
 		using namespace flexbar;
@@ -101,6 +101,7 @@ public:
 		if(! m_isBarcoding && readLength < m_minLength){
 			
 			if(cycle != PRECYCLE) ++m_nPreShortReads;
+			
 			return ++qIndex;
 		}
 		
@@ -137,9 +138,13 @@ public:
 			TSeqStr randTag = "";
 			stringstream aliString;
 			
+			
 			// align query to read sequence
 			algo->alignGlobal(query, sequence, gapsR, gapsA, mismatches, startPos, endPos, startPosA, endPosA,
-			                  startPosS, endPosS, aliScore, aliString, randTag, alignments, cycle);
+			                  startPosS, endPosS, aliScore, aliString, randTag, alignments, cycle, aIdx);
+			
+			if(cycle == PRECYCLE) return ++qIndex;
+			
 			
 			int overlapLength = endPos - startPos;
 			
