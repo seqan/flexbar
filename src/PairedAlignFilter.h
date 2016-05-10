@@ -129,33 +129,14 @@ public:
 			TAlignBundle alBundle;
 			alBundle.reserve(5);
 			
-			// TAlignSet r1AlignSetB, r2AlignSetB, bAlignSetB;
-			// TAlignSet r1AlignSetA, r2AlignSetA;
-			//
-			// TAlignScores r1ScoresB, r2ScoresB, bScoresB;
-			// TAlignScores r1ScoresA, r2ScoresA;
-			
 			TAlignments r1AlignmentsB, r2AlignmentsB, bAlignmentsB;
 			TAlignments r1AlignmentsA, r2AlignmentsA;
-			
-			// bAlignmentsB.first  = bAlignSetB;
-			// r1AlignmentsB.first = r1AlignSetB;
-			// r2AlignmentsB.first = r2AlignSetB;
-			// r1AlignmentsA.first = r1AlignSetA;
-			// r2AlignmentsA.first = r2AlignSetA;
-			//
-			// bAlignmentsB.second  = bScoresB;
-			// r1AlignmentsB.second = r1ScoresB;
-			// r2AlignmentsB.second = r2ScoresB;
-			// r1AlignmentsA.second = r1ScoresA;
-			// r2AlignmentsA.second = r2ScoresA;
 			
 			alBundle.push_back(bAlignmentsB);
 			alBundle.push_back(r1AlignmentsB);
 			alBundle.push_back(r2AlignmentsB);
 			alBundle.push_back(r1AlignmentsA);
 			alBundle.push_back(r2AlignmentsA);
-			
 			
 			unsigned int aIdxPre = 0;
 			
@@ -176,10 +157,6 @@ public:
 				
 				alignPairedRead(prBundle->at(i), alBundle, cycle, aIdx);
 			}
-			
-			// std::cout << std::endl << std::endl;
-			// std::cout << "Algin idx pre: " << aIdxPre << std::endl;
-			// std::cout << "Algin idx:     " << aIdx    << std::endl;
 			
 			return prBundle;
 		}
