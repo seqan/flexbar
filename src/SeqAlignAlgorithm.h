@@ -1,13 +1,10 @@
 /*
  *   SeqAlignAlgorithm.h
  *
- *   Authors: mat and jtr
  */
 
 #ifndef FLEXBAR_SEQALIGNALGORITHM_H
 #define FLEXBAR_SEQALIGNALGORITHM_H
-
-#include <seqan/align.h>
 
 
 template <typename TSeqStr>
@@ -76,11 +73,15 @@ public:
 	};
 	
 	
-	void align(const TSeqStr &querySeq, const TSeqStr &readSeq, int &gapsR, int &gapsA, int &mismatches, int &startPos, int &endPos, int &startPosA, int &endPosA, int &startPosS, int &endPosS, int &aliScore, std::stringstream &aliString, TSeqStr &tagSeq, flexbar::TAlignments &alignments, const bool preCycle){
+	void alignGlobal(const TSeqStr &querySeq, const TSeqStr &readSeq, int &gapsR, int &gapsA, int &mismatches, int &startPos, int &endPos, int &startPosA, int &endPosA, int &startPosS, int &endPosS, int &aliScore, std::stringstream &aliString, TSeqStr &tagSeq, flexbar::TAlignments &alignments, const flexbar::ComputeCycle cycle){
 		
 		using namespace std;
 		using namespace seqan;
 		using namespace flexbar;
+		
+		if(cycle != PRECYCLE){
+			
+		}
 		
 		TAlign align;
 		resize(rows(align), 2);
@@ -96,18 +97,11 @@ public:
 		
 		AlignConfig<true, false, true, true> ac;
 		
-		// String<int> results  = globalAlignment(aligns, Score<int, Simple>(1,-1,-2), ac, 2, 2);
-		// String<int> results2 = globalAlignment(aligns, m_scoreDna5, ac);
+		String<int> results = globalAlignment(aligns, m_scoreDna5, ac);
 		
-		// cout << results << endl << endl;
-		// cout << value(aligns, 0) << endl << endl;
-		// cout << value(aligns, 1) << endl << endl;
-		
-		
-		// String<int> results;
-		// reserve(results, aligns.size());
-		// for(unsigned int i = 0; i < aligns.size(); ++i)
-		//    results[i] = globalAlignment(aligns[i], Score<int, Simple>(1,-1,-2));
+		cout << results[0] << endl << results[1] << endl << endl;
+		cout << value(aligns, 0) << endl << endl;
+		cout << value(aligns, 1) << endl << endl;
 		
 		
 		if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
