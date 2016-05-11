@@ -1,10 +1,10 @@
 /*
- *   Types.h
+ *   FlexbarTypes.h
  *
  */
 
-#ifndef FLEXBAR_TYPES_H
-#define FLEXBAR_TYPES_H
+#ifndef FLEXBAR_FLEXBARTYPES_H
+#define FLEXBAR_FLEXBARTYPES_H
 
 #include <vector>
 

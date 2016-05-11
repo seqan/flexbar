@@ -19,7 +19,7 @@
 #include <seqan/sequence.h>
 #include <seqan/arg_parse.h>
 
-#include "Types.h"
+#include "FlexbarTypes.h"
 #include "Options.h"
 #include "FlexbarIO.h"
 #include "LoadFasta.h"
