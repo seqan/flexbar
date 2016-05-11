@@ -22,7 +22,7 @@
 #include "Types.h"
 #include "Options.h"
 #include "FlexbarIO.h"
-#include "AdapterLoader.h"
+#include "LoadFasta.h"
 #include "SeqInput.h"
 #include "PairedInputFilter.h"
 #include "PairedOutputFilter.h"
@@ -44,7 +44,7 @@ void loadBarcodes(Options &o, const bool secondSet){
 		SeqInput<TSeqStr, TString> inputFilter(o, barFile, true, false, false);
 		bpipeline.add_filter(inputFilter);
 		
-		AdapterLoader<TSeqStr, TString> adapterLoader(o, false);
+		LoadFasta<TSeqStr, TString> adapterLoader(o, false);
 		bpipeline.add_filter(adapterLoader);
 		bpipeline.run(1);
 		
@@ -78,7 +78,7 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 	
 	if(o.adapRm != AOFF){
 		
-		AdapterLoader<TSeqStr, TString> adapterLoader(o, true);
+		LoadFasta<TSeqStr, TString> adapterLoader(o, true);
 		
 		if(useAdapterFile){
 			tbb::task_scheduler_init init_serial(1);
