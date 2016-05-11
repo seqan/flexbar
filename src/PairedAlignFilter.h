@@ -28,8 +28,8 @@ private:
 	tbb::concurrent_vector<flexbar::TAdapter> *m_adapters, *m_adapters2;
 	tbb::concurrent_vector<flexbar::TAdapter> *m_barcodes, *m_barcodes2;
 	
-	typedef SeqAlign<TSeqStr, TString, SeqAlignAlgorithm<TSeqStr> > AlignFilter;
-	AlignFilter *m_afilter, *m_bfilter, *m_a2filter, *m_b2filter;
+	typedef SeqAlign<TSeqStr, TString, SeqAlignAlgorithm<TSeqStr> > TAlignFilter;
+	TAlignFilter *m_afilter, *m_bfilter, *m_a2filter, *m_b2filter;
 	
 	std::ostream *out;
 	
@@ -53,11 +53,11 @@ public:
 		m_barcodes2 = &o.barcodes2;
 		m_adapters2 = &o.adapters2;
 		
-		m_bfilter = new AlignFilter(m_barcodes, o, o.b_min_overlap, o.b_threshold, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, o.b_end, true);
-		m_afilter = new AlignFilter(m_adapters, o, o.a_min_overlap, o.a_threshold, o.a_tail_len, o.match, o.mismatch, o.gapCost, o.end, false);
+		m_bfilter = new TAlignFilter(m_barcodes, o, o.b_min_overlap, o.b_threshold, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, o.b_end, true);
+		m_afilter = new TAlignFilter(m_adapters, o, o.a_min_overlap, o.a_threshold, o.a_tail_len, o.match, o.mismatch, o.gapCost, o.end, false);
 		
-		m_b2filter = new AlignFilter(m_barcodes2, o, o.b_min_overlap, o.b_threshold, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, o.b_end, true);
-		m_a2filter = new AlignFilter(m_adapters2, o, o.a_min_overlap, o.a_threshold, o.a_tail_len, o.match, o.mismatch, o.gapCost, o.end, false);
+		m_b2filter = new TAlignFilter(m_barcodes2, o, o.b_min_overlap, o.b_threshold, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, o.b_end, true);
+		m_a2filter = new TAlignFilter(m_adapters2, o, o.a_min_overlap, o.a_threshold, o.a_tail_len, o.match, o.mismatch, o.gapCost, o.end, false);
 		
 		if(m_verb == flexbar::TAB)
 		*out << "ReadTag\tQueryTag\tQueryStart\tQueryEnd\tOverlapLength\tMismatches\tIndels\tAllowedErrors" << std::endl;

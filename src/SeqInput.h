@@ -22,6 +22,8 @@ private:
 	const flexbar::QualTrimType m_qtrim;
 	flexbar::FileFormat m_format;
 	
+	// typedef seqan::String<char, seqan::MMap<> > TMMapString;
+	
 	const bool m_switch2Fasta, m_preProcess, m_useStdin, m_qtrimPostRm;
 	const int m_maxUncalled, m_preTrimBegin, m_preTrimEnd, m_qtrimThresh, m_qtrimWinSize;
 	

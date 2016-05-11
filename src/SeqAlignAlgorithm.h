@@ -42,32 +42,24 @@ public:
 		
 		m_scoreDna5 = TScoreDna5(gapCost);
 		
-		for (unsigned i = 0; i < ValueSize<TChar>::VALUE; ++i){
-			for (unsigned j = 0; j < ValueSize<TChar>::VALUE; ++j){
+		for(unsigned i = 0; i < ValueSize<TChar>::VALUE; ++i){
+			for(unsigned j = 0; j < ValueSize<TChar>::VALUE; ++j){
 				
-				if(i == j || TChar(j) == 'N'){
-					setScore(m_scoreDna5, TChar(i), TChar(j), match);
-				}
-				else{
-					setScore(m_scoreDna5, TChar(i), TChar(j), mismatch);
-				}
-				
-				// cout << i << "\t" << TChar(i) << endl;
-				// cout << j << "\t" << TChar(j) << endl;
-				// cout << ValueSize<TChar>::VALUE << endl << endl;
+				if(i == j || TChar(j) == 'N')
+					 setScore(m_scoreDna5, TChar(i), TChar(j), match);
+				else setScore(m_scoreDna5, TChar(i), TChar(j), mismatch);
 			}
 		}
 		
 		// cout << endl;
-		// for (unsigned i = 0; i < ValueSize<TChar>::VALUE; ++i)
+		// for(unsigned i = 0; i < ValueSize<TChar>::VALUE; ++i)
 		// 	cout << "\t" << TChar(i);
 		// cout << endl;
-		// 
-		// for (unsigned i = 0; i < ValueSize<TChar>::VALUE; ++i) {
+		//
+		// for(unsigned i = 0; i < ValueSize<TChar>::VALUE; ++i){
 		// 	cout << TChar(i);
-		// 	for (unsigned j = 0; j < ValueSize<TChar>::VALUE; ++j){
+		// 	for(unsigned j = 0; j < ValueSize<TChar>::VALUE; ++j)
 		// 		cout << "\t" << score(m_scoreDna5, TChar(i), TChar(j));
-		// 	}
 		// 	cout << endl;
 		// }
 	};
