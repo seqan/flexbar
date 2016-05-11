@@ -7,7 +7,7 @@
 #ifndef FLEXBAR_PAIREDALIGNFILTER_H
 #define FLEXBAR_PAIREDALIGNFILTER_H
 
-#include "SeqAlignFilter.h"
+#include "SeqAlign.h"
 #include "SeqAlignAlgorithm.h"
 
 
@@ -28,7 +28,7 @@ private:
 	tbb::concurrent_vector<flexbar::TAdapter> *m_adapters, *m_adapters2;
 	tbb::concurrent_vector<flexbar::TAdapter> *m_barcodes, *m_barcodes2;
 	
-	typedef SeqAlignFilter<TSeqStr, TString, SeqAlignAlgorithm<TSeqStr> > AlignFilter;
+	typedef SeqAlign<TSeqStr, TString, SeqAlignAlgorithm<TSeqStr> > AlignFilter;
 	AlignFilter *m_afilter, *m_bfilter, *m_a2filter, *m_b2filter;
 	
 	std::ostream *out;

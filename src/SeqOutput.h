@@ -1,17 +1,17 @@
 /*
- *   SeqOutputFilter.h
+ *   SeqOutput.h
  *
  *   Authors: mat and jtr
  */
 
-#ifndef FLEXBAR_SEQOUTPUTFILTER_H
-#define FLEXBAR_SEQOUTPUTFILTER_H
+#ifndef FLEXBAR_SEQOUTPUT_H
+#define FLEXBAR_SEQOUTPUT_H
 
 #include <fstream>
 
 
 template <typename TSeqStr, typename TString>
-class SeqOutputFilter {
+class SeqOutput {
 
 private:
 	
@@ -32,7 +32,7 @@ private:
 	
 public:
 	
-	SeqOutputFilter(const std::string &filePath, const TString tagStr, const bool alwaysFile, const Options &o) :
+	SeqOutput(const std::string &filePath, const TString tagStr, const bool alwaysFile, const Options &o) :
 		m_format(o.format),
 		m_tagStr(tagStr),
 		m_minLength(o.min_readLen),
@@ -73,7 +73,7 @@ public:
 	};
 	
 	
-	virtual ~SeqOutputFilter(){
+	virtual ~SeqOutput(){
 		delete m_lengthDist;
 		if(! m_useStdout) close(seqFileOut);
 	};

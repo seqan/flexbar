@@ -23,7 +23,7 @@
 #include "Options.h"
 #include "FlexbarIO.h"
 #include "AdapterLoader.h"
-#include "SeqInputFilter.h"
+#include "SeqInput.h"
 #include "PairedInputFilter.h"
 #include "PairedOutputFilter.h"
 #include "PairedAlignFilter.h"
@@ -41,7 +41,7 @@ void loadBarcodes(Options &o, const bool secondSet){
 		
 		string barFile = secondSet ? o.barcode2File : o.barcodeFile;
 		
-		SeqInputFilter<TSeqStr, TString> inputFilter(o, barFile, true, false, false);
+		SeqInput<TSeqStr, TString> inputFilter(o, barFile, true, false, false);
 		bpipeline.add_filter(inputFilter);
 		
 		AdapterLoader<TSeqStr, TString> adapterLoader(o, false);
@@ -86,7 +86,7 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 			
 			string adapFile = secondSet ? o.adapter2File : o.adapterFile;
 			
-			SeqInputFilter<TSeqStr, TString> inputFilter(o, adapFile, true, false, false);
+			SeqInput<TSeqStr, TString> inputFilter(o, adapFile, true, false, false);
 			prepipe.add_filter(inputFilter);
 			prepipe.add_filter(adapterLoader);
 			prepipe.run(1);

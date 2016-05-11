@@ -1,11 +1,11 @@
 /*
- *   SeqInputFilter.h
+ *   SeqInput.h
  *
  *   Authors: mat and jtr
  */
 
-#ifndef FLEXBAR_SEQINPUTFILTER_H
-#define FLEXBAR_SEQINPUTFILTER_H
+#ifndef FLEXBAR_SEQINPUT_H
+#define FLEXBAR_SEQINPUT_H
 
 #include <seqan/seq_io.h>
 
@@ -13,7 +13,7 @@
 
 
 template <typename TSeqStr, typename TString>
-class SeqInputFilter : public tbb::filter {
+class SeqInput : public tbb::filter {
 
 private:
 	
@@ -29,7 +29,7 @@ private:
 	
 public:
 	
-	SeqInputFilter(const Options &o, const std::string filePath, const bool fastaFormat, const bool preProcess, const bool useStdin) :
+	SeqInput(const Options &o, const std::string filePath, const bool fastaFormat, const bool preProcess, const bool useStdin) :
 		
 		filter(serial_in_order),
 		m_preProcess(preProcess),
@@ -72,7 +72,7 @@ public:
 	};
 	
 	
-	virtual ~SeqInputFilter(){
+	virtual ~SeqInput(){
 		close(seqFileIn);
 	};
 	

@@ -1,27 +1,27 @@
 /*
- *   OutputFiles.h
+ *   SeqOutputFiles.h
  *
  *   Author: mat and jtr
  */
 
-#ifndef FLEXBAR_OUTPUTFILES_H
-#define FLEXBAR_OUTPUTFILES_H
+#ifndef FLEXBAR_SEQOUTPUTFILES_H
+#define FLEXBAR_SEQOUTPUTFILES_H
 
-#include "SeqOutputFilter.h"
+#include "SeqOutput.h"
 
 
 template <typename TSeqStr, typename TString>
-class OutputFiles {
+class SeqOutputFiles {
 	
 public:
 	
-	typedef SeqOutputFilter<TSeqStr, TString> TOutputFilter;
+	typedef SeqOutput<TSeqStr, TString> TOutputFilter;
 	
 	TOutputFilter *f1, *f2, *single1, *single2;
 	
 	tbb::atomic<unsigned long> m_nShort_1, m_nShort_2;
 	
-	OutputFiles() :
+	SeqOutputFiles() :
 		f1(0),
 		f2(0),
 		single1(0),
@@ -32,7 +32,7 @@ public:
 	};
 	
 	
-	virtual ~OutputFiles(){
+	virtual ~SeqOutputFiles(){
     	delete f1;
     	delete f2;
     	delete single1;
@@ -43,9 +43,9 @@ public:
 private:
 	
 	// forbid copying this object to call destructor only once (pointing to unique objects)
-	OutputFiles(OutputFiles&);
+	SeqOutputFiles(SeqOutputFiles&);
 	
-	OutputFiles& operator =(const OutputFiles& rhs);
+	SeqOutputFiles& operator =(const SeqOutputFiles& rhs);
 	
 };
 

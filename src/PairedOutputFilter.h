@@ -7,8 +7,8 @@
 #ifndef FLEXBAR_PAIREDOUTPUTFILTER_H
 #define FLEXBAR_PAIREDOUTPUTFILTER_H
 
-#include "SeqOutputFilter.h"
-#include "OutputFiles.h"
+#include "SeqOutput.h"
+#include "SeqOutputFiles.h"
 #include "QualTrimming.h"
 
 
@@ -31,8 +31,8 @@ private:
 	const flexbar::BarcodeDetect  m_barDetect;
 	const flexbar::QualTrimType   m_qtrim;
 	
-	typedef SeqOutputFilter<TSeqStr, TString>  TOutputFilter;
-	typedef OutputFiles<TSeqStr, TString> filters;
+	typedef SeqOutput<TSeqStr, TString>  TOutputFilter;
+	typedef SeqOutputFiles<TSeqStr, TString> filters;
 	
 	filters *m_outMap;
 	std::ostream *out;

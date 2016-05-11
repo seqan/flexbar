@@ -125,12 +125,12 @@ public:
 				if(cycle == COMPUTE){
 					
 					if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
-				
+						
 						AlignConfig<true, false, true, true> ac;
 						alignments.second = globalAlignment(alignments.first, m_score, ac);
 					}
 					else if(m_trimEnd == LEFT || m_trimEnd == LEFT_TAIL){
-				
+						
 						AlignConfig<true, true, false, true> ac;
 						alignments.second = globalAlignment(alignments.first, m_score, ac);
 					}
