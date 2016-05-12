@@ -15,9 +15,7 @@ public:
 	
 	typedef SeqRead<TSeqStr, TString> TSeqRead;
 	
-	TSeqRead *m_r1;
-	TSeqRead *m_r2;
-	TSeqRead *m_b;
+	TSeqRead *m_r1, *m_r2, *m_b;
 	
 	TSeqStr m_randTag;
 	int m_barcode_id, m_barcode_id2;
