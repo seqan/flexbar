@@ -76,111 +76,98 @@ public:
 		using namespace flexbar;
 		
 		
-		if(cycle == PRECYCLE){
-			
-			// TAlign &align;
-			// resize(rows(align), 2);
-			// assignSource(row(align, 0), readSeq);
-			// assignSource(row(align, 1), querySeq);
-			//
-			// appendValue(alignments.first, align);
-		}
-		else{
-			
-			// TAlign align;
-			//
-			// if(m_randTag){
-			//
-			// 	resize(rows(align), 2);
-			// 	assignSource(row(align, 0), readSeq);
-			// 	assignSource(row(align, 1), querySeq);
-			//
-			// 	if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
-			//
-			// 		AlignConfig<true, false, true, true> ac;
-			// 		alScore = globalAlignment(align, m_scoreDna5, ac);
-			// 	}
-			// 	else if(m_trimEnd == LEFT || m_trimEnd == LEFT_TAIL){
-			//
-			// 		AlignConfig<true, true, false, true> ac;
-			// 		alScore = globalAlignment(align, m_scoreDna5, ac);
-			// 	}
-			// 	else{
-			// 		AlignConfig<true, true, true, true> ac;
-			// 		alScore = globalAlignment(align, m_scoreDna5, ac);
-			// 	}
-			// }
-			// else{
-				if(cycle == COMPUTE){
+		// TAlign align;
+		//
+		// if(m_randTag){
+		//
+		// 	resize(rows(align), 2);
+		// 	assignSource(row(align, 0), readSeq);
+		// 	assignSource(row(align, 1), querySeq);
+		//
+		// 	if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
+		//
+		// 		AlignConfig<true, false, true, true> ac;
+		// 		alScore = globalAlignment(align, m_scoreDna5, ac);
+		// 	}
+		// 	else if(m_trimEnd == LEFT || m_trimEnd == LEFT_TAIL){
+		//
+		// 		AlignConfig<true, true, false, true> ac;
+		// 		alScore = globalAlignment(align, m_scoreDna5, ac);
+		// 	}
+		// 	else{
+		// 		AlignConfig<true, true, true, true> ac;
+		// 		alScore = globalAlignment(align, m_scoreDna5, ac);
+		// 	}
+		// }
+		// else{
+			if(cycle == COMPUTE){
+				
+				if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
 					
-					if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
-						
-						AlignConfig<true, false, true, true> ac;
-						alignments.second = globalAlignment(alignments.first, m_score, ac);
-					}
-					else if(m_trimEnd == LEFT || m_trimEnd == LEFT_TAIL){
-						
-						AlignConfig<true, true, false, true> ac;
-						alignments.second = globalAlignment(alignments.first, m_score, ac);
-					}
-					else{
-						AlignConfig<true, true, true, true> ac;
-						alignments.second = globalAlignment(alignments.first, m_score, ac);
-					}
+					AlignConfig<true, false, true, true> ac;
+					alignments.second = globalAlignment(alignments.first, m_score, ac);
 				}
-				
-				TAlign &align = value(alignments.first,  aIdx);
-				alScore = value(alignments.second, aIdx);
-			// }
-			
-			// cout << "Score: " << alScore << endl;
-			// cout << "Align: " << align << endl;
-			
-			
-			TRow &row1 = row(align, 0);
-			TRow &row2 = row(align, 1);
-			
-			startPosS = toViewPosition(row1, 0);
-			startPosA = toViewPosition(row2, 0);
-			endPosS   = toViewPosition(row1, length(source(row1)));
-			endPosA   = toViewPosition(row2, length(source(row2)));
-			
-			if(startPosA > startPosS) startPos = startPosA;
-			else                      startPos = startPosS;
-			
-			if(endPosA > endPosS) endPos = endPosS;
-			else                  endPos = endPosA;
-			
-			
-			// cout << "\n\n" << startPosS << endl << startPosA << endl << endPosS << endl << endPosA;
-			// cout << align << endl << alScore << endl;
-			
-			if(m_verb != flexbar::NONE) alString << align;
-			
-			
-			TRowIterator it1 = begin(row1);
-			TRowIterator it2 = begin(row2);
-			
-			int aliPos = 0;
-			gapsR      = 0;
-			gapsA      = 0;
-			mismatches = 0;
-			
-			for(; it1 != end(row1); ++it1){
-				
-				if(startPos <= aliPos && aliPos < endPos){
-					     if(isGap(it1))                   ++gapsR;
-					else if(isGap(it2))                   ++gapsA;
-					else if(*it1 != *it2 && *it2 != 'N')  ++mismatches;
-					else if(m_randTag    && *it2 == 'N')  append(tagSeq, (TSeqStrChar) *it1);
+				else if(m_trimEnd == LEFT || m_trimEnd == LEFT_TAIL){
+					
+					AlignConfig<true, true, false, true> ac;
+					alignments.second = globalAlignment(alignments.first, m_score, ac);
 				}
-				++aliPos;
-				++it2;
+				else{
+					AlignConfig<true, true, true, true> ac;
+					alignments.second = globalAlignment(alignments.first, m_score, ac);
+				}
 			}
 			
-			// cout << "\n\n" << gapsR << endl << gapsA << endl << mismatches << endl;
+			TAlign &align = value(alignments.first,  aIdx);
+			alScore = value(alignments.second, aIdx);
+		// }
+		
+		// cout << "Score: " << alScore << endl;
+		// cout << "Align: " << align << endl;
+		
+		
+		TRow &row1 = row(align, 0);
+		TRow &row2 = row(align, 1);
+		
+		startPosS = toViewPosition(row1, 0);
+		startPosA = toViewPosition(row2, 0);
+		endPosS   = toViewPosition(row1, length(source(row1)));
+		endPosA   = toViewPosition(row2, length(source(row2)));
+		
+		if(startPosA > startPosS) startPos = startPosA;
+		else                      startPos = startPosS;
+		
+		if(endPosA > endPosS) endPos = endPosS;
+		else                  endPos = endPosA;
+		
+		
+		// cout << "\n\n" << startPosS << endl << startPosA << endl << endPosS << endl << endPosA;
+		// cout << align << endl << alScore << endl;
+		
+		if(m_verb != flexbar::NONE) alString << align;
+		
+		
+		TRowIterator it1 = begin(row1);
+		TRowIterator it2 = begin(row2);
+		
+		int aliPos = 0;
+		gapsR      = 0;
+		gapsA      = 0;
+		mismatches = 0;
+		
+		for(; it1 != end(row1); ++it1){
 			
+			if(startPos <= aliPos && aliPos < endPos){
+				     if(isGap(it1))                   ++gapsR;
+				else if(isGap(it2))                   ++gapsA;
+				else if(*it1 != *it2 && *it2 != 'N')  ++mismatches;
+				else if(m_randTag    && *it2 == 'N')  append(tagSeq, (TSeqStrChar) *it1);
+			}
+			++aliPos;
+			++it2;
 		}
+		
+		// cout << "\n\n" << gapsR << endl << gapsA << endl << mismatches << endl;
 		
 		++aIdx;
 	}

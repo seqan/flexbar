@@ -75,6 +75,29 @@ public:
 		
 		SeqRead<TSeqStr, TString> &myRead = *static_cast< SeqRead<TSeqStr, TString>* >(item);
 		
+		TSeqStr seqRead = myRead.getSequence();
+		int readLength  = length(seqRead);
+		
+		if(! m_isBarcoding && readLength < m_minLength){
+			
+			if(cycle != PRECYCLE) ++m_nPreShortReads;
+			return 0;
+		}
+		
+		
+		if(cycle == PRECYCLE){
+			for(unsigned int i = 0; i < m_queries->size(); ++i){
+				TAlign align;
+				resize(rows(align), 2);
+				assignSource(row(align, 0), seqRead);
+				assignSource(row(align, 1), m_queries->at(i).first->getSequence());
+				
+				appendValue(alignments.first, align);
+			}
+			return 0;
+		}
+		
+		
 		int fmismatches, fgapsR, fgapsA, foverlapLength, fqueryLength, ftailLength;
 		int fstartPos, fstartPosA, fstartPosS, fendPos, fendPosS, fendPosA;
 		
@@ -84,25 +107,17 @@ public:
 		float fallowedErrors;
 		
 		stringstream ss;
-		TSeqStr seqread, finalRandTag;
+		TSeqStr finalRandTag;
 		
-		TString quality, finalAliStr;
+		TString quality, finalAlStr;
 		
 		TString readTag = myRead.getSequenceTag();
 		
-		seqread = myRead.getSequence();
 		quality = "";
 		
 		if(m_format == FASTQ) quality = myRead.getQuality();
 		
-		TSeqStr sequence = seqread;
-		int readLength   = length(seqread);
-		
-		if(! m_isBarcoding && readLength < m_minLength){
-			
-			if(cycle != PRECYCLE) ++m_nPreShortReads;
-			// return ++qIndex;
-		}
+		TSeqStr sequence = seqRead;
 		
 		
 		// align each query sequence and keep track of best one
@@ -121,9 +136,9 @@ public:
 				if(tailLength < readLength){
 					
 					if(m_trimEnd == LEFT_TAIL){
-						sequence = prefix<TSeqStr>(seqread, tailLength);
+						sequence = prefix<TSeqStr>(seqRead, tailLength);
 					}else{
-						sequence = suffix<TSeqStr>(seqread, readLength - tailLength);
+						sequence = suffix<TSeqStr>(seqRead, readLength - tailLength);
 					}
 					if(m_verb == ALL || m_verb == MOD)
 					ss << "Read tail length:  " << tailLength << "\n\n";
@@ -135,12 +150,12 @@ public:
 			int aliScore = 0, mismatches = 0, gapsR = 0, gapsA = 0;
 			
 			TSeqStr randTag = "";
-			stringstream aliString;
+			stringstream alString;
 			
 			
 			// align query to read sequence
 			algo->alignGlobal(query, sequence, gapsR, gapsA, mismatches, startPos, endPos, startPosA, endPosA,
-			                  startPosS, endPosS, aliScore, aliString, randTag, alignments, cycle, aIdx);
+			                  startPosS, endPosS, aliScore, alString, randTag, alignments, cycle, aIdx);
 			
 			if(cycle == PRECYCLE) return ++qIndex;
 			
@@ -184,7 +199,7 @@ public:
 				
 				if(m_verb != NONE){
 					fmismatches    = mismatches;
-					finalAliStr    = aliString.str();
+					finalAlStr    = alString.str();
 					fallowedErrors = allowedErrors;
 				}
 			}
@@ -218,7 +233,7 @@ public:
 					int rCutPos;
 					
 					case LEFT_TAIL:
-						sequence = seqread;
+						sequence = seqRead;
 					
 					case LEFT:
 						rCutPos = fendPos;
@@ -241,7 +256,7 @@ public:
 						break;
 					
 					case RIGHT_TAIL:
-						sequence  = seqread;
+						sequence  = seqRead;
 						// adjust cut pos to original read length
 						fstartPos += readLength - ftailLength;
 					
@@ -317,7 +332,7 @@ public:
 				
 				ss << "  query tag        " << queryTag                      << "\n"
 				   << "  read tag         " << readTag                       << "\n"
-				   << "  read             " << seqread                       << "\n"
+				   << "  read             " << seqRead                       << "\n"
 				   << "  read pos         " << fstartPosS << "-" << fendPosS << "\n"
 				   << "  query pos        " << fstartPosA << "-" << fendPosA << "\n"
 				   << "  score            " << scoreMax                      << "\n"
@@ -332,7 +347,7 @@ public:
 					ss << "  remaining qual   " << myRead.getQuality() << "\n";
 				}
 				
-				ss << "\n  Alignment:\n" << endl << finalAliStr;
+				ss << "\n  Alignment:\n" << endl << finalAlStr;
 			}
 			else if(m_verb == TAB){
 				ss << readTag     << "\t" << queryTag        << "\t"
@@ -343,7 +358,7 @@ public:
 		else if(m_verb == ALL){
 			ss << "No valid alignment:"   << "\n"
 			   << "read tag  " << readTag << "\n"
-			   << "read      " << seqread << "\n\n" << endl;
+			   << "read      " << seqRead << "\n\n" << endl;
 		}
 		
 		// output for multi-threading
