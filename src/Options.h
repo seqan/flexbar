@@ -450,6 +450,12 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	
 	// basic options
 	
+	getOptionValue(o.nThreads, parser, "threads");
+	*out << "Number of threads:     " << o.nThreads << endl;
+	
+	getOptionValue(o.bundleSize, parser, "bundle");
+	*out << "Reads per bundle:      " << o.bundleSize << endl << endl;
+	
 	getOptionValue(o.targetName, parser, "target");
 	*out << "Target name:           " << o.targetName << endl;
 	
@@ -545,12 +551,6 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	
 	
 	// filtering and trimming options
-	
-	getOptionValue(o.nThreads, parser, "threads");
-	*out << "threads:               " << o.nThreads << endl;
-	
-	getOptionValue(o.bundleSize, parser, "bundle");
-	*out << "bundle:                " << o.bundleSize << endl;
 	
 	getOptionValue(o.maxUncalled, parser, "max-uncalled");
 	*out << "max-uncalled:          " << o.maxUncalled << endl;

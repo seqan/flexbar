@@ -322,8 +322,8 @@ void startProcessing(Options &o){
 	
 	*out << "\n" << endl;
 	
-	*out << "Processed bases:   " << alignValue(clen, nChars) << endl;
-	*out << "Remaining bases:   " << alignValue(clen, nGoodChars);
+	*out << "Processed bases   " << alignValue(clen, nChars) << endl;
+	*out << "Remaining bases   " << alignValue(clen, nGoodChars);
 	
 	if(nChars > 0)
 	*out << "   (" << fixed << setprecision(2) << 100 * nGoodChars / nChars << "% of input)";
