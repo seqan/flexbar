@@ -10,7 +10,30 @@
 
 #include <seqan/align.h>
 
-#include "SeqRead.h"
+
+template <typename TSeqStr, typename TString>
+class SeqRead {
+	
+	public:
+	
+	TSeqStr seq;
+	TString tag, qual;
+	
+	SeqRead(const TSeqStr& sequence, const TString& seqTag)
+		: seq(sequence),
+		  tag(seqTag){
+	}
+	
+	SeqRead(const TSeqStr& sequence, const TString& seqTag, const TString& quality)
+		: seq(sequence),
+		  tag(seqTag),
+		  qual(quality){
+	}
+	
+	virtual ~SeqRead(){};
+};
+
+
 #include "PairedRead.h"
 
 
