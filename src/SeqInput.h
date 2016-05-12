@@ -104,7 +104,7 @@ public:
 		using seqan::suffix;
 		using seqan::length;
 		
-		SeqRead<TSeqStr, TString> *myRead = NULL;
+		SeqRead<TSeqStr, TString> *seqRead = NULL;
 		
 		TSeqStr rseq = "";
 		TString qual = "", tag = "", tmp = "";
@@ -152,7 +152,7 @@ public:
 						}
 					}
 					
-					myRead = new SeqRead<TSeqStr, TString>(rseq, tag);
+					seqRead = new SeqRead<TSeqStr, TString>(rseq, tag);
 					
 					++m_nrReads;
 				}
@@ -203,13 +203,13 @@ public:
 						}
 					}
 					
-					if(m_switch2Fasta) myRead = new SeqRead<TSeqStr, TString>(rseq, tag);
-					else               myRead = new SeqRead<TSeqStr, TString>(rseq, tag, qual);
+					if(m_switch2Fasta) seqRead = new SeqRead<TSeqStr, TString>(rseq, tag);
+					else               seqRead = new SeqRead<TSeqStr, TString>(rseq, tag, qual);
 					
 					++m_nrReads;
 				}
 				
-				return myRead;
+				return seqRead;
 			}
 			catch(seqan::Exception const &e){
 				cerr << "\n\n" << "ERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;

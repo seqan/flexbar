@@ -108,12 +108,12 @@ public:
 	}
 	
 	
-	void writeSeqRead(const SeqRead<TSeqStr, TString>& myRead){
+	void writeSeqRead(const SeqRead<TSeqStr, TString>& seqRead){
 		
 		using namespace std;
 		using namespace flexbar;
 		
-		TString tag = myRead.tag;
+		TString tag = seqRead.tag;
 		
 		if(m_useStdout && m_tagStr != ""){
 			append(tag, "_");
@@ -122,10 +122,10 @@ public:
 		
 		try{
 			if(m_format == FASTA){
-				writeRecord(seqFileOut, tag, myRead.seq);
+				writeRecord(seqFileOut, tag, seqRead.seq);
 			}
 			else if(m_format == FASTQ){
-				writeRecord(seqFileOut, tag, myRead.seq, myRead.qual);
+				writeRecord(seqFileOut, tag, seqRead.seq, seqRead.qual);
 			}
 		}
 		catch(seqan::Exception const &e){
@@ -154,16 +154,16 @@ public:
 		using namespace flexbar;
 		
 		if(item){
-			SeqRead<TSeqStr, TString> *myRead = static_cast< SeqRead<TSeqStr, TString>* >(item);
+			SeqRead<TSeqStr, TString> *seqRead = static_cast< SeqRead<TSeqStr, TString>* >(item);
 			
-			unsigned int readLength = length(myRead->seq);
+			unsigned int readLength = length(seqRead->seq);
 			
 			if(m_cutLen_read > 1 && m_cutLen_read >= m_minLength && m_cutLen_read < readLength){
 				
-				myRead->seq = prefix(myRead->seq, m_cutLen_read);
+				seqRead->seq = prefix(seqRead->seq, m_cutLen_read);
 				
 				if(m_format == FASTQ){
-					myRead->qual = prefix(myRead->qual, m_cutLen_read);
+					seqRead->qual = prefix(seqRead->qual, m_cutLen_read);
 				}
 				
 				readLength = m_cutLen_read;
@@ -179,7 +179,7 @@ public:
 			else if(m_writeLenDist)
 				cerr << "\nCompile Flexbar with larger max read length to get correct length dist.\n" << endl;
 			
-			writeSeqRead(*myRead);
+			writeSeqRead(*seqRead);
 		}
 		
 		return NULL;

@@ -73,9 +73,9 @@ public:
 		using seqan::infix;
 		
 		
-		SeqRead<TSeqStr, TString> &myRead = *static_cast< SeqRead<TSeqStr, TString>* >(item);
+		SeqRead<TSeqStr, TString> &seqRead = *static_cast< SeqRead<TSeqStr, TString>* >(item);
 		
-		TSeqStr seqRead = myRead.seq;
+		TSeqStr seqRead = seqRead.seq;
 		int readLength  = length(seqRead);
 		
 		if(! m_isBarcoding && readLength < m_minLength){
@@ -112,11 +112,11 @@ public:
 		
 		TString quality, finalAlStr;
 		
-		TString readTag = myRead.tag;
+		TString readTag = seqRead.tag;
 		
 		quality = "";
 		
-		if(m_format == FASTQ) quality = myRead.qual;
+		if(m_format == FASTQ) quality = seqRead.qual;
 		
 		TSeqStr sequence = seqRead;
 		
@@ -218,8 +218,8 @@ public:
 				if(trimEnd == ANY){
 					
 					if(fstartPosA <= fstartPosS && fendPosS <= fendPosA){
-						myRead.seq = "";
-						if(m_format == FASTQ) myRead.qual = "";
+						seqRead.seq = "";
+						if(m_format == FASTQ) seqRead.qual = "";
 					}
 					else if(fstartPosA - fstartPosS >= fendPosS - fendPosA){
 						trimEnd = RIGHT;
@@ -248,11 +248,11 @@ public:
 						if(rCutPos > readLength) rCutPos = readLength;
 						
 						erase(sequence, 0, rCutPos);
-						myRead.seq = sequence;
+						seqRead.seq = sequence;
 						
 						if(m_format == FASTQ){
 							erase(quality, 0, rCutPos);
-							myRead.qual = quality;
+							seqRead.qual = quality;
 						}
 						break;
 					
@@ -268,11 +268,11 @@ public:
 						if(rCutPos < 0) rCutPos = 0;
 						
 						erase(sequence, rCutPos, readLength);
-						myRead.seq = sequence;
+						seqRead.seq = sequence;
 						
 						if(m_format == FASTQ){
 							erase(quality, rCutPos, readLength);
-							myRead.qual = quality;
+							seqRead.qual = quality;
 						}
 						break;
 						
@@ -290,7 +290,7 @@ public:
 				}
 				
 				if(m_writeTag){
-					TString newTag = myRead.tag;
+					TString newTag = seqRead.tag;
 					append(newTag, "_Flexbar_removal");
 					
 					if(! m_isBarcoding){
@@ -298,7 +298,7 @@ public:
 						append(newTag, m_queries->at(qIndex).first->tag);
 					}
 					
-					myRead.tag = newTag;
+					seqRead.tag = newTag;
 				}
 				
 				// store overlap occurrences for min, max, mean and median
@@ -310,10 +310,10 @@ public:
 			// valid alignment, not neccesarily removal
 			
 			if(m_randTag && finalRandTag != ""){
-				TString newTag = myRead.tag;
+				TString newTag = seqRead.tag;
 				append(newTag, "_");
 				append(newTag, finalRandTag);
-				myRead.tag = newTag;
+				seqRead.tag = newTag;
 			}
 			
 			
@@ -342,10 +342,10 @@ public:
 				   << "  allowed errors   " << fallowedErrors                << "\n";
 				
 				if(performRemoval){
-					ss << "  remaining read   "  << myRead.seq << "\n";
+					ss << "  remaining read   "  << seqRead.seq << "\n";
 					
 					if(m_format == FASTQ)
-					ss << "  remaining qual   " << myRead.qual << "\n";
+					ss << "  remaining qual   " << seqRead.qual << "\n";
 				}
 				
 				ss << "\n  Alignment:\n" << endl << finalAlStr;
