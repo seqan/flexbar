@@ -75,8 +75,8 @@ public:
 		
 		SeqRead<TSeqStr, TString> &seqRead = *static_cast< SeqRead<TSeqStr, TString>* >(item);
 		
-		TSeqStr seqRead = seqRead.seq;
-		int readLength  = length(seqRead);
+		TSeqStr readSeq = seqRead.seq;
+		int readLength  = length(readSeq);
 		
 		if(! m_isBarcoding && readLength < m_minLength){
 			
@@ -90,7 +90,7 @@ public:
 				
 				TAlign align;
 				resize(rows(align), 2);
-				assignSource(row(align, 0), seqRead);
+				assignSource(row(align, 0), readSeq);
 				assignSource(row(align, 1), m_queries->at(i).first->seq);
 				
 				appendValue(alignments.first, align);
@@ -118,7 +118,7 @@ public:
 		
 		if(m_format == FASTQ) quality = seqRead.qual;
 		
-		TSeqStr sequence = seqRead;
+		TSeqStr sequence = readSeq;
 		
 		
 		// align each query sequence and keep track of best one
@@ -137,9 +137,9 @@ public:
 				if(tailLength < readLength){
 					
 					if(m_trimEnd == LEFT_TAIL){
-						sequence = prefix<TSeqStr>(seqRead, tailLength);
+						sequence = prefix<TSeqStr>(readSeq, tailLength);
 					}else{
-						sequence = suffix<TSeqStr>(seqRead, readLength - tailLength);
+						sequence = suffix<TSeqStr>(readSeq, readLength - tailLength);
 					}
 					if(m_log == ALL || m_log == MOD)
 					ss << "Read tail length:  " << tailLength << "\n\n";
@@ -234,7 +234,7 @@ public:
 					int rCutPos;
 					
 					case LEFT_TAIL:
-						sequence = seqRead;
+						sequence = readSeq;
 					
 					case LEFT:
 						rCutPos = fendPos;
@@ -257,7 +257,7 @@ public:
 						break;
 					
 					case RIGHT_TAIL:
-						sequence  = seqRead;
+						sequence  = readSeq;
 						// adjust cut pos to original read length
 						fstartPos += readLength - ftailLength;
 					
@@ -333,7 +333,7 @@ public:
 				
 				ss << "  query tag        " << queryTag                      << "\n"
 				   << "  read tag         " << readTag                       << "\n"
-				   << "  read             " << seqRead                       << "\n"
+				   << "  read             " << readSeq                       << "\n"
 				   << "  read pos         " << fstartPosS << "-" << fendPosS << "\n"
 				   << "  query pos        " << fstartPosA << "-" << fendPosA << "\n"
 				   << "  score            " << scoreMax                      << "\n"
@@ -359,7 +359,7 @@ public:
 		else if(m_log == ALL){
 			ss << "No valid alignment:"   << "\n"
 			   << "read tag  " << readTag << "\n"
-			   << "read      " << seqRead << "\n\n" << endl;
+			   << "read      " << readSeq << "\n\n" << endl;
 		}
 		
 		// output for multi-threading

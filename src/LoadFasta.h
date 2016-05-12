@@ -37,10 +37,10 @@ public:
 		using namespace std;
 		using namespace flexbar;
 		
-		SeqRead<TSeqStr, TString> *myRead = static_cast< SeqRead<TSeqStr, TString>* >(item);
-		SeqRead<TSeqStr, TString> *myReadRC;
+		SeqRead<TSeqStr, TString> *seqRead = static_cast< SeqRead<TSeqStr, TString>* >(item);
+		SeqRead<TSeqStr, TString> *seqReadRC;
 		
-		TString tag = myRead->tag;
+		TString tag = seqRead->tag;
 		
 		if(adapters.size() < 1000){
 			for(int i = 0; i < adapters.size(); ++i){
@@ -60,21 +60,21 @@ public:
 		}
 		
 		if(m_revComp){
-			TSeqStr seq = myRead->seq;
+			TSeqStr seq = seqRead->seq;
 			seqan::reverseComplement(seq);
 			
 			append(tag, " revcomp");
 			
-			myReadRC = new SeqRead<TSeqStr, TString>(seq, tag);
+			seqReadRC = new SeqRead<TSeqStr, TString>(seq, tag);
 		}
 		
 		TAdapter adap;
-		adap.first = myRead;
+		adap.first = seqRead;
 		adapters.push_back(adap);
 		
 		if(m_revComp){
 			TAdapter adapRC;
-			adapRC.first = myReadRC;
+			adapRC.first = seqReadRC;
 			adapters.push_back(adapRC);
 		}
 		

@@ -69,7 +69,7 @@ void loadBarcodes(Options &o, const bool secondSet){
 	}
 }
 
-	
+
 template <typename TSeqStr, typename TString>
 void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 	
@@ -111,22 +111,22 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 		else{
 			TSeqStr adapterSeq = o.adapterSeq;
 			
-			SeqRead<TSeqStr, TString> *myRead;
-			myRead = new SeqRead<TSeqStr, TString>(adapterSeq, "cmdline");
+			SeqRead<TSeqStr, TString> *seqRead;
+			seqRead = new SeqRead<TSeqStr, TString>(adapterSeq, "cmdline");
 			
 			TAdapter adap;
-			adap.first = myRead;
+			adap.first = seqRead;
 			o.adapters.push_back(adap);
 			
 			if(o.revCompAdapter){
 				TSeqStr adapterSeqRC = o.adapterSeq;
 				seqan::reverseComplement(adapterSeqRC);
 				
-				SeqRead<TSeqStr, TString> *myReadRC;
-				myReadRC = new SeqRead<TSeqStr, TString>(adapterSeqRC, "cmdline revcomp");
+				SeqRead<TSeqStr, TString> *seqReadRC;
+				seqReadRC = new SeqRead<TSeqStr, TString>(adapterSeqRC, "cmdline revcomp");
 				
 				TAdapter adapRC;
-				adapRC.first = myReadRC;
+				adapRC.first = seqReadRC;
 				o.adapters.push_back(adapRC);
 			}
 			
