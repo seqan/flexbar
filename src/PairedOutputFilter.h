@@ -246,18 +246,18 @@ public:
 			case SINGLE:
 			case SINGLE_BARCODED:{
 				
-				if(pRead->m_r1 != NULL){
-					if(m_runType == SINGLE || m_writeUnassigned || pRead->m_barcode_id > 0){
+				if(pRead->r1 != NULL){
+					if(m_runType == SINGLE || m_writeUnassigned || pRead->barID > 0){
 						
 						if(m_qtrim != QOFF && m_qtrimPostRm){
-							if(qualTrim(pRead->m_r1, m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
+							if(qualTrim(pRead->r1, m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
 						}
 						
-						if(length(pRead->m_r1->seq) >= m_minLength){
+						if(length(pRead->r1->seq) >= m_minLength){
 							
-							m_outMap[pRead->m_barcode_id].f1->writeRead(pRead->m_r1);
+							m_outMap[pRead->barID].f1->writeRead(pRead->r1);
 						}
-						else m_outMap[pRead->m_barcode_id].m_nShort_1++;
+						else m_outMap[pRead->barID].m_nShort_1++;
 					}
 				}
 				break;
@@ -266,65 +266,65 @@ public:
 			case PAIRED:
 			case PAIRED_BARCODED:{
 				
-				if(pRead->m_r1 != NULL && pRead->m_r2 != NULL){
+				if(pRead->r1 != NULL && pRead->r2 != NULL){
 					
-					int outIdx = pRead->m_barcode_id;
+					int outIdx = pRead->barID;
 					
 					if(m_twoBarcodes){
-						if(outIdx == 0 || pRead->m_barcode_id2 == 0){
+						if(outIdx == 0 || pRead->barID2 == 0){
 							outIdx = 0;
 						}
-						else outIdx += (pRead->m_barcode_id2 - 1) * m_barcodes->size();
+						else outIdx += (pRead->barID2 - 1) * m_barcodes->size();
 					}
 					
 					if(m_runType == PAIRED || m_writeUnassigned || outIdx > 0){
 						
 						if(m_qtrim != QOFF && m_qtrimPostRm){
-							if(qualTrim(pRead->m_r1, m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
-							if(qualTrim(pRead->m_r2, m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
+							if(qualTrim(pRead->r1, m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
+							if(qualTrim(pRead->r2, m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
 						}
 						
-						if(length(pRead->m_r1->seq) >= m_minLength) l1ok = true;
-						if(length(pRead->m_r2->seq) >= m_minLength) l2ok = true;
+						if(length(pRead->r1->seq) >= m_minLength) l1ok = true;
+						if(length(pRead->r2->seq) >= m_minLength) l2ok = true;
 						
 						if(l1ok && l2ok){
-							m_outMap[outIdx].f1->writeRead(pRead->m_r1);
-							m_outMap[outIdx].f2->writeRead(pRead->m_r2);
+							m_outMap[outIdx].f1->writeRead(pRead->r1);
+							m_outMap[outIdx].f2->writeRead(pRead->r2);
 						}
 						else if(l1ok && ! l2ok){
 							m_nSingleReads++;
 							
 							if(m_writeSingleReads){
-								m_outMap[outIdx].single1->writeRead(pRead->m_r1);
+								m_outMap[outIdx].single1->writeRead(pRead->r1);
 							}
 							else if(m_writeSingleReadsP){
 								
-								pRead->m_r2->seq = "N";
+								pRead->r2->seq = "N";
 								
 								if(m_format == FASTQ){
-									pRead->m_r2->qual = prefix(pRead->m_r1->qual, 1);
+									pRead->r2->qual = prefix(pRead->r1->qual, 1);
 								}
 								
-								m_outMap[outIdx].f1->writeRead(pRead->m_r1);
-								m_outMap[outIdx].f2->writeRead(pRead->m_r2);
+								m_outMap[outIdx].f1->writeRead(pRead->r1);
+								m_outMap[outIdx].f2->writeRead(pRead->r2);
 							}
 						}
 						else if(! l1ok && l2ok){
 							m_nSingleReads++;
 							
 							if(m_writeSingleReads){
-								m_outMap[outIdx].single2->writeRead(pRead->m_r2);
+								m_outMap[outIdx].single2->writeRead(pRead->r2);
 							}
 							else if(m_writeSingleReadsP){
 								
-								pRead->m_r1->seq = "N";
+								pRead->r1->seq = "N";
 								
 								if(m_format == FASTQ){
-									pRead->m_r1->qual = prefix(pRead->m_r2->qual, 1);
+									pRead->r1->qual = prefix(pRead->r2->qual, 1);
 								}
 								
-								m_outMap[outIdx].f1->writeRead(pRead->m_r1);
-								m_outMap[outIdx].f2->writeRead(pRead->m_r2);
+								m_outMap[outIdx].f1->writeRead(pRead->r1);
+								m_outMap[outIdx].f2->writeRead(pRead->r2);
 							}
 						}
 						

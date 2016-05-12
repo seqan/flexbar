@@ -84,18 +84,18 @@ public:
 			// barcode detection
 			if(m_barType != BOFF){
 				switch(m_barType){
-					case BARCODE_READ:         pRead->m_barcode_id  = m_bfilter->alignSeqRead( pRead->m_b,  false, alBundle.at(0), cycle, aIdx); break;
+					case BARCODE_READ:         pRead->barID  = m_bfilter->alignSeqRead(pRead->b,  false, alBundle.at(0), cycle, aIdx); break;
 					
-					case WITHIN_READ_REMOVAL2: pRead->m_barcode_id2 = m_b2filter->alignSeqRead(pRead->m_r2, true,  alBundle.at(2), cycle, aIdx);
-					case WITHIN_READ_REMOVAL:  pRead->m_barcode_id  = m_bfilter->alignSeqRead(pRead->m_r1,  true,  alBundle.at(1), cycle, aIdx); break;
+					case WITHIN_READ_REMOVAL2: pRead->barID2 = m_b2filter->alignSeqRead(pRead->r2, true,  alBundle.at(2), cycle, aIdx);
+					case WITHIN_READ_REMOVAL:  pRead->barID  = m_bfilter->alignSeqRead(pRead->r1,  true,  alBundle.at(1), cycle, aIdx); break;
 					
-					case WITHIN_READ2:         pRead->m_barcode_id2 = m_b2filter->alignSeqRead(pRead->m_r2, false, alBundle.at(2), cycle, aIdx);
-					case WITHIN_READ:          pRead->m_barcode_id  = m_bfilter->alignSeqRead(pRead->m_r1,  false, alBundle.at(1), cycle, aIdx); break;
+					case WITHIN_READ2:         pRead->barID2 = m_b2filter->alignSeqRead(pRead->r2, false, alBundle.at(2), cycle, aIdx);
+					case WITHIN_READ:          pRead->barID  = m_bfilter->alignSeqRead(pRead->r1,  false, alBundle.at(1), cycle, aIdx); break;
 					
 					case BOFF: break;
 				}
 				
-				if(pRead->m_barcode_id == 0 || (m_twoBarcodes && pRead->m_barcode_id2 == 0)){
+				if(pRead->barID == 0 || (m_twoBarcodes && pRead->barID2 == 0)){
 					
 					if(cycle != PRECYCLE) m_unassigned++;
 					
@@ -106,11 +106,11 @@ public:
 			// adapter removal
 			if(m_adapRem != AOFF && ! skipAdapRem){
 				if(m_adapRem != ATWO)
-				m_afilter->alignSeqRead(pRead->m_r1, true, alBundle.at(3), cycle, aIdx);
+				m_afilter->alignSeqRead(pRead->r1, true, alBundle.at(3), cycle, aIdx);
 				
-				if(pRead->m_r2 != NULL && m_adapRem != AONE){
-					if(m_adapRem != NORMAL2) m_afilter->alignSeqRead(pRead->m_r2,  true, alBundle.at(4), cycle, aIdx);
-					else                     m_a2filter->alignSeqRead(pRead->m_r2, true, alBundle.at(4), cycle, aIdx);
+				if(pRead->r2 != NULL && m_adapRem != AONE){
+					if(m_adapRem != NORMAL2) m_afilter->alignSeqRead(pRead->r2,  true, alBundle.at(4), cycle, aIdx);
+					else                     m_a2filter->alignSeqRead(pRead->r2, true, alBundle.at(4), cycle, aIdx);
 				}
 			}
 		}

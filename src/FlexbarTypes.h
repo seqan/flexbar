@@ -41,24 +41,22 @@ class PairedRead {
 	
 	typedef SeqRead<TSeqStr, TString> TSeqRead;
 	
-	TSeqRead *m_r1, *m_r2, *m_b;
+	TSeqRead *r1, *r2, *b;
 	
-	TSeqStr m_randTag;
-	int m_barcode_id, m_barcode_id2;
+	int barID, barID2;
 	
-	PairedRead(TSeqRead *r1, TSeqRead *r2, TSeqRead *b) :
-		m_r1(r1),
-		m_r2(r2),
-		m_b(b),
-		m_barcode_id(0),
-		m_barcode_id2(0),
-		m_randTag(""){
+	PairedRead(TSeqRead *p_r1, TSeqRead *p_r2, TSeqRead *p_b) :
+		r1(p_r1),
+		r2(p_r2),
+		b(p_b),
+		barID(0),
+		barID2(0){
 	}
 	
 	virtual ~PairedRead(){
-		delete m_r1;
-		delete m_r2;
-		delete m_b;
+		delete r1;
+		delete r2;
+		delete b;
 	}
 };
 
