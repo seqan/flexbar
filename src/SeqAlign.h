@@ -101,8 +101,7 @@ public:
 		if(! m_isBarcoding && readLength < m_minLength){
 			
 			if(cycle != PRECYCLE) ++m_nPreShortReads;
-			
-			return ++qIndex;
+			// return ++qIndex;
 		}
 		
 		

@@ -144,7 +144,19 @@ public:
 			
 			for(unsigned int i = 0; i < prBundle->size(); ++i){
 				
-				alignPairedRead(prBundle->at(i), alBundle, cycle, aIdxPre);
+				// std::cout << prBundle->at(i)->m_r1->getSequence() << std::endl;
+				
+				// for(unsigned int i = 0; i < m_queries->size(); ++i){
+				
+				TAlign align;
+				resize(rows(align), 2);
+				assignSource(row(align, 0), prBundle->at(i)->m_r1->getSequence());
+				assignSource(row(align, 1), m_adapters->at(0).first->getSequence());
+				
+				appendValue(alBundle.at(3).first, align);
+				
+				
+				// alignPairedRead(prBundle->at(i), alBundle, cycle, aIdxPre);
 			}
 			
 			unsigned int aIdx = 0;

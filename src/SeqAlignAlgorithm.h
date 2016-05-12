@@ -78,42 +78,39 @@ public:
 		
 		if(cycle == PRECYCLE){
 			
-			TAlign align;
-			resize(rows(align), 2);
-			assignSource(row(align, 0), readSeq);
-			assignSource(row(align, 1), querySeq);
-			
-			appendValue(alignments.first, align);
+			// TAlign &align;
+			// resize(rows(align), 2);
+			// assignSource(row(align, 0), readSeq);
+			// assignSource(row(align, 1), querySeq);
+			//
+			// appendValue(alignments.first, align);
 		}
 		else{
 			
-			TAlign align;
-			
-			if(m_randTag){
-				
-				resize(rows(align), 2);
-				assignSource(row(align, 0), readSeq);
-				assignSource(row(align, 1), querySeq);
-				
-				if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
-					
-					AlignConfig<true, false, true, true> ac;
-					alScore = globalAlignment(align, m_scoreDna5, ac);
-				}
-				else if(m_trimEnd == LEFT || m_trimEnd == LEFT_TAIL){
-					
-					AlignConfig<true, true, false, true> ac;
-					alScore = globalAlignment(align, m_scoreDna5, ac);
-				}
-				else{
-					AlignConfig<true, true, true, true> ac;
-					alScore = globalAlignment(align, m_scoreDna5, ac);
-				}
-				
-				// cout << "Score: " << alScore << endl;
-				// cout << "Align: " << align << endl;
-			}
-			else{
+			// TAlign align;
+			//
+			// if(m_randTag){
+			//
+			// 	resize(rows(align), 2);
+			// 	assignSource(row(align, 0), readSeq);
+			// 	assignSource(row(align, 1), querySeq);
+			//
+			// 	if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
+			//
+			// 		AlignConfig<true, false, true, true> ac;
+			// 		alScore = globalAlignment(align, m_scoreDna5, ac);
+			// 	}
+			// 	else if(m_trimEnd == LEFT || m_trimEnd == LEFT_TAIL){
+			//
+			// 		AlignConfig<true, true, false, true> ac;
+			// 		alScore = globalAlignment(align, m_scoreDna5, ac);
+			// 	}
+			// 	else{
+			// 		AlignConfig<true, true, true, true> ac;
+			// 		alScore = globalAlignment(align, m_scoreDna5, ac);
+			// 	}
+			// }
+			// else{
 				if(cycle == COMPUTE){
 					
 					if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
@@ -132,12 +129,12 @@ public:
 					}
 				}
 				
-				align   = value(alignments.first,  aIdx);
+				TAlign &align = value(alignments.first,  aIdx);
 				alScore = value(alignments.second, aIdx);
-				
-				// cout << "Score: " << alScore << endl;
-				// cout << "Align: " << align << endl;
-			}
+			// }
+			
+			// cout << "Score: " << alScore << endl;
+			// cout << "Align: " << align << endl;
 			
 			
 			TRow &row1 = row(align, 0);
