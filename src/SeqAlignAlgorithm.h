@@ -16,21 +16,21 @@ private:
 	typedef typename seqan::Row<flexbar::TAlign>::Type  TRow;
 	typedef typename seqan::Iterator<TRow>::Type        TRowIterator;
 	
+	typedef seqan::Score<int, seqan::Simple>                              TScoreSimple;
 	typedef seqan::Score<int, seqan::ScoreMatrix<TChar, seqan::Default> > TScoreMatrix;
 	
+	TScoreSimple m_score;
 	TScoreMatrix m_scoreMatrix;
 	
-	seqan::Score<int, seqan::Simple> m_score;
-	
 	const bool m_randTag;
-	const flexbar::LogLevel m_verb;
+	const flexbar::LogAlign m_log;
 	const flexbar::TrimEnd m_trimEnd;
 	
 public:
 	
 	SeqAlignAlgorithm(const Options &o, const int match, const int mismatch, const int gapCost, const flexbar::TrimEnd trimEnd):
 			m_randTag(o.randTag),
-			m_verb(o.logLevel),
+			m_log(o.logAlign),
 			m_trimEnd(trimEnd){
 		
 		using namespace seqan;
@@ -63,7 +63,8 @@ public:
 		using namespace flexbar;
 		
 		
-		// TAlign align;
+		// TAlign align2;
+		// TAlign &align = align2;
 		//
 		// if(m_randTag){
 		//
@@ -106,7 +107,7 @@ public:
 			}
 			
 			TAlign &align = value(alignments.first,  aIdx);
-			alScore = value(alignments.second, aIdx);
+			alScore       = value(alignments.second, aIdx);
 		// }
 		
 		// cout << "Score: " << alScore << endl;
@@ -131,7 +132,7 @@ public:
 		// cout << "\n\n" << startPosS << endl << startPosA << endl << endPosS << endl << endPosA;
 		// cout << align << endl << alScore << endl;
 		
-		if(m_verb != flexbar::NONE) alString << align;
+		if(m_log != flexbar::NONE) alString << align;
 		
 		
 		TRowIterator it1 = begin(row1);

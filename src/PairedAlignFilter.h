@@ -18,7 +18,7 @@ private:
 	
 	const bool m_writeUnassigned, m_twoBarcodes;
 	
-	const flexbar::LogLevel       m_verb;
+	const flexbar::LogAlign       m_log;
 	const flexbar::RunType        m_runType;
 	const flexbar::BarcodeDetect  m_barType;
 	const flexbar::AdapterRemoval m_adapRem;
@@ -38,7 +38,7 @@ public:
 	PairedAlignFilter(Options &o) :
 		
 		filter(parallel),
-		m_verb(o.logLevel),
+		m_log(o.logAlign),
 		m_runType(o.runType),
 		m_barType(o.barDetect),
 		m_adapRem(o.adapRm),
@@ -59,7 +59,7 @@ public:
 		m_b2filter = new TAlignFilter(m_barcodes2, o, o.b_min_overlap, o.b_threshold, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, o.b_end, true);
 		m_a2filter = new TAlignFilter(m_adapters2, o, o.a_min_overlap, o.a_threshold, o.a_tail_len, o.match, o.mismatch, o.gapCost, o.end, false);
 		
-		if(m_verb == flexbar::TAB)
+		if(m_log == flexbar::TAB)
 		*out << "ReadTag\tQueryTag\tQueryStart\tQueryEnd\tOverlapLength\tMismatches\tIndels\tAllowedErrors" << std::endl;
 	}
 	

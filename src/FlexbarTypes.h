@@ -40,7 +40,7 @@ namespace flexbar{
    		RESULTS
    	};
 	
-	enum LogLevel {
+	enum LogAlign {
 		NONE,
 		ALL,
 		TAB,

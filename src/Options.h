@@ -16,9 +16,9 @@ struct Options{
 	
 	std::string readsFile, readsFile2, barReadsFile;
 	std::string barcodeFile, adapterFile, barcode2File, adapter2File;
-	std::string adapterSeq, targetName, logLevelStr, outCompression;
+	std::string adapterSeq, targetName, logAlignStr, outCompression;
 	
-	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, randTag, logFile;
+	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, randTag, logStdout;
 	bool switch2Fasta, writeUnassigned, writeSingleReads, writeSingleReadsP, writeLengthDist;
 	bool useStdin, useStdout, relaxRegion, revCompAdapter, qtrimPostRm;
 	
@@ -33,7 +33,7 @@ struct Options{
 	flexbar::FileFormat      format;
 	flexbar::QualityType     qual;
 	flexbar::QualTrimType    qTrim;
-	flexbar::LogLevel        logLevel;
+	flexbar::LogAlign        logAlign;
 	flexbar::CompressionType cmprsType;
 	flexbar::RunType         runType;
 	flexbar::BarcodeDetect   barDetect;
@@ -63,7 +63,7 @@ struct Options{
 		writeSingleReadsP = false;
 		writeLengthDist   = false;
 		switch2Fasta      = false;
-		logFile           = false;
+		logStdout         = false;
 		randTag           = false;
 		useStdin          = false;
 		useStdout         = false;
@@ -83,7 +83,7 @@ struct Options{
 		format    = flexbar::FASTA;
 		qual      = flexbar::SANGER;
 		qTrim     = flexbar::QOFF;
-		logLevel  = flexbar::NONE;
+		logAlign  = flexbar::NONE;
 		cmprsType = flexbar::UNCOMPRESSED;
 		barDetect = flexbar::BOFF;
 		adapRm    = flexbar::AOFF;
@@ -206,7 +206,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("qa", "qtrim-post-removal", "Perform quality-based trimming after removal steps."));
 	
 	addSection(parser, "Output selection");
-	addOption(parser, ArgParseOption("o", "fasta-output", "Prefer non-quality format fasta for output."));
+	addOption(parser, ArgParseOption("f", "fasta-output", "Prefer non-quality format fasta for output."));
 	addOption(parser, ArgParseOption("z", "zip-output", "Direct compression of output files.", ARG::STRING));
 	addOption(parser, ArgParseOption("1", "stdout-reads", "Write reads to stdout, tagged and interleaved if needed."));
 	addOption(parser, ArgParseOption("j", "length-dist", "Generate length distribution for read output files."));
@@ -214,8 +214,8 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("S", "single-reads-paired", "Write paired single reads with N for short counterparts."));
 	
 	addSection(parser, "Logging and tagging");
-	addOption(parser, ArgParseOption("l", "log-level", "Print chosen read alignments.", ARG::STRING));
-	addOption(parser, ArgParseOption("f", "log-file", "Always write program statistics to target log file."));
+	addOption(parser, ArgParseOption("l", "align-log", "Print chosen read alignments.", ARG::STRING));
+	addOption(parser, ArgParseOption("o", "stdout-log", "Write statistics to console instead of target log file."));
 	addOption(parser, ArgParseOption("g", "removal-tags", "Tag reads that are subject to adapter or barcode removal."));
 	addOption(parser, ArgParseOption("e", "number-tags", "Replace read tags by ascending number to save space."));
 	addOption(parser, ArgParseOption("d", "random-tags", "Capture read sequence at barcode or adapter N positions."));
@@ -249,7 +249,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "stdout-reads");
 	setAdvanced(parser, "length-dist");
 	setAdvanced(parser, "single-reads-paired");
-	setAdvanced(parser, "log-file");
+	setAdvanced(parser, "stdout-log");
 	setAdvanced(parser, "number-tags");
 	setAdvanced(parser, "random-tags");
 	
@@ -290,7 +290,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	setValidValues(parser, "qtrim", "TAIL WIN BWA");
 	setValidValues(parser, "qtrim-format", "sanger solexa i1.3 i1.5 i1.8");
-	setValidValues(parser, "log-level", "ALL MOD TAB");
+	setValidValues(parser, "align-log", "ALL MOD TAB");
 	setValidValues(parser, "zip-output", "GZ BZ2");
 	setValidValues(parser, "adapter-read-set", "1 2");
 	
@@ -343,12 +343,14 @@ void parseCmdLine(seqan::ArgumentParser &parser, std::string version, int argc, 
 	
 	using seqan::ArgumentParser;
 	
-	bool useLogFile = false;
+	bool useLogFile = true;
 	
-	for (int i=0; i<argc; i++){
-		if(strncmp(argv[i], "-1", 2) == 0 || strncmp(argv[i], "--stdout-reads", 14) == 0 ||
-		   strncmp(argv[i], "-l", 2) == 0 || strncmp(argv[i], "--log-level",    11) == 0 ||
-		   strncmp(argv[i], "-f", 2) == 0 || strncmp(argv[i], "--log-file",     10) == 0)
+	for(int i = 0; i < argc; i++){
+		if(strncmp(argv[i], "-o", 2) == 0 || strncmp(argv[i], "--stdout-log",   12) == 0)
+			useLogFile = false;
+	}
+	for(int i = 0; i < argc; i++){
+		if(strncmp(argv[i], "-1", 2) == 0 || strncmp(argv[i], "--stdout-reads", 14) == 0)
 			useLogFile = true;
 	}
 	if(! useLogFile) cout << endl;
@@ -365,7 +367,7 @@ void parseCmdLine(seqan::ArgumentParser &parser, std::string version, int argc, 
 				cout << "Show advanced options: flexbar -hh\n" << endl;
 			}
 		}
-		else{ cout << endl; }
+		else cout << endl;
 		
 		exit(res == ArgumentParser::PARSE_ERROR);
 	}
@@ -399,23 +401,22 @@ void initOptions(Options &o, seqan::ArgumentParser &parser){
 	
 	using namespace std;
 	
-	bool stdOut   = isSet(parser, "stdout-reads");
-	bool logLevel = isSet(parser, "log-level");
-	bool logFile  = isSet(parser, "log-file");
+	bool stdOutReads = isSet(parser, "stdout-reads");
+	bool stdOutLog   = isSet(parser, "stdout-log");
 	
-	if(stdOut) o.useStdout = true;
+	if(stdOutReads) o.useStdout = true;
 	
-	if(stdOut || logLevel || logFile){
-		
+	if(stdOutLog && ! stdOutReads){
+		o.logStdout = true;
+		o.out       = &cout;
+	}
+	else{
 		string s;
 		getOptionValue(s, parser, "target");
 		openOutputFile(o.fstrmOut, s + ".log");
 		
 		o.out = &o.fstrmOut;
 		*o.out << endl;
-	}
-	else{
-		o.out = &cout;
 	}
 	
 	getOptionValue(o.readsFile, parser, "reads");
@@ -625,12 +626,12 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	
 	// output, logging and tagging options
 	
-	if(isSet(parser, "log-level")){
-		getOptionValue(o.logLevelStr, parser, "log-level");
+	if(isSet(parser, "align-log")){
+		getOptionValue(o.logAlignStr, parser, "align-log");
 		
-		     if(o.logLevelStr == "ALL") o.logLevel = ALL;
-		else if(o.logLevelStr == "TAB") o.logLevel = TAB;
-		else if(o.logLevelStr == "MOD") o.logLevel = MOD;
+		     if(o.logAlignStr == "ALL") o.logAlign = ALL;
+		else if(o.logAlignStr == "TAB") o.logAlign = TAB;
+		else if(o.logAlignStr == "MOD") o.logAlign = MOD;
 	}
 	
 	if(isSet(parser, "zip-output")){
@@ -660,8 +661,6 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		o.writeSingleReads  = false;
 	}
 	
-	if(isSet(parser, "stdout-reads")) o.useStdout       = true;
-	if(isSet(parser, "log-file"))     o.logFile         = true;
 	if(isSet(parser, "length-dist"))  o.writeLengthDist = true;
 	if(isSet(parser, "number-tags"))  o.useNumberTag    = true;
 	if(isSet(parser, "removal-tags")) o.useRemovalTag   = true;

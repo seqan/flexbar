@@ -195,22 +195,22 @@ std::string alignValue(const int refLength, const unsigned long value){
 
 void printMessage(Options &o){
 	
+	using namespace std;
 	using namespace flexbar;
 	
-	std::stringstream s;
-	s << "Flexbar completed ";
+	string s = "Flexbar completed ";
 	
-	if(o.barDetect != BOFF)                      s << "barcode";
-	if(o.barDetect == WITHIN_READ_REMOVAL)       s << " removal within reads";
-	if(o.barDetect == WITHIN_READ)               s << " detection within reads";
-	if(o.barDetect == BARCODE_READ)              s << " detection with separate reads";
-	if(o.barDetect != BOFF && o.adapRm != AOFF)  s << " and ";
-	if(o.barDetect == BOFF && o.adapRm == AOFF)  s << "basic processing";
-	if(o.adapRm    != AOFF)                      s << "adapter removal";
+	if(o.barDetect != BOFF)                      s += "barcode";
+	if(o.barDetect == WITHIN_READ_REMOVAL)       s += " removal within reads";
+	if(o.barDetect == WITHIN_READ)               s += " detection within reads";
+	if(o.barDetect == BARCODE_READ)              s += " detection with separate reads";
+	if(o.barDetect != BOFF && o.adapRm != AOFF)  s += " and ";
+	if(o.barDetect == BOFF && o.adapRm == AOFF)  s += "basic processing";
+	if(o.adapRm    != AOFF)                      s += "adapter removal";
 	
-	*o.out << s.str() << ".\n" << std::endl;
+	*o.out << s << ".\n" << endl;
 	
-	if(o.useStdout) closeFile(o.fstrmOut);
+	if(! o.logStdout) closeFile(o.fstrmOut);
 }
 
 
@@ -227,11 +227,11 @@ void startProcessing(Options &o){
 	
 	*out << "\nProcessing reads ..." << flush;
 	
-	if(o.logLevel != NONE) *out << "\n\nLog level " << o.logLevelStr << " output generation:\n\n" << endl;
+	if(o.logAlign != NONE) *out << "\n\nAlignment " << o.logAlignStr << " logging:\n\n" << endl;
 	
-	PairedInputFilter<TSeqStr, TString>      inputFilter(o);
+	PairedInputFilter<TSeqStr, TString>  inputFilter(o);
 	PairedAlignFilter<TSeqStr, TString>  alignFilter(o);
-	PairedOutputFilter<TSeqStr, TString>     outputFilter(o);
+	PairedOutputFilter<TSeqStr, TString> outputFilter(o);
 	
 	tbb::task_scheduler_init init_serial(o.nThreads);
 	tbb::pipeline pipe;
@@ -241,7 +241,7 @@ void startProcessing(Options &o){
 	pipe.add_filter(outputFilter);
 	pipe.run(o.nThreads);
 	
-	if(o.logLevel == TAB) *out << "\n";
+	if(o.logAlign == TAB) *out << "\n";
 	*out << "done.\n" << endl;
 	
 	printComputationTime(o, start);
@@ -264,13 +264,13 @@ void startProcessing(Options &o){
 	outputFilter.printFileSummary();
 	
 	
-	const unsigned long nReads     = inputFilter.getNrProcessedReads();
-	const unsigned long nChars     = inputFilter.getNrProcessedChars();
-	const unsigned long uncalled   = inputFilter.getNrUncalledReads();
-	const unsigned long uPairs     = inputFilter.getNrUncalledPairedReads();
+	const unsigned long nReads   = inputFilter.getNrProcessedReads();
+	const unsigned long nChars   = inputFilter.getNrProcessedChars();
+	const unsigned long uncalled = inputFilter.getNrUncalledReads();
+	const unsigned long uPairs   = inputFilter.getNrUncalledPairedReads();
 	
-	unsigned long nGoodReads = outputFilter.getNrGoodReads();
-	unsigned long nGoodChars = outputFilter.getNrGoodChars();
+	unsigned long nGoodReads     = outputFilter.getNrGoodReads();
+	unsigned long nGoodChars     = outputFilter.getNrGoodChars();
 	
 	if(o.isPaired && o.writeSingleReadsP){
 		nGoodReads -= outputFilter.getNrSingleReads();

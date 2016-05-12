@@ -14,7 +14,7 @@ class SeqAlign {
 private:
 	
 	const flexbar::TrimEnd m_trimEnd;
-	const flexbar::LogLevel m_verb;
+	const flexbar::LogAlign m_log;
 	const flexbar::FileFormat m_format;
 	
 	const bool m_isBarcoding, m_writeTag, m_randTag, m_strictRegion;
@@ -40,7 +40,7 @@ public:
 			m_isBarcoding(isBarcoding),
 			m_randTag(o.randTag),
 			m_minLength(o.min_readLen),
-			m_verb(o.logLevel),
+			m_log(o.logAlign),
 			m_format(o.format),
 			m_writeTag(o.useRemovalTag),
 			m_strictRegion(! o.relaxRegion),
@@ -87,6 +87,7 @@ public:
 		
 		if(cycle == PRECYCLE){
 			for(unsigned int i = 0; i < m_queries->size(); ++i){
+				
 				TAlign align;
 				resize(rows(align), 2);
 				assignSource(row(align, 0), seqRead);
@@ -140,7 +141,7 @@ public:
 					}else{
 						sequence = suffix<TSeqStr>(seqRead, readLength - tailLength);
 					}
-					if(m_verb == ALL || m_verb == MOD)
+					if(m_log == ALL || m_log == MOD)
 					ss << "Read tail length:  " << tailLength << "\n\n";
 				}
 			}
@@ -197,7 +198,7 @@ public:
 				foverlapLength = overlapLength;
 				fqueryLength   = queryLength;
 				
-				if(m_verb != NONE){
+				if(m_log != NONE){
 					fmismatches    = mismatches;
 					finalAlStr    = alString.str();
 					fallowedErrors = allowedErrors;
@@ -319,7 +320,7 @@ public:
 			// alignment stats
 			TString queryTag = m_queries->at(qIndex).first->getSequenceTag();
 			
-			if(m_verb == ALL || (m_verb == MOD && performRemoval)){
+			if(m_log == ALL || (m_log == MOD && performRemoval)){
 				
 				if(performRemoval){
 					ss << "Sequence removal:";
@@ -349,20 +350,20 @@ public:
 				
 				ss << "\n  Alignment:\n" << endl << finalAlStr;
 			}
-			else if(m_verb == TAB){
+			else if(m_log == TAB){
 				ss << readTag     << "\t" << queryTag        << "\t"
 				   << fstartPosA  << "\t" << fendPosA        << "\t" << foverlapLength << "\t"
 				   << fmismatches << "\t" << fgapsR + fgapsA << "\t" << fallowedErrors << endl;
 			}
 		}
-		else if(m_verb == ALL){
+		else if(m_log == ALL){
 			ss << "No valid alignment:"   << "\n"
 			   << "read tag  " << readTag << "\n"
 			   << "read      " << seqRead << "\n\n" << endl;
 		}
 		
 		// output for multi-threading
-		if(m_verb != NONE) *m_out << ss.str();
+		if(m_log != NONE) *m_out << ss.str();
 		
 		return ++qIndex;
 	}
