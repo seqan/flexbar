@@ -353,6 +353,13 @@ void parseCmdLine(seqan::ArgumentParser &parser, std::string version, int argc, 
 		if(strncmp(argv[i], "-1", 2) == 0 || strncmp(argv[i], "--stdout-reads", 14) == 0)
 			useLogFile = true;
 	}
+	for(int i = 0; i < argc; i++){
+		if(strncmp(argv[i], "-h",           2) == 0 ||
+		   strncmp(argv[i], "--help",       6) == 0 ||
+		   strncmp(argv[i], "--full-help", 11) == 0 ||
+		   strncmp(argv[i], "--version",    9) == 0 )
+			useLogFile = false;
+	}
 	if(! useLogFile) cout << endl;
 	
 	
@@ -374,11 +381,13 @@ void parseCmdLine(seqan::ArgumentParser &parser, std::string version, int argc, 
 	
 	
 	if(isSet(parser, "versions")){
+		cout << endl;
 		printVersion(parser, cout);
 		cout << endl;
 		exit(0);
 	}
 	if(isSet(parser, "cite")){
+		cout << endl;
 		cout << getFlexbarBanner(version) << endl;
 		cout << getFlexbarCitation()      << endl;
 		cout << getFlexbarURL()           << endl;
@@ -386,9 +395,11 @@ void parseCmdLine(seqan::ArgumentParser &parser, std::string version, int argc, 
 	}
 	if(isSet(parser, "man-help")){
 		printHelp(parser, cout, "man", true);
+		cout << endl;
 		exit(0);
 	}
 	if(! isSet(parser, "reads")){
+		cout << endl;
 		printShortHelp(parser);
 		cout << endl << getFlexbarURL();
 		cerr << "\nPlease specify reads input file.\n" << endl;
