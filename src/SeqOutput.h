@@ -113,7 +113,7 @@ public:
 		using namespace std;
 		using namespace flexbar;
 		
-		TString tag = myRead.getSequenceTag();
+		TString tag = myRead.tag;
 		
 		if(m_useStdout && m_tagStr != ""){
 			append(tag, "_");
@@ -122,10 +122,10 @@ public:
 		
 		try{
 			if(m_format == FASTA){
-				writeRecord(seqFileOut, tag, myRead.getSequence());
+				writeRecord(seqFileOut, tag, myRead.seq);
 			}
 			else if(m_format == FASTQ){
-				writeRecord(seqFileOut, tag, myRead.getSequence(), myRead.getQuality());
+				writeRecord(seqFileOut, tag, myRead.seq, myRead.qual);
 			}
 		}
 		catch(seqan::Exception const &e){
@@ -156,14 +156,14 @@ public:
 		if(item){
 			SeqRead<TSeqStr, TString> *myRead = static_cast< SeqRead<TSeqStr, TString>* >(item);
 			
-			unsigned int readLength = length(myRead->getSequence());
+			unsigned int readLength = length(myRead->seq);
 			
 			if(m_cutLen_read > 1 && m_cutLen_read >= m_minLength && m_cutLen_read < readLength){
 				
-				myRead->setSequence(prefix(myRead->getSequence(), m_cutLen_read));
+				myRead->seq = prefix(myRead->seq, m_cutLen_read);
 				
 				if(m_format == FASTQ){
-					myRead->setQuality(prefix(myRead->getQuality(), m_cutLen_read));
+					myRead->qual = prefix(myRead->qual, m_cutLen_read);
 				}
 				
 				readLength = m_cutLen_read;

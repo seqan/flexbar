@@ -137,9 +137,9 @@ public:
 			converter << ++m_tagCounter;
 			TString tagCount = converter.str();
 			
-			read1->setSequenceTag(tagCount);
-			if(m_isPaired) read2->setSequenceTag(tagCount);
-			if(m_useBarcodeRead) barRead->setSequenceTag(tagCount);
+			read1->tag = tagCount;
+			if(m_isPaired) read2->tag = tagCount;
+			if(m_useBarcodeRead) barRead->tag = tagCount;
 		}
 		
 		return new PairedRead<TSeqStr, TString>(read1, read2, barRead);

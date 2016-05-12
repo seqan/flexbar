@@ -89,11 +89,11 @@ public:
 					int idxB1 = i % m_barcodes->size();
 					int idxB2 = div(i, m_barcodes->size()).quot;
 					
-					TString barcode = m_barcodes->at(idxB1).first->getSequenceTag();
+					TString barcode = m_barcodes->at(idxB1).first->tag;
 					
 					if(m_twoBarcodes){
 						append(barcode, "-");
-						append(barcode, m_barcodes2->at(idxB2).first->getSequenceTag());
+						append(barcode, m_barcodes2->at(idxB2).first->tag);
 					}
 					
 					TString barcode1 = barcode;
@@ -206,7 +206,7 @@ public:
 				
 				for(int i = 0; i < m_barcodes->size(); ++i){
 					
-					TString barcode = m_barcodes->at(i).first->getSequenceTag();
+					TString barcode = m_barcodes->at(i).first->tag;
 					
 					stringstream ss;
 					ss << m_target << "_barcode_" << barcode << toFormatStr(m_format);
@@ -253,7 +253,7 @@ public:
 							if(qualTrim(pRead->m_r1, m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
 						}
 						
-						if(length(pRead->m_r1->getSequence()) >= m_minLength){
+						if(length(pRead->m_r1->seq) >= m_minLength){
 							
 							m_outMap[pRead->m_barcode_id].f1->writeRead(pRead->m_r1);
 						}
@@ -284,8 +284,8 @@ public:
 							if(qualTrim(pRead->m_r2, m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
 						}
 						
-						if(length(pRead->m_r1->getSequence()) >= m_minLength) l1ok = true;
-						if(length(pRead->m_r2->getSequence()) >= m_minLength) l2ok = true;
+						if(length(pRead->m_r1->seq) >= m_minLength) l1ok = true;
+						if(length(pRead->m_r2->seq) >= m_minLength) l2ok = true;
 						
 						if(l1ok && l2ok){
 							m_outMap[outIdx].f1->writeRead(pRead->m_r1);
@@ -299,10 +299,10 @@ public:
 							}
 							else if(m_writeSingleReadsP){
 								
-								pRead->m_r2->setSequence("N");
+								pRead->m_r2->seq = "N";
 								
 								if(m_format == FASTQ){
-									pRead->m_r2->setQuality(prefix(pRead->m_r1->getQuality(), 1));
+									pRead->m_r2->qual = prefix(pRead->m_r1->qual, 1);
 								}
 								
 								m_outMap[outIdx].f1->writeRead(pRead->m_r1);
@@ -317,10 +317,10 @@ public:
 							}
 							else if(m_writeSingleReadsP){
 								
-								pRead->m_r1->setSequence("N");
+								pRead->m_r1->seq = "N";
 								
 								if(m_format == FASTQ){
-									pRead->m_r1->setQuality(prefix(pRead->m_r2->getQuality(), 1));
+									pRead->m_r1->qual = prefix(pRead->m_r2->qual, 1);
 								}
 								
 								m_outMap[outIdx].f1->writeRead(pRead->m_r1);
@@ -469,7 +469,7 @@ public:
 		
 		for(unsigned int i = 0; i < adapters->size(); i++){
 			
-			TString seqTag = adapters->at(i).first->getSequenceTag();
+			TString seqTag = adapters->at(i).first->tag;
 			
 			int wsLen = maxSpaceLen - length(seqTag);
 			if(wsLen < 2) wsLen = 2;

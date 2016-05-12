@@ -40,12 +40,12 @@ public:
 		SeqRead<TSeqStr, TString> *myRead = static_cast< SeqRead<TSeqStr, TString>* >(item);
 		SeqRead<TSeqStr, TString> *myReadRC;
 		
-		TString tag = myRead->getSequenceTag();
+		TString tag = myRead->tag;
 		
 		if(adapters.size() < 1000){
 			for(int i = 0; i < adapters.size(); ++i){
 				
-				if(tag == adapters.at(i).first->getSequenceTag()){
+				if(tag == adapters.at(i).first->tag){
 					cerr << "Two ";
 					
 					if(m_isAdapter) cerr << "adapters";
@@ -60,7 +60,7 @@ public:
 		}
 		
 		if(m_revComp){
-			TSeqStr seq = myRead->getSequence();
+			TSeqStr seq = myRead->seq;
 			seqan::reverseComplement(seq);
 			
 			append(tag, " revcomp");
@@ -105,14 +105,14 @@ public:
 		*out << adapterName << ":" << string(maxSpaceLen - len, ' ') << "Sequence:" << "\n";
 		
 		for(unsigned int i=0; i < adapters.size(); ++i){
-			TString seqTag = adapters.at(i).first->getSequenceTag();
+			TString seqTag = adapters.at(i).first->tag;
 			
 			int whiteSpaceLen = maxSpaceLen - length(seqTag);
 			if(whiteSpaceLen < 2) whiteSpaceLen = 2;
 			
 			string whiteSpace = string(whiteSpaceLen, ' ');
 			
-			*out << seqTag << whiteSpace << adapters.at(i).first->getSequence() << "\n";
+			*out << seqTag << whiteSpace << adapters.at(i).first->seq << "\n";
 		}
 		*out << endl;
 	}

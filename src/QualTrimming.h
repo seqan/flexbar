@@ -157,14 +157,14 @@ bool qualTrim(TSeqStr &seq, TString &qual, const flexbar::QualTrimType qtrim, co
 template <typename TSeqStr, typename TString>
 bool qualTrim(SeqRead<TSeqStr, TString> *seqRead, const flexbar::QualTrimType qtrim, const int cutoff, const int wSize){
 	
-	TSeqStr seq  = seqRead->getSequence();
-	TString qual = seqRead->getQuality();
+	TSeqStr seq  = seqRead->seq;
+	TString qual = seqRead->qual;
 	
 	bool trimmed = qualTrim(seq, qual, qtrim, cutoff, wSize);
 	
 	if(trimmed){
-		seqRead->setSequence(seq);
-		seqRead->setQuality(qual);
+		seqRead->seq = seq;
+		seqRead->qual = qual;
 	}
 	
 	return trimmed;
