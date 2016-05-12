@@ -12,15 +12,13 @@ class SeqAlignAlgorithm {
 
 private:
 	
-	typedef typename seqan::Dna5 TChar;
-	typedef typename seqan::Value<TSeqStr>::Type TSeqStrChar;
+	typedef typename seqan::Value<TSeqStr>::Type        TChar;
+	typedef typename seqan::Row<flexbar::TAlign>::Type  TRow;
+	typedef typename seqan::Iterator<TRow>::Type        TRowIterator;
 	
-	typedef typename seqan::Row<flexbar::TAlign>::Type TRow;
-	typedef typename seqan::Iterator<TRow>::Type TRowIterator;
+	typedef seqan::Score<int, seqan::ScoreMatrix<TChar, seqan::Default> > TScoreMatrix;
 	
-	typedef seqan::Score<int, seqan::ScoreMatrix<TChar, seqan::Default> > TScoreDna5;
-	
-	TScoreDna5 m_scoreDna5;
+	TScoreMatrix m_scoreMatrix;
 	
 	seqan::Score<int, seqan::Simple> m_score;
 	
@@ -35,33 +33,22 @@ public:
 			m_verb(o.logLevel),
 			m_trimEnd(trimEnd){
 		
-		using namespace std;
 		using namespace seqan;
 		
 		m_score = Score<int, Simple>(match, mismatch, gapCost);
 		
-		m_scoreDna5 = TScoreDna5(gapCost);
+		m_scoreMatrix = TScoreMatrix(gapCost);
 		
 		for(unsigned i = 0; i < ValueSize<TChar>::VALUE; ++i){
 			for(unsigned j = 0; j < ValueSize<TChar>::VALUE; ++j){
 				
 				if(i == j || TChar(j) == 'N')
-					 setScore(m_scoreDna5, TChar(i), TChar(j), match);
-				else setScore(m_scoreDna5, TChar(i), TChar(j), mismatch);
+					 setScore(m_scoreMatrix, TChar(i), TChar(j), match);
+				else setScore(m_scoreMatrix, TChar(i), TChar(j), mismatch);
 			}
 		}
 		
-		// cout << endl;
-		// for(unsigned i = 0; i < ValueSize<TChar>::VALUE; ++i)
-		// 	cout << "\t" << TChar(i);
-		// cout << endl;
-		//
-		// for(unsigned i = 0; i < ValueSize<TChar>::VALUE; ++i){
-		// 	cout << TChar(i);
-		// 	for(unsigned j = 0; j < ValueSize<TChar>::VALUE; ++j)
-		// 		cout << "\t" << score(m_scoreDna5, TChar(i), TChar(j));
-		// 	cout << endl;
-		// }
+		// printScoreMatrix(m_scoreMatrix);
 	};
 	
 	
@@ -87,16 +74,16 @@ public:
 		// 	if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
 		//
 		// 		AlignConfig<true, false, true, true> ac;
-		// 		alScore = globalAlignment(align, m_scoreDna5, ac);
+		// 		alScore = globalAlignment(align, m_scoreMatrix, ac);
 		// 	}
 		// 	else if(m_trimEnd == LEFT || m_trimEnd == LEFT_TAIL){
 		//
 		// 		AlignConfig<true, true, false, true> ac;
-		// 		alScore = globalAlignment(align, m_scoreDna5, ac);
+		// 		alScore = globalAlignment(align, m_scoreMatrix, ac);
 		// 	}
 		// 	else{
 		// 		AlignConfig<true, true, true, true> ac;
-		// 		alScore = globalAlignment(align, m_scoreDna5, ac);
+		// 		alScore = globalAlignment(align, m_scoreMatrix, ac);
 		// 	}
 		// }
 		// else{
@@ -161,7 +148,7 @@ public:
 				     if(isGap(it1))                   ++gapsR;
 				else if(isGap(it2))                   ++gapsA;
 				else if(*it1 != *it2 && *it2 != 'N')  ++mismatches;
-				else if(m_randTag    && *it2 == 'N')  append(tagSeq, (TSeqStrChar) *it1);
+				else if(m_randTag    && *it2 == 'N')  append(tagSeq, (TChar) *it1);
 			}
 			++aliPos;
 			++it2;
@@ -170,6 +157,25 @@ public:
 		// cout << "\n\n" << gapsR << endl << gapsA << endl << mismatches << endl;
 		
 		++aIdx;
+	}
+	
+	
+	void printScoreMatrix(TScoreMatrix &scoreMatrix){
+		
+		using namespace std;
+		using namespace seqan;
+		
+		cout << endl;
+		for(unsigned i = 0; i < ValueSize<TChar>::VALUE; ++i)
+			cout << "\t" << TChar(i);
+		cout << endl;
+		
+		for(unsigned i = 0; i < ValueSize<TChar>::VALUE; ++i){
+			cout << TChar(i);
+			for(unsigned j = 0; j < ValueSize<TChar>::VALUE; ++j)
+				cout << "\t" << score(scoreMatrix, TChar(i), TChar(j));
+			cout << endl;
+		}
 	}
 };
 
