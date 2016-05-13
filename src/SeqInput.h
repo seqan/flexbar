@@ -106,15 +106,15 @@ public:
 		
 		SeqRead<TSeqStr, TString> *seqRead = NULL;
 		
-		TSeqStr rseq = "";
-		TString qual = "", tag = "", tmp = "";
-		
 		if(! atEnd(seqFileIn)){
 			
 			isUncalled = false;
 			
 			try{
 				if(m_format == FASTA){
+					
+					TSeqStr rseq;
+					TString tag;
 					
 					readRecord(tag, rseq, seqFileIn);
 					
@@ -157,8 +157,10 @@ public:
 					++m_nrReads;
 				}
 				
-				// fastq
-				else{
+				else{  // fastq
+					
+					TSeqStr rseq;
+					TString qual, tag;
 					
 					readRecord(tag, rseq, qual, seqFileIn);
 					

@@ -156,12 +156,9 @@ public:
 			TSeqStr randTag;
 			stringstream alString;
 			
-			
 			// align query to read sequence
 			algo->alignGlobal(query, sequence, gapsR, gapsA, mismatches, startPos, endPos, startPosA, endPosA,
 			                  startPosS, endPosS, alScore, alString, randTag, alignments, cycle, aIdx);
-			
-			if(cycle == PRECYCLE) return ++qIndex;
 			
 			
 			int overlapLength = endPos - startPos;
