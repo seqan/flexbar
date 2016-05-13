@@ -114,7 +114,7 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 			SeqRead<TSeqStr, TString> *seqRead;
 			seqRead = new SeqRead<TSeqStr, TString>(adapterSeq, "cmdline");
 			
-			TAdapter adap;
+			TBar adap;
 			adap.first = seqRead;
 			o.adapters.push_back(adap);
 			
@@ -125,7 +125,7 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 				SeqRead<TSeqStr, TString> *seqReadRC;
 				seqReadRC = new SeqRead<TSeqStr, TString>(adapterSeqRC, "cmdline revcomp");
 				
-				TAdapter adapRC;
+				TBar adapRC;
 				adapRC.first = seqReadRC;
 				o.adapters.push_back(adapRC);
 			}

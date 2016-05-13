@@ -23,7 +23,7 @@ private:
 	
 	tbb::atomic<unsigned long> m_nPreShortReads, m_modified;
 	
-	tbb::concurrent_vector<flexbar::TAdapter> *m_queries;
+	tbb::concurrent_vector<flexbar::TBar> *m_queries;
 	tbb::concurrent_vector<unsigned long> *m_rmOverlaps;
 	
 	std::ostream *m_out;
@@ -31,7 +31,7 @@ private:
 	
 public:
 	
-	SeqAlign(tbb::concurrent_vector<flexbar::TAdapter> *queries, const Options &o, int minOverlap, float threshold, const int tailLength, const int match, const int mismatch, const int gapCost, const flexbar::TrimEnd end, const bool isBarcoding):
+	SeqAlign(tbb::concurrent_vector<flexbar::TBar> *queries, const Options &o, int minOverlap, float threshold, const int tailLength, const int match, const int mismatch, const int gapCost, const flexbar::TrimEnd end, const bool isBarcoding):
 			
 			m_minOverlap(minOverlap),
 			m_threshold(threshold),

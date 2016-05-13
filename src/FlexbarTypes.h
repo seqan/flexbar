@@ -93,7 +93,7 @@ namespace flexbar{
 	
 	
 	typedef std::pair< SeqRead<FSeqStr, FString>*,
-	                   std::pair< tbb::atomic<unsigned long>, tbb::atomic<unsigned long> > > TAdapter;
+	                   std::pair< tbb::atomic<unsigned long>, tbb::atomic<unsigned long> > > TBar;
 	
 	
    	enum ComputeCycle {

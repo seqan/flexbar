@@ -13,7 +13,7 @@ class LoadFasta : public tbb::filter{
 private:
 	
 	std::ostream *out;
-	tbb::concurrent_vector<flexbar::TAdapter> adapters;
+	tbb::concurrent_vector<flexbar::TBar> adapters;
 	
 	bool m_revComp, m_isAdapter;
 	
@@ -68,12 +68,12 @@ public:
 			seqReadRC = new SeqRead<TSeqStr, TString>(seq, tag);
 		}
 		
-		TAdapter adap;
+		TBar adap;
 		adap.first = seqRead;
 		adapters.push_back(adap);
 		
 		if(m_revComp){
-			TAdapter adapRC;
+			TBar adapRC;
 			adapRC.first = seqReadRC;
 			adapters.push_back(adapRC);
 		}
@@ -82,12 +82,12 @@ public:
 	};
 	
 	
-	tbb::concurrent_vector<flexbar::TAdapter> getAdapters(){
+	tbb::concurrent_vector<flexbar::TBar> getAdapters(){
 		return adapters;
 	}
 	
 	
-	void setAdapters(tbb::concurrent_vector<flexbar::TAdapter> &adapterVec){
+	void setAdapters(tbb::concurrent_vector<flexbar::TBar> &adapterVec){
 		adapters = adapterVec;
 	}
 	

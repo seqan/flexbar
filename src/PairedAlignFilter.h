@@ -25,8 +25,8 @@ private:
 	
 	tbb::atomic<unsigned long> m_unassigned;
 	
-	tbb::concurrent_vector<flexbar::TAdapter> *m_adapters, *m_adapters2;
-	tbb::concurrent_vector<flexbar::TAdapter> *m_barcodes, *m_barcodes2;
+	tbb::concurrent_vector<flexbar::TBar> *m_adapters, *m_adapters2;
+	tbb::concurrent_vector<flexbar::TBar> *m_barcodes, *m_barcodes2;
 	
 	typedef SeqAlign<TSeqStr, TString, SeqAlignAlgorithm<TSeqStr> > TAlignFilter;
 	TAlignFilter *m_afilter, *m_bfilter, *m_a2filter, *m_b2filter;

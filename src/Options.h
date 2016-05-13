@@ -39,7 +39,7 @@ struct Options{
 	flexbar::BarcodeDetect   barDetect;
 	flexbar::AdapterRemoval  adapRm;
 	
-	tbb::concurrent_vector<flexbar::TAdapter> barcodes, adapters, barcodes2, adapters2;
+	tbb::concurrent_vector<flexbar::TBar> barcodes, adapters, barcodes2, adapters2;
 	
 	std::ostream *out;
 	std::fstream fstrmOut;

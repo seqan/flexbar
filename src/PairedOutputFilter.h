@@ -37,8 +37,8 @@ private:
 	filters *m_outMap;
 	std::ostream *out;
 	
-	tbb::concurrent_vector<flexbar::TAdapter> *m_adapters,  *m_barcodes;
-	tbb::concurrent_vector<flexbar::TAdapter> *m_adapters2, *m_barcodes2;
+	tbb::concurrent_vector<flexbar::TBar> *m_adapters,  *m_barcodes;
+	tbb::concurrent_vector<flexbar::TBar> *m_adapters2, *m_barcodes2;
 	
 public:
 	
@@ -447,7 +447,7 @@ public:
 		
 		using namespace std;
 		
-		tbb::concurrent_vector<flexbar::TAdapter> *adapters;
+		tbb::concurrent_vector<flexbar::TBar> *adapters;
 		const unsigned int maxSpaceLen = 20;
 		
 		int startLen = 8;
