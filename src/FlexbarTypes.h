@@ -7,7 +7,6 @@
 #define FLEXBAR_FLEXBARTYPES_H
 
 #include <vector>
-
 #include <seqan/align.h>
 
 
@@ -19,15 +18,15 @@ class SeqRead {
 	TSeqStr seq;
 	TString tag, qual;
 	
-	SeqRead(const TSeqStr& sequence, const TString& seqTag)
-		: seq(sequence),
-		  tag(seqTag){
+	SeqRead(const TSeqStr& sequence, const TString& seqTag) :
+		seq(sequence),
+		tag(seqTag){
 	}
 	
-	SeqRead(const TSeqStr& sequence, const TString& seqTag, const TString& quality)
-		: seq(sequence),
-		  tag(seqTag),
-		  qual(quality){
+	SeqRead(const TSeqStr& sequence, const TString& seqTag, const TString& quality) :
+		seq(sequence),
+		tag(seqTag),
+		qual(quality){
 	}
 	
 	virtual ~SeqRead(){}
@@ -36,13 +35,12 @@ class SeqRead {
 
 template <typename TSeqStr, typename TString>
 class PairedRead {
-
+	
 	public:
 	
 	typedef SeqRead<TSeqStr, TString> TSeqRead;
 	
 	TSeqRead *r1, *r2, *b;
-	
 	int barID, barID2;
 	
 	PairedRead(TSeqRead *p_r1, TSeqRead *p_r2, TSeqRead *p_b) :
@@ -58,6 +56,23 @@ class PairedRead {
 		delete r2;
 		delete b;
 	}
+};
+
+
+template <typename TSeqStr, typename TString>
+class Bar {
+	
+	public:
+	
+	typedef SeqRead<TSeqStr, TString> TSeqRead;
+	
+	TSeqRead seqRead;
+	unsigned long rmOvl, rmFull;
+	
+	Bar() :
+		rmOvl(0),
+		rmFull(0){
+    }
 };
 
 
@@ -150,7 +165,6 @@ namespace flexbar{
 		SINGLE_BARCODED,
 		PAIRED_BARCODED
 	};
-	
 }
 
 #endif
