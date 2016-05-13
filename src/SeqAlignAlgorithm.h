@@ -138,6 +138,8 @@ public:
 		TRowIterator it1 = begin(row1);
 		TRowIterator it2 = begin(row2);
 		
+		if(m_randTag) tagSeq = "";
+		
 		int aliPos = 0;
 		gapsR      = 0;
 		gapsA      = 0;

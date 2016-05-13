@@ -21,6 +21,8 @@ private:
 	const int m_minLength, m_minOverlap, m_tailLength;
 	const float m_threshold;
 	
+	const unsigned int m_bundleSize;
+	
 	tbb::atomic<unsigned long> m_nPreShortReads, m_modified;
 	
 	tbb::concurrent_vector<flexbar::TBar> *m_queries;
@@ -44,6 +46,7 @@ public:
 			m_format(o.format),
 			m_writeTag(o.useRemovalTag),
 			m_strictRegion(! o.relaxRegion),
+			m_bundleSize(o.bundleSize),
 			m_out(o.out){
 		
 		m_queries = queries;
@@ -86,7 +89,14 @@ public:
 		
 		
 		if(cycle == PRECYCLE){
-			for(unsigned int i = 0; i < m_queries->size(); ++i){
+			
+			unsigned int nQueries = m_queries->size();
+			
+			if(aIdx == 0){
+				reserve(alignments.first, m_bundleSize * nQueries);
+			}
+			
+			for(unsigned int i = 0; i < nQueries; ++i){
 				
 				TAlign align;
 				resize(rows(align), 2);
@@ -94,6 +104,8 @@ public:
 				assignSource(row(align, 1), m_queries->at(i).first->seq);
 				
 				appendValue(alignments.first, align);
+				
+				++aIdx;
 			}
 			return 0;
 		}
@@ -139,15 +151,15 @@ public:
 			
 			
 			int startPos = 0, endPos = 0, startPosA = 0, endPosA = 0, startPosS = 0, endPosS = 0;
-			int aliScore = 0, mismatches = 0, gapsR = 0, gapsA = 0;
+			int alScore = 0, mismatches = 0, gapsR = 0, gapsA = 0;
 			
-			TSeqStr randTag = "";
+			TSeqStr randTag;
 			stringstream alString;
 			
 			
 			// align query to read sequence
 			algo->alignGlobal(query, sequence, gapsR, gapsA, mismatches, startPos, endPos, startPosA, endPosA,
-			                  startPosS, endPosS, aliScore, alString, randTag, alignments, cycle, aIdx);
+			                  startPosS, endPosS, alScore, alString, randTag, alignments, cycle, aIdx);
 			
 			if(cycle == PRECYCLE) return ++qIndex;
 			
@@ -171,10 +183,10 @@ public:
 			
 			
 			// check if alignment is valid and score is max as well as if number of errors and overlap length are allowed
-			if(validAli && aliScore > scoreMax && madeErrors <= allowedErrors && overlapLength >= minOverlapValue){
+			if(validAli && alScore > scoreMax && madeErrors <= allowedErrors && overlapLength >= minOverlapValue){
 				
 				qIndex      = i;
-				scoreMax    = aliScore;
+				scoreMax    = alScore;
 				fstartPos   = startPos;
 				fstartPosA  = startPosA;
 				fstartPosS  = startPosS;
@@ -184,10 +196,11 @@ public:
 				fgapsR      = gapsR;
 				fgapsA      = gapsA;
 				
-				finalRandTag   = randTag;
 				ftailLength    = tailLength;
 				foverlapLength = overlapLength;
 				fqueryLength   = queryLength;
+				
+				if(m_randTag) finalRandTag = randTag;
 				
 				if(m_log != NONE){
 					fmismatches    = mismatches;
@@ -319,7 +332,7 @@ public:
 				
 				ss << "  query tag        " << queryTag                      << "\n"
 				   << "  read tag         " << readTag                       << "\n"
-				   << "  read             " << readSeq                       << "\n"
+				   << "  read seq         " << readSeq                       << "\n"
 				   << "  read pos         " << fstartPosS << "-" << fendPosS << "\n"
 				   << "  query pos        " << fstartPosA << "-" << fendPosA << "\n"
 				   << "  score            " << scoreMax                      << "\n"
@@ -355,7 +368,7 @@ public:
 			
 			ss << "No valid alignment:"   << "\n"
 			   << "read tag  " << readTag << "\n"
-			   << "read      " << readSeq << "\n\n" << endl;
+			   << "read seq  " << readSeq << "\n\n" << endl;
 			
 			*m_out << ss.str();
 		}
