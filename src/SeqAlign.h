@@ -75,8 +75,8 @@ public:
 		
 		SeqRead<TSeqStr, TString> &seqRead = *static_cast< SeqRead<TSeqStr, TString>* >(item);
 		
-		TSeqStr readSeq = seqRead.seq;
-		int readLength  = length(readSeq);
+		TSeqStr &readSeq = seqRead.seq;
+		int readLength   = length(readSeq);
 		
 		if(! m_isBarcoding && readLength < m_minLength){
 			
@@ -107,17 +107,10 @@ public:
 		
 		float fallowedErrors;
 		
-		stringstream ss;
 		TSeqStr finalRandTag;
+		TString finalAlStr;
 		
-		TString quality, finalAlStr;
-		
-		TString readTag = seqRead.tag;
-		
-		quality = "";
-		
-		if(m_format == FASTQ) quality = seqRead.qual;
-		
+		TString &readTag = seqRead.tag;
 		TSeqStr sequence = readSeq;
 		
 		
@@ -126,7 +119,7 @@ public:
 			
 			if(i > 0) cycle = RESULTS;
 			
-			TSeqStr query = m_queries->at(i).first->seq;
+			TSeqStr &query = m_queries->at(i).first->seq;
 			
 			int queryLength = length(query);
 			int tailLength  = (m_tailLength > 0) ? m_tailLength : queryLength;
@@ -137,12 +130,10 @@ public:
 				if(tailLength < readLength){
 					
 					if(m_trimEnd == LEFT_TAIL){
-						sequence = prefix<TSeqStr>(readSeq, tailLength);
+						sequence = prefix(readSeq, tailLength);
 					}else{
-						sequence = suffix<TSeqStr>(readSeq, readLength - tailLength);
+						sequence = suffix(readSeq, readLength - tailLength);
 					}
-					if(m_log == ALL || m_log == MOD)
-					ss << "Read tail length:  " << tailLength << "\n\n";
 				}
 			}
 			
@@ -200,7 +191,7 @@ public:
 				
 				if(m_log != NONE){
 					fmismatches    = mismatches;
-					finalAlStr    = alString.str();
+					finalAlStr     = alString.str();
 					fallowedErrors = allowedErrors;
 				}
 			}
@@ -251,8 +242,7 @@ public:
 						seqRead.seq = sequence;
 						
 						if(m_format == FASTQ){
-							erase(quality, 0, rCutPos);
-							seqRead.qual = quality;
+							erase(seqRead.qual, 0, rCutPos);
 						}
 						break;
 					
@@ -271,8 +261,7 @@ public:
 						seqRead.seq = sequence;
 						
 						if(m_format == FASTQ){
-							erase(quality, rCutPos, readLength);
-							seqRead.qual = quality;
+							erase(seqRead.qual, rCutPos, readLength);
 						}
 						break;
 						
@@ -290,15 +279,12 @@ public:
 				}
 				
 				if(m_writeTag){
-					TString newTag = seqRead.tag;
-					append(newTag, "_Flexbar_removal");
+					append(seqRead.tag, "_Flexbar_removal");
 					
 					if(! m_isBarcoding){
-						append(newTag, "_");
-						append(newTag, m_queries->at(qIndex).first->tag);
+						append(seqRead.tag, "_");
+						append(seqRead.tag, m_queries->at(qIndex).first->tag);
 					}
-					
-					seqRead.tag = newTag;
 				}
 				
 				// store overlap occurrences for min, max, mean and median
@@ -310,17 +296,17 @@ public:
 			// valid alignment, not neccesarily removal
 			
 			if(m_randTag && finalRandTag != ""){
-				TString newTag = seqRead.tag;
-				append(newTag, "_");
-				append(newTag, finalRandTag);
-				seqRead.tag = newTag;
+				append(seqRead.tag, "_");
+				append(seqRead.tag, finalRandTag);
 			}
 			
 			
 			// alignment stats
-			TString queryTag = m_queries->at(qIndex).first->tag;
+			TString &queryTag = m_queries->at(qIndex).first->tag;
 			
 			if(m_log == ALL || (m_log == MOD && performRemoval)){
+				
+				stringstream ss;
 				
 				if(performRemoval){
 					ss << "Sequence removal:";
@@ -349,21 +335,30 @@ public:
 				}
 				
 				ss << "\n  Alignment:\n" << endl << finalAlStr;
+				
+				*m_out << ss.str();
 			}
 			else if(m_log == TAB){
+				
+				stringstream ss;
+				
 				ss << readTag     << "\t" << queryTag        << "\t"
 				   << fstartPosA  << "\t" << fendPosA        << "\t" << foverlapLength << "\t"
 				   << fmismatches << "\t" << fgapsR + fgapsA << "\t" << fallowedErrors << endl;
+				
+				*m_out << ss.str();
 			}
 		}
 		else if(m_log == ALL){
+			
+			stringstream ss;
+			
 			ss << "No valid alignment:"   << "\n"
 			   << "read tag  " << readTag << "\n"
 			   << "read      " << readSeq << "\n\n" << endl;
+			
+			*m_out << ss.str();
 		}
-		
-		// output for multi-threading
-		if(m_log != NONE) *m_out << ss.str();
 		
 		return ++qIndex;
 	}
