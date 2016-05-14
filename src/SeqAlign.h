@@ -13,6 +13,8 @@ class SeqAlign {
 
 private:
 	
+	typedef AlignResults<TSeqStr> TAlignResults;
+	
 	const flexbar::TrimEnd m_trimEnd;
 	const flexbar::LogAlign m_log;
 	const flexbar::FileFormat m_format;
@@ -109,21 +111,9 @@ public:
 			return 0;
 		}
 		
-		
-		// int fmismatches, fgapsR, fgapsA, foverlapLength, fqueryLength, ftailLength;
-		// int fstartPos, fstartPosA, fstartPosS, fendPos, fendPosS, fendPosA;
-		//
-		
 		int qIndex = -1;
 		
-		// int scoreMax = -1000000;
-		//
-		// float fallowedErrors;
-		//
-		// TSeqStr finalRandTag;
-		// TString finalAlStr;
-		
-		AlignResults<TSeqStr> am;
+		TAlignResults *am;
 		
 		TString &readTag = seqRead.tag;
 		TSeqStr sequence = readSeq;
@@ -136,7 +126,7 @@ public:
 			
 			TSeqStr &query = m_queries->at(i).first->seq;
 			
-			AlignResults<TSeqStr> a;
+			TAlignResults a;
 			
 			a.queryLength = length(query);
 			a.tailLength  = (m_tailLength > 0) ? m_tailLength : a.queryLength;
@@ -162,24 +152,23 @@ public:
 			
 			float madeErrors = static_cast<float>(a.mismatches + a.gapsR + a.gapsA);
 			
-			int minOverlapValue = (m_isBarcoding && m_minOverlap == 0) ? a.queryLength : m_minOverlap;
+			int minOverlap = (m_isBarcoding && m_minOverlap == 0) ? a.queryLength : m_minOverlap;
 			
-			
-			bool validAli = true;
+			bool validAl = true;
 			
 			if(((m_trimEnd == RIGHT_TAIL || m_trimEnd == RIGHT) && a.startPosA < a.startPosS && m_strictRegion) ||
 			   ((m_trimEnd == LEFT_TAIL  || m_trimEnd == LEFT)  && a.endPosA   > a.endPosS   && m_strictRegion) ||
 			     a.overlapLength < 1){
 				
-				validAli = false;
+				validAl = false;
 			}
 			
 			
 			// check if alignment is valid and score is max as well as if number of errors and overlap length are allowed
-			if(validAli && a.score > am.score && madeErrors <= a.allowedErrors && a.overlapLength >= minOverlapValue){
+			if(validAl && a.score > am->score && madeErrors <= a.allowedErrors && a.overlapLength >= minOverlap){
 				
 				qIndex = i;
-				am     = a;
+				am     = &a;
 			}
 		}
 		
@@ -194,11 +183,11 @@ public:
 				
 				if(trimEnd == ANY){
 					
-					if(am.startPosA <= am.startPosS && am.endPosS <= am.endPosA){
+					if(am->startPosA <= am->startPosS && am->endPosS <= am->endPosA){
 						seqRead.seq = "";
 						if(m_format == FASTQ) seqRead.qual = "";
 					}
-					else if(am.startPosA - am.startPosS >= am.endPosS - am.endPosA){
+					else if(am->startPosA - am->startPosS >= am->endPosS - am->endPosA){
 						trimEnd = RIGHT;
 					}
 					else trimEnd = LEFT;
@@ -210,13 +199,13 @@ public:
 					
 					case LEFT_TAIL:
 					case LEFT:
-						rCutPos = am.endPos;
+						rCutPos = am->endPos;
 						
 						// translate alignment end pos to read idx
-						if(am.startPosS > 0) rCutPos -= am.startPosS;
+						if(am->startPosS > 0) rCutPos -= am->startPosS;
 						
 						// adjust to inner read gaps
-						rCutPos -= am.gapsR;
+						rCutPos -= am->gapsR;
 						
 						if(rCutPos > readLength) rCutPos = readLength;
 						
@@ -229,10 +218,10 @@ public:
 					
 					case RIGHT_TAIL:
 						// adjust cut pos to original read length
-						am.startPos += readLength - am.tailLength;
+						am->startPos += readLength - am->tailLength;
 					
 					case RIGHT:
-						rCutPos = am.startPos;
+						rCutPos = am->startPos;
 						
 						// skipped restriction
 						if(rCutPos < 0) rCutPos = 0;
@@ -253,7 +242,7 @@ public:
 				// count number of removals for each query
 				m_queries->at(qIndex).second.first++;
 				
-				if(am.overlapLength == am.queryLength)
+				if(am->overlapLength == am->queryLength)
 				m_queries->at(qIndex).second.second++;
 				
 				if(m_writeTag){
@@ -266,16 +255,16 @@ public:
 				}
 				
 				// store overlap occurrences for min, max, mean and median
-				if(am.overlapLength <= MAX_READLENGTH) m_rmOverlaps->at(am.overlapLength)++;
+				if(am->overlapLength <= MAX_READLENGTH) m_rmOverlaps->at(am->overlapLength)++;
 				else cerr << "\nCompile Flexbar with larger max read length to get correct overlap stats.\n" << endl;
 			}
 			
 			
 			// valid alignment, not neccesarily removal
 			
-			if(m_randTag && am.randTag != ""){
+			if(m_randTag && am->randTag != ""){
 				append(seqRead.tag, "_");
-				append(seqRead.tag, am.randTag);
+				append(seqRead.tag, am->randTag);
 			}
 			
 			
@@ -295,15 +284,15 @@ public:
 				}
 				else ss << "Sequence detection, no removal:\n";
 				
-				ss << "  query tag        " << queryTag                            << "\n"
-				   << "  read tag         " << readTag                             << "\n"
-				   << "  read seq         " << readSeq                             << "\n"
-				   << "  read pos         " << am.startPosS << "-" << am.endPosS   << "\n"
-				   << "  query pos        " << am.startPosA << "-" << am.endPosA   << "\n"
-				   << "  score            " << am.score                            << "\n"
-				   << "  overlap          " << am.overlapLength                    << "\n"
-				   << "  errors           " << am.gapsR + am.gapsA + am.mismatches << "\n"
-				   << "  allowed errors   " << am.allowedErrors                    << "\n";
+				ss << "  query tag        " << queryTag                               << "\n"
+				   << "  read tag         " << readTag                                << "\n"
+				   << "  read seq         " << readSeq                                << "\n"
+				   << "  read pos         " << am->startPosS << "-" << am->endPosS    << "\n"
+				   << "  query pos        " << am->startPosA << "-" << am->endPosA    << "\n"
+				   << "  score            " << am->score                              << "\n"
+				   << "  overlap          " << am->overlapLength                      << "\n"
+				   << "  errors           " << am->gapsR + am->gapsA + am->mismatches << "\n"
+				   << "  allowed errors   " << am->allowedErrors                      << "\n";
 				
 				if(performRemoval){
 					ss << "  remaining read   "  << seqRead.seq << "\n";
@@ -312,7 +301,7 @@ public:
 					ss << "  remaining qual   " << seqRead.qual << "\n";
 				}
 				
-				ss << "\n  Alignment:\n" << endl << am.alString;
+				ss << "\n  Alignment:\n" << endl << am->alString;
 				
 				*m_out << ss.str();
 			}
@@ -320,9 +309,9 @@ public:
 				
 				stringstream ss;
 				
-				ss << readTag       << "\t" << queryTag            << "\t"
-				   << am.startPosA  << "\t" << am.endPosA          << "\t" << am.overlapLength << "\t"
-				   << am.mismatches << "\t" << am.gapsR + am.gapsA << "\t" << am.allowedErrors << endl;
+				ss << readTag        << "\t" << queryTag              << "\t"
+				   << am->startPosA  << "\t" << am->endPosA           << "\t" << am->overlapLength << "\t"
+				   << am->mismatches << "\t" << am->gapsR + am->gapsA << "\t" << am->allowedErrors << endl;
 				
 				*m_out << ss.str();
 			}
