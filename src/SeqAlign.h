@@ -83,42 +83,43 @@ public:
 		int readLength = length(seqRead.seq);
 		
 		if(! m_isBarcoding && readLength < m_minLength){
-			
 			if(cycle != PRECYCLE) ++m_nPreShortReads;
 			return 0;
 		}
 		
 		if(cycle == PRECYCLE){
 			
-			if(aIdx == 0)
-			reserve(alignments.first, m_bundleSize * m_queries->size());
+			if(aIdx == 0) reserve(alignments.first, m_bundleSize * m_queries->size());
 			
 			for(unsigned int i = 0; i < m_queries->size(); ++i){
 				
 				TSeqStr &qseq = m_queries->at(i).first->seq;
-				TSeqStr rseq = seqRead.seq;
+				
+				TAlign align;
+				resize(rows(align), 2);
 				
 				if(m_trimEnd == LEFT_TAIL || m_trimEnd == RIGHT_TAIL){
-					
 					int tailLength  = (m_tailLength > 0) ? m_tailLength : length(qseq);
+					
+					TSeqStr rseq;
 					
 					if(tailLength < readLength){
 						if(m_trimEnd == LEFT_TAIL) rseq = prefix(seqRead.seq, tailLength);
 						else                       rseq = suffix(seqRead.seq, readLength - tailLength);
 					}
+					else rseq = seqRead.seq;
+					
+					assignSource(row(align, 0), rseq);
 				}
-				// else rseq = &seqRead.seq;
+				else assignSource(row(align, 0), seqRead.seq);
 				
-				TAlign align;
-				resize(rows(align), 2);
-				assignSource(row(align, 0), rseq);
 				assignSource(row(align, 1), qseq);
-				
 				appendValue(alignments.first, align);
 				++aIdx;
 			}
 			return 0;
 		}
+		
 		
 		TAlignResults *am;
 		
@@ -143,8 +144,7 @@ public:
 			a.allowedErrors = m_threshold * a.overlapLength / 10.0f;
 			
 			float madeErrors = static_cast<float>(a.mismatches + a.gapsR + a.gapsA);
-			
-			int minOverlap = (m_isBarcoding && m_minOverlap == 0) ? a.queryLength : m_minOverlap;
+			int minOverlap   = (m_isBarcoding && m_minOverlap == 0) ? a.queryLength : m_minOverlap;
 			
 			bool validAl = true;
 			
@@ -170,7 +170,7 @@ public:
 			
 			TrimEnd trimEnd = m_trimEnd;
 			
-			// cut read according to best alignment
+			// trim read based on alignment
 			if(performRemoval){
 				
 				if(trimEnd == ANY){
@@ -230,7 +230,6 @@ public:
 				
 				++m_modified;
 				
-				
 				// count number of removals for each query
 				m_queries->at(qIndex).second.first++;
 				
@@ -246,11 +245,10 @@ public:
 					}
 				}
 				
-				// store overlap occurrences for min, max, mean and median
+				// store overlap occurrences
 				if(am->overlapLength <= MAX_READLENGTH) m_rmOverlaps->at(am->overlapLength)++;
-				else cerr << "\nCompile Flexbar with larger max read length to get correct overlap stats.\n" << endl;
+				else cerr << "\nCompile Flexbar with larger max read length for correct overlap stats.\n" << endl;
 			}
-			
 			
 			// valid alignment, not neccesarily removal
 			
@@ -259,64 +257,55 @@ public:
 				append(seqRead.tag, am->randTag);
 			}
 			
-			
 			// alignment stats
-			TString &queryTag = m_queries->at(qIndex).first->tag;
-			
 			if(m_log == ALL || (m_log == MOD && performRemoval)){
 				
-				stringstream ss;
+				stringstream s;
 				
 				if(performRemoval){
-					ss << "Sequence removal:";
+					s << "Sequence removal:";
 					
-					     if(trimEnd == LEFT  || trimEnd == LEFT_TAIL)  ss << "  left side\n";
-					else if(trimEnd == RIGHT || trimEnd == RIGHT_TAIL) ss << "  right side\n";
-					else                                               ss << "  any side\n";
+					     if(trimEnd == LEFT  || trimEnd == LEFT_TAIL)  s << " left side\n";
+					else if(trimEnd == RIGHT || trimEnd == RIGHT_TAIL) s << " right side\n";
+					else                                               s << " any side\n";
 				}
-				else ss << "Sequence detection, no removal:\n";
+				else s << "Sequence detection, no removal:\n";
 				
-				ss << "  query tag        " << queryTag                               << "\n"
-				   << "  read tag         " << seqRead.tag                            << "\n"
-				   << "  read seq         " << seqRead.seq                            << "\n"
-				   << "  read pos         " << am->startPosS << "-" << am->endPosS    << "\n"
-				   << "  query pos        " << am->startPosA << "-" << am->endPosA    << "\n"
-				   << "  score            " << am->score                              << "\n"
-				   << "  overlap          " << am->overlapLength                      << "\n"
-				   << "  errors           " << am->gapsR + am->gapsA + am->mismatches << "\n"
-				   << "  allowed errors   " << am->allowedErrors                      << "\n";
+				s << "  query tag        " << m_queries->at(qIndex).first->tag       << "\n"
+				  << "  read tag         " << seqRead.tag                            << "\n"
+				  << "  read seq         " << seqRead.seq                            << "\n"
+				  << "  read pos         " << am->startPosS << "-" << am->endPosS    << "\n"
+				  << "  query pos        " << am->startPosA << "-" << am->endPosA    << "\n"
+				  << "  score            " << am->score                              << "\n"
+				  << "  overlap          " << am->overlapLength                      << "\n"
+				  << "  errors           " << am->gapsR + am->gapsA + am->mismatches << "\n"
+				  << "  allowed errors   " << am->allowedErrors                      << "\n";
 				
 				if(performRemoval){
-					ss << "  remaining read   "  << seqRead.seq << "\n";
+					s << "  remaining read   "  << seqRead.seq << "\n";
 					
 					if(m_format == FASTQ)
-					ss << "  remaining qual   " << seqRead.qual << "\n";
+					s << "  remaining qual   " << seqRead.qual << "\n";
 				}
-				
-				ss << "\n  Alignment:\n" << endl << am->alString;
-				
-				*m_out << ss.str();
+				s << "\n  Alignment:\n" << endl << am->alString;
+				*m_out << s.str();
 			}
 			else if(m_log == TAB){
 				
-				stringstream ss;
-				
-				ss << seqRead.tag    << "\t" << queryTag              << "\t"
-				   << am->startPosA  << "\t" << am->endPosA           << "\t" << am->overlapLength << "\t"
-				   << am->mismatches << "\t" << am->gapsR + am->gapsA << "\t" << am->allowedErrors << endl;
-				
-				*m_out << ss.str();
+				stringstream s;
+				s << seqRead.tag    << "\t" << m_queries->at(qIndex).first->tag                   << "\t"
+				  << am->startPosA  << "\t" << am->endPosA           << "\t" << am->overlapLength << "\t"
+				  << am->mismatches << "\t" << am->gapsR + am->gapsA << "\t" << am->allowedErrors << endl;
+				*m_out << s.str();
 			}
 		}
 		else if(m_log == ALL){
 			
-			stringstream ss;
-			
-			ss << "No valid alignment:"       << "\n"
-			   << "read tag  " << seqRead.tag << "\n"
-			   << "read seq  " << seqRead.seq << "\n\n" << endl;
-			
-			*m_out << ss.str();
+			stringstream s;
+			s << "No valid alignment:"       << "\n"
+			  << "read tag  " << seqRead.tag << "\n"
+			  << "read seq  " << seqRead.seq << "\n\n" << endl;
+			*m_out << s.str();
 		}
 		
 		return ++qIndex;
@@ -353,12 +342,12 @@ public:
 		
 		if(m_modified > 0) mean = lenSum / m_modified;
 		
-		std::stringstream ss;
+		std::stringstream s;
 		
-		ss << "Min, max, mean and median adapter overlap: ";
-		ss << min << " / " << max << " / " << mean << " / " << median;
+		s << "Min, max, mean and median adapter overlap: ";
+		s << min << " / " << max << " / " << mean << " / " << median;
 		
-		return ss.str();
+		return s.str();
 	}
 	
 	
