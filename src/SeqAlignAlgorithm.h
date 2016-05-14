@@ -16,6 +16,8 @@ private:
 	typedef typename seqan::Row<flexbar::TAlign>::Type  TRow;
 	typedef typename seqan::Iterator<TRow>::Type        TRowIterator;
 	
+	typedef AlignResults<TSeqStr> TAlignResults;
+	
 	typedef seqan::Score<int, seqan::Simple>                              TScoreSimple;
 	typedef seqan::Score<int, seqan::ScoreMatrix<TChar, seqan::Default> > TScoreMatrix;
 	
@@ -56,7 +58,7 @@ public:
 	};
 	
 	
-	void alignGlobal(const TSeqStr &querySeq, const TSeqStr &readSeq, int &gapsR, int &gapsA, int &mismatches, int &startPos, int &endPos, int &startPosA, int &endPosA, int &startPosS, int &endPosS, int &alScore, std::stringstream &alString, TSeqStr &tagSeq, flexbar::TAlignments &alignments, const flexbar::ComputeCycle cycle, unsigned int &aIdx){
+	void alignGlobal(TAlignResults &a, flexbar::TAlignments &alignments, const flexbar::ComputeCycle cycle, unsigned int &aIdx){
 		
 		using namespace std;
 		using namespace seqan;
@@ -107,7 +109,7 @@ public:
 			}
 			
 			TAlign &align = value(alignments.first,  aIdx);
-			alScore       = value(alignments.second, aIdx);
+			a.score       = value(alignments.second, aIdx);
 		// }
 		
 		// cout << "Score: " << alScore << endl;
@@ -117,41 +119,44 @@ public:
 		TRow &row1 = row(align, 0);
 		TRow &row2 = row(align, 1);
 		
-		startPosS = toViewPosition(row1, 0);
-		startPosA = toViewPosition(row2, 0);
-		endPosS   = toViewPosition(row1, length(source(row1)));
-		endPosA   = toViewPosition(row2, length(source(row2)));
+		a.startPosS = toViewPosition(row1, 0);
+		a.startPosA = toViewPosition(row2, 0);
+		a.endPosS   = toViewPosition(row1, length(source(row1)));
+		a.endPosA   = toViewPosition(row2, length(source(row2)));
 		
-		if(startPosA > startPosS) startPos = startPosA;
-		else                      startPos = startPosS;
+		if(a.startPosA > a.startPosS) a.startPos = a.startPosA;
+		else                          a.startPos = a.startPosS;
 		
-		if(endPosA > endPosS) endPos = endPosS;
-		else                  endPos = endPosA;
+		if(a.endPosA > a.endPosS) a.endPos = a.endPosS;
+		else                      a.endPos = a.endPosA;
 		
 		
 		// cout << "\n\n" << startPosS << endl << startPosA << endl << endPosS << endl << endPosA;
 		// cout << align << endl << alScore << endl;
 		
-		if(m_log != flexbar::NONE) alString << align;
-		
+		if(m_log != flexbar::NONE){
+			stringstream al;
+			al << align;
+			a.alString = al.str();
+		}
 		
 		TRowIterator it1 = begin(row1);
 		TRowIterator it2 = begin(row2);
 		
-		if(m_randTag) tagSeq = "";
+		if(m_randTag) a.randTag = "";
 		
-		int aliPos = 0;
-		gapsR      = 0;
-		gapsA      = 0;
-		mismatches = 0;
+		int aliPos   = 0;
+		a.gapsR      = 0;
+		a.gapsA      = 0;
+		a.mismatches = 0;
 		
 		for(; it1 != end(row1); ++it1){
 			
-			if(startPos <= aliPos && aliPos < endPos){
-				     if(isGap(it1))                   ++gapsR;
-				else if(isGap(it2))                   ++gapsA;
-				else if(*it1 != *it2 && *it2 != 'N')  ++mismatches;
-				else if(m_randTag    && *it2 == 'N')  append(tagSeq, (TChar) *it1);
+			if(a.startPos <= aliPos && aliPos < a.endPos){
+				     if(isGap(it1))                   ++a.gapsR;
+				else if(isGap(it2))                   ++a.gapsA;
+				else if(*it1 != *it2 && *it2 != 'N')  ++a.mismatches;
+				else if(m_randTag    && *it2 == 'N')  append(a.randTag, (TChar) *it1);
 			}
 			++aliPos;
 			++it2;

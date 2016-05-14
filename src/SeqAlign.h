@@ -92,9 +92,8 @@ public:
 			
 			unsigned int nQueries = m_queries->size();
 			
-			if(aIdx == 0){
-				reserve(alignments.first, m_bundleSize * nQueries);
-			}
+			if(aIdx == 0)
+			reserve(alignments.first, m_bundleSize * nQueries);
 			
 			for(unsigned int i = 0; i < nQueries; ++i){
 				
@@ -111,16 +110,20 @@ public:
 		}
 		
 		
-		int fmismatches, fgapsR, fgapsA, foverlapLength, fqueryLength, ftailLength;
-		int fstartPos, fstartPosA, fstartPosS, fendPos, fendPosS, fendPosA;
+		// int fmismatches, fgapsR, fgapsA, foverlapLength, fqueryLength, ftailLength;
+		// int fstartPos, fstartPosA, fstartPosS, fendPos, fendPosS, fendPosA;
+		//
 		
-		int qIndex   = -1;
-		int scoreMax = -1000000;
+		int qIndex = -1;
 		
-		float fallowedErrors;
+		// int scoreMax = -1000000;
+		//
+		// float fallowedErrors;
+		//
+		// TSeqStr finalRandTag;
+		// TString finalAlStr;
 		
-		TSeqStr finalRandTag;
-		TString finalAlStr;
+		AlignResults<TSeqStr> am;
 		
 		TString &readTag = seqRead.tag;
 		TSeqStr sequence = readSeq;
@@ -133,77 +136,50 @@ public:
 			
 			TSeqStr &query = m_queries->at(i).first->seq;
 			
-			int queryLength = length(query);
-			int tailLength  = (m_tailLength > 0) ? m_tailLength : queryLength;
+			AlignResults<TSeqStr> a;
+			
+			a.queryLength = length(query);
+			a.tailLength  = (m_tailLength > 0) ? m_tailLength : a.queryLength;
 			
 			
 			if(m_trimEnd == LEFT_TAIL || m_trimEnd == RIGHT_TAIL){
 				
-				if(tailLength < readLength){
+				if(a.tailLength < readLength){
 					
 					if(m_trimEnd == LEFT_TAIL){
-						sequence = prefix(readSeq, tailLength);
+						sequence = prefix(readSeq, a.tailLength);
 					}else{
-						sequence = suffix(readSeq, readLength - tailLength);
+						sequence = suffix(readSeq, readLength - a.tailLength);
 					}
 				}
 			}
 			
-			
-			int startPos = 0, endPos = 0, startPosA = 0, endPosA = 0, startPosS = 0, endPosS = 0;
-			int alScore = 0, mismatches = 0, gapsR = 0, gapsA = 0;
-			
-			TSeqStr randTag;
-			stringstream alString;
-			
 			// align query to read sequence
-			algo->alignGlobal(query, sequence, gapsR, gapsA, mismatches, startPos, endPos, startPosA, endPosA,
-			                  startPosS, endPosS, alScore, alString, randTag, alignments, cycle, aIdx);
+			algo->alignGlobal(a, alignments, cycle, aIdx);
 			
+			a.overlapLength = a.endPos - a.startPos;
+			a.allowedErrors = m_threshold * a.overlapLength / 10.0f;
 			
-			int overlapLength = endPos - startPos;
+			float madeErrors = static_cast<float>(a.mismatches + a.gapsR + a.gapsA);
 			
-			float allowedErrors = m_threshold * overlapLength / 10.0f;
-			float madeErrors    = static_cast<float>(mismatches + gapsR + gapsA);
-			
-			int minOverlapValue = (m_isBarcoding && m_minOverlap == 0) ? queryLength : m_minOverlap;
+			int minOverlapValue = (m_isBarcoding && m_minOverlap == 0) ? a.queryLength : m_minOverlap;
 			
 			
 			bool validAli = true;
 			
-			if(((m_trimEnd == RIGHT_TAIL || m_trimEnd == RIGHT) && startPosA < startPosS && m_strictRegion) ||
-			   ((m_trimEnd == LEFT_TAIL  || m_trimEnd == LEFT)  && endPosA   > endPosS   && m_strictRegion) ||
-			     overlapLength < 1){
+			if(((m_trimEnd == RIGHT_TAIL || m_trimEnd == RIGHT) && a.startPosA < a.startPosS && m_strictRegion) ||
+			   ((m_trimEnd == LEFT_TAIL  || m_trimEnd == LEFT)  && a.endPosA   > a.endPosS   && m_strictRegion) ||
+			     a.overlapLength < 1){
 				
 				validAli = false;
 			}
 			
 			
 			// check if alignment is valid and score is max as well as if number of errors and overlap length are allowed
-			if(validAli && alScore > scoreMax && madeErrors <= allowedErrors && overlapLength >= minOverlapValue){
+			if(validAli && a.score > am.score && madeErrors <= a.allowedErrors && a.overlapLength >= minOverlapValue){
 				
-				qIndex      = i;
-				scoreMax    = alScore;
-				fstartPos   = startPos;
-				fstartPosA  = startPosA;
-				fstartPosS  = startPosS;
-				fendPos     = endPos;
-				fendPosA    = endPosA;
-				fendPosS    = endPosS;
-				fgapsR      = gapsR;
-				fgapsA      = gapsA;
-				
-				ftailLength    = tailLength;
-				foverlapLength = overlapLength;
-				fqueryLength   = queryLength;
-				
-				if(m_randTag) finalRandTag = randTag;
-				
-				if(m_log != NONE){
-					fmismatches    = mismatches;
-					finalAlStr     = alString.str();
-					fallowedErrors = allowedErrors;
-				}
+				qIndex = i;
+				am     = a;
 			}
 		}
 		
@@ -218,16 +194,14 @@ public:
 				
 				if(trimEnd == ANY){
 					
-					if(fstartPosA <= fstartPosS && fendPosS <= fendPosA){
+					if(am.startPosA <= am.startPosS && am.endPosS <= am.endPosA){
 						seqRead.seq = "";
 						if(m_format == FASTQ) seqRead.qual = "";
 					}
-					else if(fstartPosA - fstartPosS >= fendPosS - fendPosA){
+					else if(am.startPosA - am.startPosS >= am.endPosS - am.endPosA){
 						trimEnd = RIGHT;
 					}
-					else{
-						trimEnd = LEFT;
-					}
+					else trimEnd = LEFT;
 				}
 				
 				switch(trimEnd){
@@ -235,44 +209,39 @@ public:
 					int rCutPos;
 					
 					case LEFT_TAIL:
-						sequence = readSeq;
-					
 					case LEFT:
-						rCutPos = fendPos;
+						rCutPos = am.endPos;
 						
 						// translate alignment end pos to read idx
-						if(fstartPosS > 0) rCutPos -= fstartPosS;
+						if(am.startPosS > 0) rCutPos -= am.startPosS;
 						
 						// adjust to inner read gaps
-						rCutPos -= fgapsR;
+						rCutPos -= am.gapsR;
 						
 						if(rCutPos > readLength) rCutPos = readLength;
 						
-						erase(sequence, 0, rCutPos);
-						seqRead.seq = sequence;
+						erase(seqRead.seq, 0, rCutPos);
 						
-						if(m_format == FASTQ){
-							erase(seqRead.qual, 0, rCutPos);
-						}
+						if(m_format == FASTQ)
+						erase(seqRead.qual, 0, rCutPos);
+						
 						break;
 					
 					case RIGHT_TAIL:
-						sequence  = readSeq;
 						// adjust cut pos to original read length
-						fstartPos += readLength - ftailLength;
+						am.startPos += readLength - am.tailLength;
 					
 					case RIGHT:
-						rCutPos = fstartPos;
+						rCutPos = am.startPos;
 						
 						// skipped restriction
 						if(rCutPos < 0) rCutPos = 0;
 						
-						erase(sequence, rCutPos, readLength);
-						seqRead.seq = sequence;
+						erase(seqRead.seq, rCutPos, readLength);
 						
-						if(m_format == FASTQ){
-							erase(seqRead.qual, rCutPos, readLength);
-						}
+						if(m_format == FASTQ)
+						erase(seqRead.qual, rCutPos, readLength);
+						
 						break;
 						
 	                case ANY:;
@@ -281,12 +250,11 @@ public:
 				++m_modified;
 				
 				
-				// count for each query number of removals
+				// count number of removals for each query
 				m_queries->at(qIndex).second.first++;
 				
-				if(foverlapLength == fqueryLength){
-					m_queries->at(qIndex).second.second++;
-				}
+				if(am.overlapLength == am.queryLength)
+				m_queries->at(qIndex).second.second++;
 				
 				if(m_writeTag){
 					append(seqRead.tag, "_Flexbar_removal");
@@ -298,16 +266,16 @@ public:
 				}
 				
 				// store overlap occurrences for min, max, mean and median
-				if(foverlapLength <= MAX_READLENGTH) m_rmOverlaps->at(foverlapLength)++;
+				if(am.overlapLength <= MAX_READLENGTH) m_rmOverlaps->at(am.overlapLength)++;
 				else cerr << "\nCompile Flexbar with larger max read length to get correct overlap stats.\n" << endl;
 			}
 			
 			
 			// valid alignment, not neccesarily removal
 			
-			if(m_randTag && finalRandTag != ""){
+			if(m_randTag && am.randTag != ""){
 				append(seqRead.tag, "_");
-				append(seqRead.tag, finalRandTag);
+				append(seqRead.tag, am.randTag);
 			}
 			
 			
@@ -325,17 +293,17 @@ public:
 					else if(trimEnd == RIGHT || trimEnd == RIGHT_TAIL) ss << "  right side\n";
 					else                                               ss << "  any side\n";
 				}
-				else{ ss << "Sequence detection, no removal:\n"; }
+				else ss << "Sequence detection, no removal:\n";
 				
-				ss << "  query tag        " << queryTag                      << "\n"
-				   << "  read tag         " << readTag                       << "\n"
-				   << "  read seq         " << readSeq                       << "\n"
-				   << "  read pos         " << fstartPosS << "-" << fendPosS << "\n"
-				   << "  query pos        " << fstartPosA << "-" << fendPosA << "\n"
-				   << "  score            " << scoreMax                      << "\n"
-				   << "  overlap          " << foverlapLength                << "\n"
-				   << "  errors           " << fgapsR + fgapsA + fmismatches << "\n"
-				   << "  allowed errors   " << fallowedErrors                << "\n";
+				ss << "  query tag        " << queryTag                            << "\n"
+				   << "  read tag         " << readTag                             << "\n"
+				   << "  read seq         " << readSeq                             << "\n"
+				   << "  read pos         " << am.startPosS << "-" << am.endPosS   << "\n"
+				   << "  query pos        " << am.startPosA << "-" << am.endPosA   << "\n"
+				   << "  score            " << am.score                            << "\n"
+				   << "  overlap          " << am.overlapLength                    << "\n"
+				   << "  errors           " << am.gapsR + am.gapsA + am.mismatches << "\n"
+				   << "  allowed errors   " << am.allowedErrors                    << "\n";
 				
 				if(performRemoval){
 					ss << "  remaining read   "  << seqRead.seq << "\n";
@@ -344,7 +312,7 @@ public:
 					ss << "  remaining qual   " << seqRead.qual << "\n";
 				}
 				
-				ss << "\n  Alignment:\n" << endl << finalAlStr;
+				ss << "\n  Alignment:\n" << endl << am.alString;
 				
 				*m_out << ss.str();
 			}
@@ -352,9 +320,9 @@ public:
 				
 				stringstream ss;
 				
-				ss << readTag     << "\t" << queryTag        << "\t"
-				   << fstartPosA  << "\t" << fendPosA        << "\t" << foverlapLength << "\t"
-				   << fmismatches << "\t" << fgapsR + fgapsA << "\t" << fallowedErrors << endl;
+				ss << readTag       << "\t" << queryTag            << "\t"
+				   << am.startPosA  << "\t" << am.endPosA          << "\t" << am.overlapLength << "\t"
+				   << am.mismatches << "\t" << am.gapsR + am.gapsA << "\t" << am.allowedErrors << endl;
 				
 				*m_out << ss.str();
 			}
