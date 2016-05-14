@@ -37,8 +37,7 @@ public:
 		
 		using namespace seqan;
 		
-		m_score = Score<int, Simple>(match, mismatch, gapCost);
-		
+		m_score       = Score<int, Simple>(match, mismatch, gapCost);
 		m_scoreMatrix = TScoreMatrix(gapCost);
 		
 		for(unsigned i = 0; i < ValueSize<TChar>::VALUE; ++i){

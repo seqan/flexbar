@@ -80,8 +80,7 @@ public:
 		
 		SeqRead<TSeqStr, TString> &seqRead = *static_cast< SeqRead<TSeqStr, TString>* >(item);
 		
-		TSeqStr &readSeq = seqRead.seq;
-		int readLength   = length(readSeq);
+		int readLength = length(seqRead.seq);
 		
 		if(! m_isBarcoding && readLength < m_minLength){
 			
@@ -89,62 +88,55 @@ public:
 			return 0;
 		}
 		
-		
 		if(cycle == PRECYCLE){
 			
-			unsigned int nQueries = m_queries->size();
-			
 			if(aIdx == 0)
-			reserve(alignments.first, m_bundleSize * nQueries);
+			reserve(alignments.first, m_bundleSize * m_queries->size());
 			
-			for(unsigned int i = 0; i < nQueries; ++i){
+			for(unsigned int i = 0; i < m_queries->size(); ++i){
+				
+				TSeqStr &qseq = m_queries->at(i).first->seq;
+				TSeqStr rseq = seqRead.seq;
+				
+				if(m_trimEnd == LEFT_TAIL || m_trimEnd == RIGHT_TAIL){
+					
+					int tailLength  = (m_tailLength > 0) ? m_tailLength : length(qseq);
+					
+					if(tailLength < readLength){
+						if(m_trimEnd == LEFT_TAIL) rseq = prefix(seqRead.seq, tailLength);
+						else                       rseq = suffix(seqRead.seq, readLength - tailLength);
+					}
+				}
+				// else rseq = &seqRead.seq;
 				
 				TAlign align;
 				resize(rows(align), 2);
-				assignSource(row(align, 0), readSeq);
-				assignSource(row(align, 1), m_queries->at(i).first->seq);
+				assignSource(row(align, 0), rseq);
+				assignSource(row(align, 1), qseq);
 				
 				appendValue(alignments.first, align);
-				
 				++aIdx;
 			}
 			return 0;
 		}
 		
-		int qIndex = -1;
-		
 		TAlignResults *am;
 		
-		TString &readTag = seqRead.tag;
-		TSeqStr sequence = readSeq;
+		int qIndex  = -1;
+		int amScore = numeric_limits<int>::min();
 		
-		
-		// align each query sequence and keep track of best one
+		// align each query sequence and store best one
 		for(unsigned int i = 0; i < m_queries->size(); ++i){
 			
 			if(i > 0) cycle = RESULTS;
 			
-			TSeqStr &query = m_queries->at(i).first->seq;
-			
 			TAlignResults a;
 			
-			a.queryLength = length(query);
+			a.queryLength = length(m_queries->at(i).first->seq);
 			a.tailLength  = (m_tailLength > 0) ? m_tailLength : a.queryLength;
 			
 			
-			if(m_trimEnd == LEFT_TAIL || m_trimEnd == RIGHT_TAIL){
-				
-				if(a.tailLength < readLength){
-					
-					if(m_trimEnd == LEFT_TAIL){
-						sequence = prefix(readSeq, a.tailLength);
-					}else{
-						sequence = suffix(readSeq, readLength - a.tailLength);
-					}
-				}
-			}
-			
-			// align query to read sequence
+			// sequence alignment
 			algo->alignGlobal(a, alignments, cycle, aIdx);
 			
 			a.overlapLength = a.endPos - a.startPos;
@@ -163,12 +155,12 @@ public:
 				validAl = false;
 			}
 			
-			
-			// check if alignment is valid and score is max as well as if number of errors and overlap length are allowed
-			if(validAl && a.score > am->score && madeErrors <= a.allowedErrors && a.overlapLength >= minOverlap){
+			// check if alignment is valid, score is max, number of errors and overlap length
+			if(validAl && a.score > amScore && madeErrors <= a.allowedErrors && a.overlapLength >= minOverlap){
 				
-				qIndex = i;
-				am     = &a;
+				am      = &a;
+				amScore = a.score;
+				qIndex  = i;
 			}
 		}
 		
@@ -285,8 +277,8 @@ public:
 				else ss << "Sequence detection, no removal:\n";
 				
 				ss << "  query tag        " << queryTag                               << "\n"
-				   << "  read tag         " << readTag                                << "\n"
-				   << "  read seq         " << readSeq                                << "\n"
+				   << "  read tag         " << seqRead.tag                            << "\n"
+				   << "  read seq         " << seqRead.seq                            << "\n"
 				   << "  read pos         " << am->startPosS << "-" << am->endPosS    << "\n"
 				   << "  query pos        " << am->startPosA << "-" << am->endPosA    << "\n"
 				   << "  score            " << am->score                              << "\n"
@@ -309,7 +301,7 @@ public:
 				
 				stringstream ss;
 				
-				ss << readTag        << "\t" << queryTag              << "\t"
+				ss << seqRead.tag    << "\t" << queryTag              << "\t"
 				   << am->startPosA  << "\t" << am->endPosA           << "\t" << am->overlapLength << "\t"
 				   << am->mismatches << "\t" << am->gapsR + am->gapsA << "\t" << am->allowedErrors << endl;
 				
@@ -320,9 +312,9 @@ public:
 			
 			stringstream ss;
 			
-			ss << "No valid alignment:"   << "\n"
-			   << "read tag  " << readTag << "\n"
-			   << "read seq  " << readSeq << "\n\n" << endl;
+			ss << "No valid alignment:"       << "\n"
+			   << "read tag  " << seqRead.tag << "\n"
+			   << "read seq  " << seqRead.seq << "\n\n" << endl;
 			
 			*m_out << ss.str();
 		}

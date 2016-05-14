@@ -85,13 +85,10 @@ struct AlignResults{
 	int overlapLength, queryLength, tailLength;
 	
 	float allowedErrors;
-	
 	TSeqStr randTag;
-	
 	seqan::CharString alString;
 	
 	AlignResults(){
-		score = -100000000;
 	}
 };
 
@@ -108,6 +105,7 @@ namespace flexbar{
 	typedef seqan::String<int>                      TAlignScores;
 	typedef std::pair<TAlignSet, TAlignScores>      TAlignments;
 	
+	// typedef seqan::StringSet<TAlign, seqan::Dependent<> >              TAlignSet;
 	// typedef seqan::StringSet<TAlign, seqan::Dependent<seqan::Tight> >  TAlignSet;
 	
 	typedef std::vector<TAlignments>                    TAlignBundle;
