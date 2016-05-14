@@ -76,6 +76,26 @@ class Bar {
 };
 
 
+template <typename TSeqStr>
+struct AlignResults{
+	
+	int score, mismatches, gapsR, gapsA;
+	int startPos, startPosA, startPosS;
+	int endPos, endPosS, endPosA;
+	int overlapLength, queryLength, tailLength;
+	
+	float allowedErrors;
+	
+	TSeqStr randTag;
+	
+	seqan::CharString alString;
+	
+	AlignResults(){
+		score = -100000000;
+	}
+};
+
+
 namespace flexbar{
 	
 	const unsigned int MAX_READLENGTH = 2048;
