@@ -27,7 +27,7 @@ void openInputFile(std::fstream &strm, std::string path){
 	strm.open(path.c_str(), ios::in | ios::binary);
 	
 	if(! strm.good()){
-		cerr << "Error opening file: " << path << "\n" << endl;
+		cerr << "ERROR while opening file: " << path << "\n" << endl;
 		exit(1);
 	}
 }
@@ -38,7 +38,7 @@ void openOutputFile(std::fstream &strm, std::string path){
 	strm.open(path.c_str(), ios::out | ios::binary);
 	
 	if(! strm.good()){
-		cerr << "Error opening file: " << path << "\n" << endl;
+		cerr << "ERROR while opening file: " << path << "\n" << endl;
 		exit(1);
 	}
 }
@@ -177,7 +177,7 @@ std::string toFormatStr(const flexbar::FileFormat format){
 // 	string call = "qcCommand " + path + " &> qc.out";
 //
 // 	if(system(call.c_str()) != 0){
-// 		cerr << "Error in quality control.\n" << endl;
+// 		cerr << "ERROR in quality control.\n" << endl;
 // 	}
 // }
 

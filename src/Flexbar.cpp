@@ -8,11 +8,11 @@
    and TBB library 4.0 or later
    
    
-           Developer:  Johannes Roehr
+             Developer:  Johannes Roehr
    
-   Former developers:  Matthias Dodt
-                       Benjamin Menkuec
-                       Sebastian Roskosch
+   Former contributors:  Matthias Dodt
+                         Benjamin Menkuec
+                         Sebastian Roskosch
    
    
    https://github.com/seqan/flexbar

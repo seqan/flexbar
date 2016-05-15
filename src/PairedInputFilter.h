@@ -74,14 +74,14 @@ public:
 				if(m_useBarcodeRead) barRead = static_cast< SeqRead<TSeqStr, TString>* >(m_b->getRead(uBR));
 				
 				if(read1 == NULL && m_useBarcodeRead && barRead != NULL){
-					cerr << "Error: barcode read without read, or file reading error.\n" << endl;
+					cerr << "ERROR: barcode read without read or file reading error.\n" << endl;
 					exit(1);
 				}
 				else if(read1 == NULL){
 					return NULL;
 				}
 				else if(m_useBarcodeRead && barRead == NULL){
-					cerr << "Error: read without barcode read, or file reading error.\n" << endl;
+					cerr << "ERROR: read without barcode read or file reading error.\n" << endl;
 					exit(1);
 				}
 				
@@ -105,18 +105,18 @@ public:
 				
 				
 				if((read1 == NULL || read2 == NULL) && m_useBarcodeRead && barRead != NULL){
-					cerr << "Error: barcode read without read-pair or file reading error.\n" << endl;
+					cerr << "ERROR: barcode read without read-pair or file reading error.\n" << endl;
 					exit(1);
 				}
 				else if(read1 == NULL && read2 == NULL){
 					return NULL;
 				}
 				else if(read1 == NULL || read2 == NULL){
-					cerr << "Error: single read in paired mode, or file reading error.\n" << endl;
+					cerr << "ERROR: single read in paired mode or file reading error.\n" << endl;
 					exit(1);
 				}
 				else if(m_useBarcodeRead && barRead == NULL){
-					cerr << "Error: reads without barcode read or file reading error.\n" << endl;
+					cerr << "ERROR: reads without barcode read or file reading error.\n" << endl;
 					exit(1);
 				}
 				
