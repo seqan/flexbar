@@ -36,10 +36,9 @@ class SeqRead {
 template <typename TSeqStr, typename TString>
 class PairedRead {
 	
-	public:
-	
 	typedef SeqRead<TSeqStr, TString> TSeqRead;
 	
+	public:
 	TSeqRead *r1, *r2, *b;
 	int barID, barID2;
 	
@@ -62,10 +61,9 @@ class PairedRead {
 template <typename TSeqStr, typename TString>
 class Bar {
 	
-	public:
-	
 	typedef SeqRead<TSeqStr, TString> TSeqRead;
 	
+	public:
 	TSeqRead seqRead;
 	unsigned long rmOvl, rmFull;
 	
@@ -100,6 +98,15 @@ namespace flexbar{
 	typedef seqan::Dna5String FSeqStr;
 	typedef seqan::CharString FString;
 	
+	typedef seqan::StringSet<FSeqStr, seqan::Dependent<seqan::Tight> > TSeqStrs;
+	typedef seqan::StringSet<FString, seqan::Dependent<seqan::Tight> > TStrings;
+	
+	typedef SeqRead<FSeqStr, FString>    TSeqRead;
+	typedef PairedRead<FSeqStr, FString> TPairedRead;
+	
+	typedef seqan::StringSet<TSeqRead,    seqan::Dependent<seqan::Tight> > TSeqReads;
+	typedef seqan::StringSet<TPairedRead, seqan::Dependent<seqan::Tight> > TPairedReads;
+	
 	typedef seqan::Align<FSeqStr, seqan::ArrayGaps> TAlign;
 	typedef seqan::StringSet<TAlign>                TAlignSet;
 	typedef seqan::String<int>                      TAlignScores;
@@ -111,9 +118,9 @@ namespace flexbar{
 	typedef std::vector<TAlignments>                    TAlignBundle;
 	typedef std::vector<PairedRead<FSeqStr, FString>* > TPairedReadBundle;
 	
+	typedef tbb::atomic<unsigned long> TAtomicUlong;
 	
-	typedef std::pair< SeqRead<FSeqStr, FString>*,
-	                   std::pair< tbb::atomic<unsigned long>, tbb::atomic<unsigned long> > > TBar;
+	typedef std::pair< SeqRead<FSeqStr, FString>*, std::pair<TAtomicUlong, TAtomicUlong> > TBar;
 	
 	
    	enum ComputeCycle {
