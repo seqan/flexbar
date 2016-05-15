@@ -98,8 +98,8 @@ namespace flexbar{
 	typedef seqan::Dna5String FSeqStr;
 	typedef seqan::CharString FString;
 	
-	typedef seqan::StringSet<FSeqStr, seqan::Dependent<seqan::Tight> > TSeqStrs;
-	typedef seqan::StringSet<FString, seqan::Dependent<seqan::Tight> > TStrings;
+	typedef seqan::StringSet<FSeqStr> TSeqStrs;
+	typedef seqan::StringSet<FString> TStrings;
 	
 	typedef SeqRead<FSeqStr, FString>    TSeqRead;
 	typedef PairedRead<FSeqStr, FString> TPairedRead;

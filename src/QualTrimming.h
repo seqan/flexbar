@@ -163,7 +163,7 @@ bool qualTrim(SeqRead<TSeqStr, TString> *seqRead, const flexbar::QualTrimType qt
 	bool trimmed = qualTrim(seq, qual, qtrim, cutoff, wSize);
 	
 	if(trimmed){
-		seqRead->seq = seq;
+		seqRead->seq  = seq;
 		seqRead->qual = qual;
 	}
 	
