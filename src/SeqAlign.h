@@ -68,7 +68,7 @@ public:
 	};
 	
 	
-	int alignSeqRead(void* item, const bool performRemoval, flexbar::TAlignments &alignments, flexbar::ComputeCycle cycle, unsigned int &aIdx){
+	int alignSeqRead(void* item, const bool performRemoval, flexbar::TAlignments &alignments, flexbar::ComputeCycle cycle, unsigned int &idxAl){
 		
 		using namespace std;
 		using namespace flexbar;
@@ -83,17 +83,20 @@ public:
 		int readLength = length(seqRead.seq);
 		
 		if(! m_isBarcoding && readLength < m_minLength){
-			if(cycle != PRECYCLE) ++m_nPreShortReads;
+			if(cycle != PRELOAD) ++m_nPreShortReads;
 			return 0;
 		}
 		
-		if(cycle == PRECYCLE){
+		if(cycle == PRELOAD){
 			
-			if(aIdx == 0) reserve(alignments.first, m_bundleSize * m_queries->size());
+			if(idxAl++ == 0) reserve(alignments.first, m_bundleSize * m_queries->size());
 			
 			for(unsigned int i = 0; i < m_queries->size(); ++i){
 				
 				TSeqStr &qseq = m_queries->at(i).first->seq;
+				TSeqStr *rseq;
+				
+				rseq = &seqRead.seq;
 				
 				TAlign align;
 				resize(rows(align), 2);
@@ -101,21 +104,18 @@ public:
 				if(m_trimEnd == LEFT_TAIL || m_trimEnd == RIGHT_TAIL){
 					int tailLength  = (m_tailLength > 0) ? m_tailLength : length(qseq);
 					
-					TSeqStr rseq;
+					TSeqStr seq;
 					
 					if(tailLength < readLength){
-						if(m_trimEnd == LEFT_TAIL) rseq = prefix(seqRead.seq, tailLength);
-						else                       rseq = suffix(seqRead.seq, readLength - tailLength);
+						if(m_trimEnd == LEFT_TAIL) seq = prefix(seqRead.seq, tailLength);
+						else                       seq = suffix(seqRead.seq, readLength - tailLength);
 					}
-					else rseq = seqRead.seq;
-					
-					assignSource(row(align, 0), rseq);
+					rseq = &seq;
 				}
-				else assignSource(row(align, 0), seqRead.seq);
 				
-				assignSource(row(align, 1), qseq);
+				assignSource(row(align, 0),  *rseq);
+				assignSource(row(align, 1),   qseq);
 				appendValue(alignments.first, align);
-				++aIdx;
 			}
 			return 0;
 		}
@@ -133,12 +133,11 @@ public:
 			
 			TAlignResults a;
 			
+			// global sequence alignment
+			algo->alignGlobal(a, alignments, cycle, idxAl++);
+			
 			a.queryLength = length(m_queries->at(i).first->seq);
 			a.tailLength  = (m_tailLength > 0) ? m_tailLength : a.queryLength;
-			
-			
-			// sequence alignment
-			algo->alignGlobal(a, alignments, cycle, aIdx);
 			
 			a.overlapLength = a.endPos - a.startPos;
 			a.allowedErrors = m_threshold * a.overlapLength / 10.0f;

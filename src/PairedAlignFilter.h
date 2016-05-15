@@ -72,7 +72,7 @@ public:
 	};
 	
 	
-	void alignPairedRead(void* item, flexbar::TAlignBundle &alBundle, flexbar::ComputeCycle cycle, unsigned int &aIdx){
+	void alignPairedRead(void* item, flexbar::TAlignBundle &alBundle, flexbar::ComputeCycle cycle, unsigned int &idxAl){
 		
 		using namespace flexbar;
 		
@@ -84,21 +84,20 @@ public:
 			// barcode detection
 			if(m_barType != BOFF){
 				switch(m_barType){
-					case BARCODE_READ:         pRead->barID  = m_bfilter->alignSeqRead(pRead->b,  false, alBundle.at(0), cycle, aIdx); break;
+					case BARCODE_READ:         pRead->barID  = m_bfilter->alignSeqRead(pRead->b,  false, alBundle.at(0), cycle, idxAl); break;
 					
-					case WITHIN_READ_REMOVAL2: pRead->barID2 = m_b2filter->alignSeqRead(pRead->r2, true,  alBundle.at(2), cycle, aIdx);
-					case WITHIN_READ_REMOVAL:  pRead->barID  = m_bfilter->alignSeqRead(pRead->r1,  true,  alBundle.at(1), cycle, aIdx); break;
+					case WITHIN_READ_REMOVAL2: pRead->barID2 = m_b2filter->alignSeqRead(pRead->r2, true,  alBundle.at(2), cycle, idxAl);
+					case WITHIN_READ_REMOVAL:  pRead->barID  = m_bfilter->alignSeqRead(pRead->r1,  true,  alBundle.at(1), cycle, idxAl); break;
 					
-					case WITHIN_READ2:         pRead->barID2 = m_b2filter->alignSeqRead(pRead->r2, false, alBundle.at(2), cycle, aIdx);
-					case WITHIN_READ:          pRead->barID  = m_bfilter->alignSeqRead(pRead->r1,  false, alBundle.at(1), cycle, aIdx); break;
+					case WITHIN_READ2:         pRead->barID2 = m_b2filter->alignSeqRead(pRead->r2, false, alBundle.at(2), cycle, idxAl);
+					case WITHIN_READ:          pRead->barID  = m_bfilter->alignSeqRead(pRead->r1,  false, alBundle.at(1), cycle, idxAl); break;
 					
 					case BOFF: break;
 				}
 				
 				if(pRead->barID == 0 || (m_twoBarcodes && pRead->barID2 == 0)){
 					
-					if(cycle != PRECYCLE) m_unassigned++;
-					
+					if(cycle != PRELOAD)    m_unassigned++;
 					if(! m_writeUnassigned) skipAdapRem = true;
 				}
 			}
@@ -106,11 +105,11 @@ public:
 			// adapter removal
 			if(m_adapRem != AOFF && ! skipAdapRem){
 				if(m_adapRem != ATWO)
-				m_afilter->alignSeqRead(pRead->r1, true, alBundle.at(3), cycle, aIdx);
+				m_afilter->alignSeqRead(pRead->r1, true, alBundle.at(3), cycle, idxAl);
 				
 				if(pRead->r2 != NULL && m_adapRem != AONE){
-					if(m_adapRem != NORMAL2) m_afilter->alignSeqRead(pRead->r2,  true, alBundle.at(4), cycle, aIdx);
-					else                     m_a2filter->alignSeqRead(pRead->r2, true, alBundle.at(4), cycle, aIdx);
+					if(m_adapRem != NORMAL2) m_afilter->alignSeqRead(pRead->r2,  true, alBundle.at(4), cycle, idxAl);
+					else                     m_a2filter->alignSeqRead(pRead->r2, true, alBundle.at(4), cycle, idxAl);
 				}
 			}
 		}
@@ -138,20 +137,20 @@ public:
 			alBundle.push_back(r1AlignmentsA);
 			alBundle.push_back(r2AlignmentsA);
 			
-			unsigned int aIdx  = 0;
-			ComputeCycle cycle = PRECYCLE;
+			unsigned int idxAl = 0;
+			ComputeCycle cycle = PRELOAD;
 			
 			for(unsigned int i = 0; i < prBundle->size(); ++i)
-				alignPairedRead(prBundle->at(i), alBundle, cycle, aIdx);
+				alignPairedRead(prBundle->at(i), alBundle, cycle, idxAl);
 			
-			aIdx  = 0;
+			idxAl = 0;
 			cycle = COMPUTE;
 			
 			for(unsigned int i = 0; i < prBundle->size(); ++i){
 				
 				if(i > 0) cycle = RESULTS;
 				
-				alignPairedRead(prBundle->at(i), alBundle, cycle, aIdx);
+				alignPairedRead(prBundle->at(i), alBundle, cycle, idxAl);
 			}
 			
 			return prBundle;

@@ -57,21 +57,19 @@ public:
 	};
 	
 	
-	void alignGlobal(TAlignResults &a, flexbar::TAlignments &alignments, const flexbar::ComputeCycle cycle, unsigned int &aIdx){
+	void alignGlobal(TAlignResults &a, flexbar::TAlignments &alignments, const flexbar::ComputeCycle cycle, const unsigned int idxAl){
 		
 		using namespace std;
 		using namespace seqan;
 		using namespace flexbar;
 		
 		
-		// TAlign align2;
-		// TAlign &align = align2;
-		//
 		// if(m_randTag){
 		//
+		// 	TAlign align;
 		// 	resize(rows(align), 2);
-		// 	assignSource(row(align, 0), readSeq);
-		// 	assignSource(row(align, 1), querySeq);
+		// 	assignSource(row(align, 0), rseq);
+		// 	assignSource(row(align, 1), qseq);
 		//
 		// 	if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
 		//
@@ -107,8 +105,8 @@ public:
 				}
 			}
 			
-			TAlign &align = value(alignments.first,  aIdx);
-			a.score       = value(alignments.second, aIdx);
+			TAlign &align = value(alignments.first,  idxAl);
+			a.score       = value(alignments.second, idxAl);
 		// }
 		
 		// cout << "Score: " << alScore << endl;
@@ -129,9 +127,8 @@ public:
 		if(a.endPosA > a.endPosS) a.endPos = a.endPosS;
 		else                      a.endPos = a.endPosA;
 		
-		
-		// cout << "\n\n" << startPosS << endl << startPosA << endl << endPosS << endl << endPosA;
-		// cout << align << endl << alScore << endl;
+		// cout << startPosS << endl << startPosA << endl;
+		// cout << endPosS   << endl << endPosA   << endl;
 		
 		if(m_log != flexbar::NONE){
 			stringstream al;
@@ -139,31 +136,29 @@ public:
 			a.alString = al.str();
 		}
 		
+		if(m_randTag) a.randTag = "";
+		
 		TRowIterator it1 = begin(row1);
 		TRowIterator it2 = begin(row2);
 		
-		if(m_randTag) a.randTag = "";
-		
-		int aliPos   = 0;
+		int alPos    = 0;
 		a.gapsR      = 0;
 		a.gapsA      = 0;
 		a.mismatches = 0;
 		
 		for(; it1 != end(row1); ++it1){
 			
-			if(a.startPos <= aliPos && aliPos < a.endPos){
+			if(a.startPos <= alPos && alPos < a.endPos){
 				     if(isGap(it1))                   ++a.gapsR;
 				else if(isGap(it2))                   ++a.gapsA;
 				else if(*it1 != *it2 && *it2 != 'N')  ++a.mismatches;
 				else if(m_randTag    && *it2 == 'N')  append(a.randTag, (TChar) *it1);
 			}
-			++aliPos;
+			++alPos;
 			++it2;
 		}
 		
-		// cout << "\n\n" << gapsR << endl << gapsA << endl << mismatches << endl;
-		
-		++aIdx;
+		// cout << gapsR << endl << gapsA << endl << mismatches << endl;
 	}
 	
 	

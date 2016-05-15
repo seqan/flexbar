@@ -117,7 +117,7 @@ namespace flexbar{
 	
 	
    	enum ComputeCycle {
-   		PRECYCLE,
+   		PRELOAD,
    		COMPUTE,
    		RESULTS
    	};
