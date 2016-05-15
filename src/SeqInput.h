@@ -8,12 +8,11 @@
 #define FLEXBAR_SEQINPUT_H
 
 #include <seqan/seq_io.h>
-
 #include "QualTrimming.h"
 
 
 template <typename TSeqStr, typename TString>
-class SeqInput : public tbb::filter {
+class SeqInput {
 
 private:
 	
@@ -33,7 +32,6 @@ public:
 	
 	SeqInput(const Options &o, const std::string filePath, const bool fastaFormat, const bool preProcess, const bool useStdin) :
 		
-		filter(serial_in_order),
 		m_preProcess(preProcess),
 		m_useStdin(useStdin),
 		m_switch2Fasta(o.switch2Fasta),
@@ -94,8 +92,8 @@ public:
 	}
 	
 	
-	// returns SeqRead or NULL if end of file
-	void* getRead(bool &isUncalled){
+	// returns number of read SeqReads
+	unsigned int getReads(bool &isUncalled, flexbar::TSeqReads &seqReads, const unsigned int nReads){
 		
 		using namespace std;
 		using namespace flexbar;
@@ -104,114 +102,78 @@ public:
 		using seqan::suffix;
 		using seqan::length;
 		
-		SeqRead<TSeqStr, TString> *seqRead = NULL;
 		
 		if(! atEnd(seqFileIn)){
 			
-			isUncalled = false;
-			
 			try{
-				if(m_format == FASTA){
+				isUncalled = false;
+				
+				TSeqStrs seqs;
+				TStrings quals, ids;
+				
+				if(m_format == FASTA) readRecords(ids, seqs,        seqFileIn, nReads);
+				else                  readRecords(ids, seqs, quals, seqFileIn, nReads);
+				
+				for(unsigned int i = 0; i < length(ids); ++i){
 					
-					TSeqStr rseq;
-					TString tag;
+					TString &id  = value(ids,  i);
+					TSeqStr &seq = value(seqs, i);
 					
-					readRecord(tag, rseq, seqFileIn);
-					
-					if(length(tag) < 1){
+					if(length(id) < 1){
 						cerr << "\n\n" << "ERROR: Read without name in input.\n" << endl;
 						close(seqFileIn);
 						exit(1);
 					}
-					if(length(rseq) < 1){
+					if(length(seq) < 1){
 						cerr << "\n\n" << "ERROR: Read without sequence in input.\n" << endl;
 						close(seqFileIn);
 						exit(1);
 					}
 					
-					m_nrChars += length(rseq);
-					
-					
-					if(m_preProcess){
-						isUncalled = isUncalledSequence(rseq);
-						
-						if(m_preTrimBegin > 0 && length(rseq) > 1){
-							
-							int idx = m_preTrimBegin;
-							if(idx >= length(rseq)) idx = length(rseq) - 1;
-							
-							erase(rseq, 0, idx);
-						}
-						
-						if(m_preTrimEnd > 0 && length(rseq) > 1){
-							
-							int idx = m_preTrimEnd;
-							if(idx >= length(rseq)) idx = length(rseq) - 1;
-							
-							rseq = prefix(rseq, length(rseq) - idx);
-						}
-					}
-					
-					seqRead = new SeqRead<TSeqStr, TString>(rseq, tag);
-					
-					++m_nrReads;
-				}
-				
-				else{  // fastq
-					
-					TSeqStr rseq;
-					TString qual, tag;
-					
-					readRecord(tag, rseq, qual, seqFileIn);
-					
-					if(length(tag) < 1){
-						cerr << "\n\n" << "ERROR: Read without name in input.\n" << endl;
-						close(seqFileIn);
-						exit(1);
-					}
-					if(length(rseq) < 1){
-						cerr << "\n\n" << "ERROR: Read without sequence in input.\n" << endl;
-						close(seqFileIn);
-						exit(1);
-					}
-					
-					m_nrChars += length(rseq);
-					
+					m_nrChars += length(seq);
 					
 					if(m_preProcess){
-						isUncalled = isUncalledSequence(rseq);
+						isUncalled = isUncalledSequence(seq);
 						
-						if(m_preTrimBegin > 0 && length(rseq) > 1){
+						if(m_preTrimBegin > 0 && length(seq) > 1){
 							
 							int idx = m_preTrimBegin;
-							if(idx >= length(rseq)) idx = length(rseq) - 1;
+							if(idx >= length(seq)) idx = length(seq) - 1;
 							
-							erase(rseq, 0, idx);
-							erase(qual, 0, idx);
+							erase(seq, 0, idx);
+							
+							if(m_format == FASTQ)
+							erase(value(quals, i), 0, idx);
 						}
 						
-						if(m_preTrimEnd > 0 && length(rseq) > 1){
+						if(m_preTrimEnd > 0 && length(seq) > 1){
 							
 							int idx = m_preTrimEnd;
-							if(idx >= length(rseq)) idx = length(rseq) - 1;
+							if(idx >= length(seq)) idx = length(seq) - 1;
 							
-							rseq = prefix(rseq, length(rseq) - idx);
-							qual = prefix(qual, length(qual) - idx);
+							seq  = prefix(seq, length(seq) - idx);
+							
+							if(m_format == FASTQ)
+							assignValue(quals, i, prefix(value(quals, i), length(value(quals, i)) - idx));
 						}
 						
-						if(m_qtrim != QOFF && ! m_qtrimPostRm){
-							
-							if(qualTrim(rseq, qual, m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
+						if(m_format == FASTQ && m_qtrim != QOFF && ! m_qtrimPostRm){
+							if(qualTrim(seq, value(quals, i), m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
 						}
 					}
 					
-					if(m_switch2Fasta) seqRead = new SeqRead<TSeqStr, TString>(rseq, tag);
-					else               seqRead = new SeqRead<TSeqStr, TString>(rseq, tag, qual);
+					if(m_format == FASTA || m_switch2Fasta){
+						TSeqRead seqRead = TSeqRead(seq, id);
+						appendValue(seqReads, seqRead);
+					}else{
+						TSeqRead seqRead = TSeqRead(seq, id, value(quals, i));
+						appendValue(seqReads, seqRead);
+					}
 					
-					++m_nrReads;
 				}
+				m_nrReads += length(ids);
 				
-				return seqRead;
+				return length(ids);
 			}
 			catch(seqan::Exception const &e){
 				cerr << "\n\n" << "ERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
@@ -220,8 +182,8 @@ public:
 			}
 		}
 		
-		// end of stream
-		else return NULL;
+		// end of file
+		else return 0;
 	}
 	
 	
@@ -242,14 +204,6 @@ public:
 		}
 		
 		return(n > m_maxUncalled);
-	}
- 	
-	
-	// tbb filter operator
-	void* operator()(void*){
-		
-		bool isUncalled = false;
-		return getRead(isUncalled);
 	}
 	
 };
