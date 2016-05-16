@@ -8,12 +8,12 @@
 
 
 template <typename TSeqStr, typename TString>
-class LoadFasta : public tbb::filter{
+class LoadFasta {
 
 private:
 	
 	std::ostream *out;
-	tbb::concurrent_vector<flexbar::TBar> adapters;
+	tbb::concurrent_vector<flexbar::TBar> bars;
 	
 	bool m_revComp, m_isAdapter;
 	
@@ -21,7 +21,6 @@ public:
 	
 	LoadFasta(const Options &o, const bool isAdapter) :
 		
-		filter(serial),
 		out(o.out),
 		m_isAdapter(isAdapter){
 			
@@ -32,20 +31,31 @@ public:
 	virtual ~LoadFasta(){};
 	
 	
-	void* operator()(void* item){
+	void loadSequences(const std::string filePath){
 		
 		using namespace std;
 		using namespace flexbar;
 		
-		SeqRead<TSeqStr, TString> *seqRead = static_cast< SeqRead<TSeqStr, TString>* >(item);
-		SeqRead<TSeqStr, TString> *seqReadRC;
+		seqan::SeqFileIn seqFileIn;
 		
-		TString tag = seqRead->tag;
+		setFormat(seqFileIn, seqan::Fasta());
 		
-		if(adapters.size() < 1000){
-			for(int i = 0; i < adapters.size(); ++i){
+		if(! open(seqFileIn, filePath.c_str())){
+			cerr << "ERROR: Could not open file: " << filePath << "\n" << endl;
+			exit(1);
+		}
+		
+		TSeqStrs seqs;
+		TStrings ids;
+		
+		try{
+			readRecords(ids, seqs, seqFileIn);
+			
+			map<TString, short> idMap;
+			
+			for(unsigned int i = 0; i < length(ids); ++i){
 				
-				if(tag == adapters.at(i).first->tag){
+				if(idMap.count(ids[i]) == 1){
 					cerr << "Two ";
 					
 					if(m_isAdapter) cerr << "adapters";
@@ -53,46 +63,55 @@ public:
 					
 					cerr << " have the same name.\n";
 					cerr << "Please use unique names and restart.\n" << endl;
-					
 					exit(1);
+				}
+				else idMap[ids[i]] = 1;
+				
+				TSeqRead *seqRead, *seqReadRC;
+				
+				seqRead = new TSeqRead(seqs[i], ids[i]);
+				
+				TBar bar;
+				bar.first = seqRead;
+				bars.push_back(bar);
+				
+				if(m_revComp){
+					TSeqStr seq = seqs[i];
+					TString  id =  ids[i];
+					
+					append(id, " revcomp");
+					seqan::reverseComplement(seq);
+					
+					seqReadRC = new TSeqRead(seq, id);
+					
+					TBar barRC;
+					barRC.first = seqReadRC;
+					bars.push_back(barRC);
 				}
 			}
 		}
-		
-		if(m_revComp){
-			TSeqStr seq = seqRead->seq;
-			seqan::reverseComplement(seq);
-			
-			append(tag, " revcomp");
-			
-			seqReadRC = new SeqRead<TSeqStr, TString>(seq, tag);
+		catch(seqan::Exception const &e){
+			cerr << "\n\n" << "ERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
+			close(seqFileIn);
+			exit(1);
 		}
 		
-		TBar adap;
-		adap.first = seqRead;
-		adapters.push_back(adap);
-		
-		if(m_revComp){
-			TBar adapRC;
-			adapRC.first = seqReadRC;
-			adapters.push_back(adapRC);
-		}
-		
-		return NULL;
+		close(seqFileIn);
 	};
 	
 	
-	tbb::concurrent_vector<flexbar::TBar> getAdapters(){
-		return adapters;
+	tbb::concurrent_vector<flexbar::TBar> getBars(){
+		return bars;
 	}
 	
 	
-	void setAdapters(tbb::concurrent_vector<flexbar::TBar> &adapterVec){
-		adapters = adapterVec;
+	void setBars(tbb::concurrent_vector<flexbar::TBar> &newBars){
+		bars = newBars;
 	}
 	
 	
-	void printAdapters(std::string adapterName) const {
+	void printBars(std::string adapterName) const {
+		
 		using namespace std;
 		
 		const unsigned int maxSpaceLen = 23;
@@ -104,15 +123,15 @@ public:
 		
 		*out << adapterName << ":" << string(maxSpaceLen - len, ' ') << "Sequence:" << "\n";
 		
-		for(unsigned int i=0; i < adapters.size(); ++i){
-			TString seqTag = adapters.at(i).first->tag;
+		for(unsigned int i=0; i < bars.size(); ++i){
+			TString seqTag = bars.at(i).first->tag;
 			
 			int whiteSpaceLen = maxSpaceLen - length(seqTag);
 			if(whiteSpaceLen < 2) whiteSpaceLen = 2;
 			
 			string whiteSpace = string(whiteSpaceLen, ' ');
 			
-			*out << seqTag << whiteSpace << adapters.at(i).first->seq << "\n";
+			*out << seqTag << whiteSpace << bars.at(i).first->seq << "\n";
 		}
 		*out << endl;
 	}

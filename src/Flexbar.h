@@ -35,36 +35,28 @@ void loadBarcodes(Options &o, const bool secondSet){
 	using namespace std;
 	using namespace flexbar;
 	
-	if(o.barDetect != BOFF){
-		tbb::task_scheduler_init init_serial(1);
-		tbb::pipeline bpipeline;
+	string barFile = secondSet ? o.barcode2File : o.barcodeFile;
+	
+	LoadFasta<TSeqStr, TString> lf(o, false);
+	
+	lf.loadSequences(barFile);
+	
+	if(secondSet){
+		o.barcodes2 = lf.getBars();
+		lf.printBars("Barcode2");
 		
-		string barFile = secondSet ? o.barcode2File : o.barcodeFile;
-		
-		SeqInput<TSeqStr, TString> inputFilter(o, barFile, true, false, false);
-		bpipeline.add_filter(inputFilter);
-		
-		LoadFasta<TSeqStr, TString> adapterLoader(o, false);
-		bpipeline.add_filter(adapterLoader);
-		bpipeline.run(1);
-		
-		if(secondSet){
-			o.barcodes2 = adapterLoader.getAdapters();
-			adapterLoader.printAdapters("Barcode2");
-
-			if(o.barcodes2.size() == 0){
-				cerr << "No barcodes found in file!\n" << endl;
-				exit(1);
-			}
+		if(o.barcodes2.size() == 0){
+			cerr << "No barcodes found in file.\n" << endl;
+			exit(1);
 		}
-		else{
-			o.barcodes = adapterLoader.getAdapters();
-			adapterLoader.printAdapters("Barcode");
+	}
+	else{
+		o.barcodes = lf.getBars();
+		lf.printBars("Barcode");
 
-			if(o.barcodes.size() == 0){
-				cerr << "No barcodes found in file!\n" << endl;
-				exit(1);
-			}
+		if(o.barcodes.size() == 0){
+			cerr << "No barcodes found in file.\n" << endl;
+			exit(1);
 		}
 	}
 }
@@ -72,70 +64,62 @@ void loadBarcodes(Options &o, const bool secondSet){
 
 template <typename TSeqStr, typename TString>
 void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
-	
+
 	using namespace std;
 	using namespace flexbar;
 	
-	if(o.adapRm != AOFF){
+	LoadFasta<TSeqStr, TString> lf(o, true);
+	
+	if(useAdapterFile){
 		
-		LoadFasta<TSeqStr, TString> adapterLoader(o, true);
+		string adapFile = secondSet ? o.adapter2File : o.adapterFile;
 		
-		if(useAdapterFile){
-			tbb::task_scheduler_init init_serial(1);
-			tbb::pipeline prepipe;
+		lf.loadSequences(adapFile);
+		
+		if(secondSet){
+			o.adapters2 = lf.getBars();
 			
-			string adapFile = secondSet ? o.adapter2File : o.adapterFile;
-			
-			SeqInput<TSeqStr, TString> inputFilter(o, adapFile, true, false, false);
-			prepipe.add_filter(inputFilter);
-			prepipe.add_filter(adapterLoader);
-			prepipe.run(1);
-			
-			if(secondSet){
-				o.adapters2 = adapterLoader.getAdapters();
-
-				if(o.adapters2.size() == 0){
-					cerr << "No adapters found in file!\n" << endl;
-					exit(1);
-				}
-			}
-			else{
-				o.adapters = adapterLoader.getAdapters();
-
-				if(o.adapters.size() == 0){
-					cerr << "No adapters found in file!\n" << endl;
-					exit(1);
-				}
+			if(o.adapters2.size() == 0){
+				cerr << "No adapters found in file.\n" << endl;
+				exit(1);
 			}
 		}
 		else{
-			TSeqStr adapterSeq = o.adapterSeq;
+			o.adapters = lf.getBars();
 			
-			SeqRead<TSeqStr, TString> *seqRead;
-			seqRead = new SeqRead<TSeqStr, TString>(adapterSeq, "cmdline");
-			
-			TBar adap;
-			adap.first = seqRead;
-			o.adapters.push_back(adap);
-			
-			if(o.revCompAdapter){
-				TSeqStr adapterSeqRC = o.adapterSeq;
-				seqan::reverseComplement(adapterSeqRC);
-				
-				SeqRead<TSeqStr, TString> *seqReadRC;
-				seqReadRC = new SeqRead<TSeqStr, TString>(adapterSeqRC, "cmdline revcomp");
-				
-				TBar adapRC;
-				adapRC.first = seqReadRC;
-				o.adapters.push_back(adapRC);
+			if(o.adapters.size() == 0){
+				cerr << "No adapters found in file.\n" << endl;
+				exit(1);
 			}
+		}
+	}
+	else{
+		TSeqStr adapterSeq = o.adapterSeq;
+		
+		SeqRead<TSeqStr, TString> *seqRead;
+		seqRead = new SeqRead<TSeqStr, TString>(adapterSeq, "cmdline");
+		
+		TBar bar;
+		bar.first = seqRead;
+		o.adapters.push_back(bar);
+		
+		if(o.revCompAdapter){
+			TSeqStr adapterSeqRC = o.adapterSeq;
+			seqan::reverseComplement(adapterSeqRC);
 			
-			adapterLoader.setAdapters(o.adapters);
+			SeqRead<TSeqStr, TString> *seqReadRC;
+			seqReadRC = new SeqRead<TSeqStr, TString>(adapterSeqRC, "cmdline revcomp");
+			
+			TBar barRC;
+			barRC.first = seqReadRC;
+			o.adapters.push_back(barRC);
 		}
 		
-		if(secondSet) adapterLoader.printAdapters("Adapter2");
-		else          adapterLoader.printAdapters("Adapter");
+		lf.setBars(o.adapters);
 	}
+	
+	if(secondSet) lf.printBars("Adapter2");
+	else          lf.printBars("Adapter");
 }
 
 
@@ -145,15 +129,19 @@ void loadBarcodesAndAdapters(Options &o){
 	using namespace std;
 	using namespace flexbar;
 	
-	loadBarcodes<TSeqStr, TString>(o, false);
+	if(o.barDetect != BOFF){
+		loadBarcodes<TSeqStr, TString>(o, false);
+		
+		if(o.barDetect == WITHIN_READ2 || o.barDetect == WITHIN_READ_REMOVAL2)
+		loadBarcodes<TSeqStr, TString>(o, true);
+	}
 	
-	if(o.barDetect == WITHIN_READ2 || o.barDetect == WITHIN_READ_REMOVAL2)
-	loadBarcodes<TSeqStr, TString>(o, true);
-	
-	loadAdapters<TSeqStr, TString>(o, false, o.useAdapterFile);
-	
-	if(o.adapRm == NORMAL2)
-	loadAdapters<TSeqStr, TString>(o, true, true);
+	if(o.adapRm != AOFF){
+		loadAdapters<TSeqStr, TString>(o, false, o.useAdapterFile);
+		
+		if(o.adapRm == NORMAL2)
+		loadAdapters<TSeqStr, TString>(o, true, true);
+	}
 }
 
 
