@@ -94,24 +94,18 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 		}
 	}
 	else{
-		TSeqStr adapterSeq = o.adapterSeq;
-		
-		SeqRead<TSeqStr, TString> *seqRead;
-		seqRead = new SeqRead<TSeqStr, TString>(adapterSeq, "cmdline");
-		
 		TBar bar;
-		bar.first = seqRead;
+		bar.id  = "cmdline";
+		bar.seq = o.adapterSeq;
 		o.adapters.push_back(bar);
 		
 		if(o.revCompAdapter){
 			TSeqStr adapterSeqRC = o.adapterSeq;
 			seqan::reverseComplement(adapterSeqRC);
 			
-			SeqRead<TSeqStr, TString> *seqReadRC;
-			seqReadRC = new SeqRead<TSeqStr, TString>(adapterSeqRC, "cmdline revcomp");
-			
 			TBar barRC;
-			barRC.first = seqReadRC;
+			barRC.id  = "cmdline revcomp";
+			barRC.seq = adapterSeqRC;
 			o.adapters.push_back(barRC);
 		}
 		

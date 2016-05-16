@@ -14,9 +14,10 @@ template <typename TSeqStr, typename TString>
 class SeqRead {
 	
 	public:
-	
 	TSeqStr seq;
 	TString tag, qual;
+	
+	SeqRead(){}
 	
 	SeqRead(const TSeqStr& sequence, const TString& seqTag) :
 		seq(sequence),
@@ -28,8 +29,6 @@ class SeqRead {
 		tag(seqTag),
 		qual(quality){
 	}
-	
-	virtual ~SeqRead(){}
 };
 
 
@@ -55,22 +54,6 @@ class PairedRead {
 		delete r2;
 		delete b;
 	}
-};
-
-
-template <typename TSeqStr, typename TString>
-class Bar {
-	
-	typedef SeqRead<TSeqStr, TString> TSeqRead;
-	
-	public:
-	TSeqRead seqRead;
-	unsigned long rmOvl, rmFull;
-	
-	Bar() :
-		rmOvl(0),
-		rmFull(0){
-    }
 };
 
 
@@ -118,9 +101,20 @@ namespace flexbar{
 	typedef std::vector<TAlignments>                    TAlignBundle;
 	typedef std::vector<PairedRead<FSeqStr, FString>* > TPairedReadBundle;
 	
-	typedef tbb::atomic<unsigned long> TAtomicUlong;
 	
-	typedef std::pair< SeqRead<FSeqStr, FString>*, std::pair<TAtomicUlong, TAtomicUlong> > TBar;
+	class TBar {
+		
+		public:
+		FString id;
+		FSeqStr seq;
+		
+		tbb::atomic<unsigned long> rmOverlap, rmFull;
+		
+		TBar() :
+			rmOverlap(0),
+			rmFull(0){
+	    }
+	};
 	
 	
    	enum ComputeCycle {

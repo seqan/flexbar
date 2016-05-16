@@ -93,7 +93,7 @@ public:
 			
 			for(unsigned int i = 0; i < m_queries->size(); ++i){
 				
-				TSeqStr &qseq = m_queries->at(i).first->seq;
+				TSeqStr &qseq = m_queries->at(i).seq;
 				TSeqStr *rseq;
 				
 				rseq = &seqRead.seq;
@@ -136,7 +136,7 @@ public:
 			// global sequence alignment
 			algo->alignGlobal(a, alignments, cycle, idxAl++);
 			
-			a.queryLength = length(m_queries->at(i).first->seq);
+			a.queryLength = length(m_queries->at(i).seq);
 			a.tailLength  = (m_tailLength > 0) ? m_tailLength : a.queryLength;
 			
 			a.overlapLength = a.endPos - a.startPos;
@@ -230,17 +230,17 @@ public:
 				++m_modified;
 				
 				// count number of removals for each query
-				m_queries->at(qIndex).second.first++;
+				m_queries->at(qIndex).rmOverlap++;
 				
 				if(am->overlapLength == am->queryLength)
-				m_queries->at(qIndex).second.second++;
+				m_queries->at(qIndex).rmFull++;
 				
 				if(m_writeTag){
 					append(seqRead.tag, "_Flexbar_removal");
 					
 					if(! m_isBarcoding){
 						append(seqRead.tag, "_");
-						append(seqRead.tag, m_queries->at(qIndex).first->tag);
+						append(seqRead.tag, m_queries->at(qIndex).id);
 					}
 				}
 				
@@ -270,7 +270,7 @@ public:
 				}
 				else s << "Sequence detection, no removal:\n";
 				
-				s << "  query tag        " << m_queries->at(qIndex).first->tag       << "\n"
+				s << "  query tag        " << m_queries->at(qIndex).id      << "\n"
 				  << "  read tag         " << seqRead.tag                            << "\n"
 				  << "  read seq         " << seqRead.seq                            << "\n"
 				  << "  read pos         " << am->startPosS << "-" << am->endPosS    << "\n"
@@ -292,7 +292,7 @@ public:
 			else if(m_log == TAB){
 				
 				stringstream s;
-				s << seqRead.tag    << "\t" << m_queries->at(qIndex).first->tag                   << "\t"
+				s << seqRead.tag    << "\t" << m_queries->at(qIndex).id                  << "\t"
 				  << am->startPosA  << "\t" << am->endPosA           << "\t" << am->overlapLength << "\t"
 				  << am->mismatches << "\t" << am->gapsR + am->gapsA << "\t" << am->allowedErrors << endl;
 				*m_out << s.str();

@@ -89,11 +89,11 @@ public:
 					int idxB1 = i % m_barcodes->size();
 					int idxB2 = div(i, m_barcodes->size()).quot;
 					
-					TString barcode = m_barcodes->at(idxB1).first->tag;
+					TString barcode = m_barcodes->at(idxB1).id;
 					
 					if(m_twoBarcodes){
 						append(barcode, "-");
-						append(barcode, m_barcodes2->at(idxB2).first->tag);
+						append(barcode, m_barcodes2->at(idxB2).id);
 					}
 					
 					TString barcode1 = barcode;
@@ -206,7 +206,7 @@ public:
 				
 				for(int i = 0; i < m_barcodes->size(); ++i){
 					
-					TString barcode = m_barcodes->at(i).first->tag;
+					TString barcode = m_barcodes->at(i).id;
 					
 					stringstream ss;
 					ss << m_target << "_barcode_" << barcode << toFormatStr(m_format);
@@ -469,14 +469,14 @@ public:
 		
 		for(unsigned int i = 0; i < adapters->size(); i++){
 			
-			TString seqTag = adapters->at(i).first->tag;
+			TString seqTag = adapters->at(i).id;
 			
 			int wsLen = maxSpaceLen - length(seqTag);
 			if(wsLen < 2) wsLen = 2;
 			string whiteSpace = string(wsLen, ' ');
 			
-			unsigned long nAdapOvl  = adapters->at(i).second.first;
-			unsigned long nAdapFull = adapters->at(i).second.second;
+			unsigned long nAdapOvl  = adapters->at(i).rmOverlap;
+			unsigned long nAdapFull = adapters->at(i).rmFull;
 			
 			stringstream ss;  ss << nAdapOvl;
 			

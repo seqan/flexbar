@@ -67,12 +67,9 @@ public:
 				}
 				else idMap[ids[i]] = 1;
 				
-				TSeqRead *seqRead, *seqReadRC;
-				
-				seqRead = new TSeqRead(seqs[i], ids[i]);
-				
 				TBar bar;
-				bar.first = seqRead;
+				bar.id  =  ids[i];
+				bar.seq = seqs[i];
 				bars.push_back(bar);
 				
 				if(m_revComp){
@@ -82,10 +79,9 @@ public:
 					append(id, " revcomp");
 					seqan::reverseComplement(seq);
 					
-					seqReadRC = new TSeqRead(seq, id);
-					
 					TBar barRC;
-					barRC.first = seqReadRC;
+					barRC.id  = id;
+					barRC.seq = seq;
 					bars.push_back(barRC);
 				}
 			}
@@ -124,14 +120,14 @@ public:
 		*out << adapterName << ":" << string(maxSpaceLen - len, ' ') << "Sequence:" << "\n";
 		
 		for(unsigned int i=0; i < bars.size(); ++i){
-			TString seqTag = bars.at(i).first->tag;
+			TString seqTag = bars.at(i).id;
 			
 			int whiteSpaceLen = maxSpaceLen - length(seqTag);
 			if(whiteSpaceLen < 2) whiteSpaceLen = 2;
 			
 			string whiteSpace = string(whiteSpaceLen, ' ');
 			
-			*out << seqTag << whiteSpace << bars.at(i).first->seq << "\n";
+			*out << seqTag << whiteSpace << bars.at(i).seq << "\n";
 		}
 		*out << endl;
 	}
