@@ -24,9 +24,9 @@
 #include "FlexbarIO.h"
 #include "LoadFasta.h"
 #include "SeqInput.h"
-#include "PairedInputFilter.h"
-#include "PairedOutputFilter.h"
-#include "PairedAlignFilter.h"
+#include "PairedInput.h"
+#include "PairedOutput.h"
+#include "PairedAlign.h"
 
 
 template <typename TSeqStr, typename TString>
@@ -211,9 +211,9 @@ void startProcessing(Options &o){
 	
 	if(o.logAlign != NONE) *out << "\n\nAlignment " << o.logAlignStr << " logging:\n\n" << endl;
 	
-	PairedInputFilter<TSeqStr, TString>  inputFilter(o);
-	PairedAlignFilter<TSeqStr, TString>  alignFilter(o);
-	PairedOutputFilter<TSeqStr, TString> outputFilter(o);
+	PairedInput<TSeqStr, TString>  inputFilter(o);
+	PairedAlign<TSeqStr, TString>  alignFilter(o);
+	PairedOutput<TSeqStr, TString> outputFilter(o);
 	
 	tbb::task_scheduler_init init_serial(o.nThreads);
 	tbb::pipeline pipe;

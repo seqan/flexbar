@@ -1,11 +1,11 @@
 /*
- *   PairedOutputFilter.h
+ *   PairedOutput.h
  *
  *   Authors: mat and jtr
  */
 
-#ifndef FLEXBAR_PAIREDOUTPUTFILTER_H
-#define FLEXBAR_PAIREDOUTPUTFILTER_H
+#ifndef FLEXBAR_PAIREDOUTPUT_H
+#define FLEXBAR_PAIREDOUTPUT_H
 
 #include "SeqOutput.h"
 #include "SeqOutputFiles.h"
@@ -13,7 +13,7 @@
 
 
 template <typename TSeqStr, typename TString>
-class PairedOutputFilter : public tbb::filter {
+class PairedOutput : public tbb::filter {
 
 private:
 	
@@ -42,7 +42,7 @@ private:
 	
 public:
 	
-	PairedOutputFilter(Options &o) :
+	PairedOutput(Options &o) :
 		
 		filter(serial_in_order),
 		m_target(o.targetName),
@@ -228,7 +228,7 @@ public:
 	}
 	
 	
-	virtual ~PairedOutputFilter(){
+	virtual ~PairedOutput(){
 		delete[] m_outMap;
 	};
 	

@@ -1,17 +1,17 @@
 /*
- *   PairedInputFilter.h
+ *   PairedInput.h
  *
  *   Authors: mat and jtr
  */
 
-#ifndef FLEXBAR_PAIREDINPUTFILTER_H
-#define FLEXBAR_PAIREDINPUTFILTER_H
+#ifndef FLEXBAR_PAIREDINPUT_H
+#define FLEXBAR_PAIREDINPUT_H
 
 #include "SeqInput.h"
 
 
 template <typename TSeqStr, typename TString>
-class PairedInputFilter : public tbb::filter {
+class PairedInput : public tbb::filter {
 
 private:
 	
@@ -24,7 +24,7 @@ private:
 	
 public:
 	
-	PairedInputFilter(const Options &o) :
+	PairedInput(const Options &o) :
 		
 		filter(serial_in_order),
 		m_useNumberTag(o.useNumberTag),
@@ -51,7 +51,7 @@ public:
 	}
 	
 	
-	virtual ~PairedInputFilter(){
+	virtual ~PairedInput(){
 		delete m_f1;
 		delete m_f2;
 		delete m_b;

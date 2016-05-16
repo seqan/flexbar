@@ -1,18 +1,18 @@
 /*
- *   PairedAlignFilter.h
+ *   PairedAlign.h
  *
  *   Authors: mat and jtr
  */
 
-#ifndef FLEXBAR_PAIREDALIGNFILTER_H
-#define FLEXBAR_PAIREDALIGNFILTER_H
+#ifndef FLEXBAR_PAIREDALIGN_H
+#define FLEXBAR_PAIREDALIGN_H
 
 #include "SeqAlign.h"
-#include "SeqAlignAlgorithm.h"
+#include "SeqAlignAlgo.h"
 
 
 template <typename TSeqStr, typename TString>
-class PairedAlignFilter : public tbb::filter {
+class PairedAlign : public tbb::filter {
 
 private:
 	
@@ -28,14 +28,14 @@ private:
 	tbb::concurrent_vector<flexbar::TBar> *m_adapters, *m_adapters2;
 	tbb::concurrent_vector<flexbar::TBar> *m_barcodes, *m_barcodes2;
 	
-	typedef SeqAlign<TSeqStr, TString, SeqAlignAlgorithm<TSeqStr> > TAlignFilter;
+	typedef SeqAlign<TSeqStr, TString, SeqAlignAlgo<TSeqStr> > TAlignFilter;
 	TAlignFilter *m_afilter, *m_bfilter, *m_a2filter, *m_b2filter;
 	
 	std::ostream *out;
 	
 public:
 	
-	PairedAlignFilter(Options &o) :
+	PairedAlign(Options &o) :
 		
 		filter(parallel),
 		m_log(o.logAlign),
@@ -64,7 +64,7 @@ public:
 	}
 	
 	
-	virtual ~PairedAlignFilter(){
+	virtual ~PairedAlign(){
 		delete m_bfilter;
 		delete m_afilter;
 		delete m_b2filter;

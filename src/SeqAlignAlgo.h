@@ -1,14 +1,14 @@
 /*
- *   SeqAlignAlgorithm.h
+ *   SeqAlignAlgo.h
  *
  */
 
-#ifndef FLEXBAR_SEQALIGNALGORITHM_H
-#define FLEXBAR_SEQALIGNALGORITHM_H
+#ifndef FLEXBAR_SEQALIGNALGO_H
+#define FLEXBAR_SEQALIGNALGO_H
 
 
 template <typename TSeqStr>
-class SeqAlignAlgorithm {
+class SeqAlignAlgo {
 
 private:
 	
@@ -30,7 +30,7 @@ private:
 	
 public:
 	
-	SeqAlignAlgorithm(const Options &o, const int match, const int mismatch, const int gapCost, const flexbar::TrimEnd trimEnd):
+	SeqAlignAlgo(const Options &o, const int match, const int mismatch, const int gapCost, const flexbar::TrimEnd trimEnd):
 			m_randTag(o.randTag),
 			m_log(o.logAlign),
 			m_trimEnd(trimEnd){
@@ -53,7 +53,7 @@ public:
 	};
 	
 	
-	virtual ~SeqAlignAlgorithm(){
+	virtual ~SeqAlignAlgo(){
 	};
 	
 	
