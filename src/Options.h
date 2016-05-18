@@ -296,7 +296,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	setDefaultValue(parser, "target",          "flexbarOut");
 	setDefaultValue(parser, "threads",         "1");
-	setDefaultValue(parser, "bundle",          "16");
+	setDefaultValue(parser, "bundle",          "256");
 	setDefaultValue(parser, "max-uncalled",    "0");
 	setDefaultValue(parser, "min-read-length", "18");
 	
@@ -454,7 +454,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	*out << "Number of threads:     " << o.nThreads << endl;
 	
 	getOptionValue(o.bundleSize, parser, "bundle");
-	*out << "Reads per bundle:      " << o.bundleSize << endl << endl;
+	*out << "Fragments per bundle:  " << o.bundleSize << endl << endl;
 	
 	getOptionValue(o.targetName, parser, "target");
 	*out << "Target name:           " << o.targetName << endl;
