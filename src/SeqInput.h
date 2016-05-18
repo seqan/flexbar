@@ -30,7 +30,7 @@ private:
 	
 public:
 	
-	SeqInput(const Options &o, const std::string filePath, const bool fastaFormat, const bool preProcess, const bool useStdin) :
+	SeqInput(const Options &o, const std::string filePath, const bool preProcess, const bool useStdin) :
 		
 		m_preProcess(preProcess),
 		m_useStdin(useStdin),
@@ -50,50 +50,29 @@ public:
 		
 		using namespace std;
 		
-		if(fastaFormat){
-			m_format = flexbar::FASTA;
-		}
-		else if(m_switch2Fasta){
-			m_format = flexbar::FASTQ;
-		}
+		if(m_switch2Fasta) m_format = flexbar::FASTQ;
 		
 		if(m_useStdin){
-			if(!open(seqFileIn, cin)){
+			if(! open(seqFileIn, cin)){
 				cerr << "ERROR: Could not open input stream.\n" << endl;
 				exit(1);
 			}
 		}
 		else{
-			if(!open(seqFileIn, filePath.c_str())){
+			if(! open(seqFileIn, filePath.c_str())){
 				cerr << "ERROR: Could not open file: " << filePath << "\n" << endl;
 				exit(1);
 			}
 		}
 	};
 	
-	
 	virtual ~SeqInput(){
 		close(seqFileIn);
 	};
 	
 	
-	unsigned long getNrLowPhredReads() const {
-		return m_nLowPhred;
-	}
-	
-	
-	unsigned long getNrProcessedReads() const {
-		return m_nrReads;
-	}
-	
-	
-	unsigned long getNrProcessedChars() const {
-		return m_nrChars;
-	}
-	
-	
-	// returns SeqRead or NULL if end of file
-	void* getRead(bool &isUncalled){
+	// returns number of read SeqReads
+	unsigned int getSeqReads(seqan::StringSet<bool> &uncalled, flexbar::TSeqReads &seqReads, const unsigned int nReads){
 		
 		using namespace std;
 		using namespace flexbar;
@@ -102,146 +81,128 @@ public:
 		using seqan::suffix;
 		using seqan::length;
 		
-		SeqRead<TSeqStr, TString> *seqRead = NULL;
-		
-		if(! atEnd(seqFileIn)){
-			
-			isUncalled = false;
-			
-			try{
+		try{
+			if(! atEnd(seqFileIn)){
+				
+				TSeqStrs seqs;
+				TStrings ids, quals;
+				
+				reserve(ids,      nReads);
+				reserve(seqs,     nReads);
+				reserve(uncalled, nReads);
+				
 				if(m_format == FASTA){
-					
-					TSeqStr rseq;
-					TString tag;
-					
-					readRecord(tag, rseq, seqFileIn);
-					
-					if(length(tag) < 1){
-						cerr << "\n\n" << "ERROR: Read without name in input.\n" << endl;
-						close(seqFileIn);
-						exit(1);
-					}
-					if(length(rseq) < 1){
-						cerr << "\n\n" << "ERROR: Read without sequence in input.\n" << endl;
-						close(seqFileIn);
-						exit(1);
-					}
-					
-					m_nrChars += length(rseq);
-					
-					
-					if(m_preProcess){
-						isUncalled = isUncalledSequence(rseq);
-						
-						if(m_preTrimBegin > 0 && length(rseq) > 1){
-							
-							int idx = m_preTrimBegin;
-							if(idx >= length(rseq)) idx = length(rseq) - 1;
-							
-							erase(rseq, 0, idx);
-						}
-						
-						if(m_preTrimEnd > 0 && length(rseq) > 1){
-							
-							int idx = m_preTrimEnd;
-							if(idx >= length(rseq)) idx = length(rseq) - 1;
-							
-							rseq = prefix(rseq, length(rseq) - idx);
-						}
-					}
-					
-					seqRead = new SeqRead<TSeqStr, TString>(rseq, tag);
-					
-					++m_nrReads;
+					readRecords(ids, seqs, seqFileIn, nReads);
+				}
+				else{
+					reserve(quals, nReads);
+					readRecords(ids, seqs, quals, seqFileIn, nReads);
 				}
 				
-				else{  // fastq
+				for(unsigned int i = 0; i < length(ids); ++i){
 					
-					TSeqStr rseq;
-					TString qual, tag;
+					TString &id  =  ids[i];
+					TSeqStr &seq = seqs[i];
 					
-					readRecord(tag, rseq, qual, seqFileIn);
-					
-					if(length(tag) < 1){
-						cerr << "\n\n" << "ERROR: Read without name in input.\n" << endl;
+					if(length(id) < 1){
+						cerr << "\n\n" << "ERROR: read without name in input.\n" << endl;
 						close(seqFileIn);
 						exit(1);
 					}
-					if(length(rseq) < 1){
-						cerr << "\n\n" << "ERROR: Read without sequence in input.\n" << endl;
+					if(length(seq) < 1){
+						cerr << "\n\n" << "ERROR: read without sequence in input.\n" << endl;
 						close(seqFileIn);
 						exit(1);
 					}
 					
-					m_nrChars += length(rseq);
+					m_nrChars += length(seq);
 					
+					appendValue(uncalled, isUncalledSequence(seq));
 					
 					if(m_preProcess){
-						isUncalled = isUncalledSequence(rseq);
 						
-						if(m_preTrimBegin > 0 && length(rseq) > 1){
+						if(m_preTrimBegin > 0 && length(seq) > 1){
 							
 							int idx = m_preTrimBegin;
-							if(idx >= length(rseq)) idx = length(rseq) - 1;
+							if(idx >= length(seq)) idx = length(seq) - 1;
 							
-							erase(rseq, 0, idx);
-							erase(qual, 0, idx);
+							erase(seq, 0, idx);
+							
+							if(m_format == FASTQ)
+							erase(quals[i], 0, idx);
 						}
-						
-						if(m_preTrimEnd > 0 && length(rseq) > 1){
+						if(m_preTrimEnd > 0 && length(seq) > 1){
 							
 							int idx = m_preTrimEnd;
-							if(idx >= length(rseq)) idx = length(rseq) - 1;
+							if(idx >= length(seq)) idx = length(seq) - 1;
 							
-							rseq = prefix(rseq, length(rseq) - idx);
-							qual = prefix(qual, length(qual) - idx);
+							seq = prefix(seq, length(seq) - idx);
+							
+							if(m_format == FASTQ)
+							quals[i] = prefix(quals[i], length(quals[i]) - idx);
 						}
-						
-						if(m_qtrim != QOFF && ! m_qtrimPostRm){
-							
-							if(qualTrim(rseq, qual, m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
+						if(m_format == FASTQ && m_qtrim != QOFF && ! m_qtrimPostRm){
+							if(qualTrim(seq, quals[i], m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
 						}
 					}
 					
-					if(m_switch2Fasta) seqRead = new SeqRead<TSeqStr, TString>(rseq, tag);
-					else               seqRead = new SeqRead<TSeqStr, TString>(rseq, tag, qual);
+					TSeqRead *seqRead;
 					
-					++m_nrReads;
+					if(m_format == FASTA || m_switch2Fasta){
+						seqRead = new TSeqRead(seq, id);
+						seqReads.push_back(seqRead);
+					}
+					else{
+						seqRead = new TSeqRead(seq, id, quals[i]);
+						seqReads.push_back(seqRead);
+					}
 				}
+				m_nrReads += length(ids);
 				
-				return seqRead;
+				return length(ids);
 			}
-			catch(seqan::Exception const &e){
-				cerr << "\n\n" << "ERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
-				close(seqFileIn);
-				exit(1);
-			}
+			
+			else return 0;  // end of file
 		}
-		
-		// end of stream
-		else return NULL;
+		catch(seqan::Exception const &e){
+			cerr << "\n\n" << "ERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
+			close(seqFileIn);
+			exit(1);
+		}
 	}
 	
 	
 	// returns TRUE if read contains too many uncalled bases
 	bool isUncalledSequence(TSeqStr &seq){
-		int n = 0;
 		
 		using namespace seqan;
 		
-		typename Iterator<TSeqStr >::Type it, itEnd;
+		typename Iterator<TSeqStr>::Type it, itEnd;
 		
 		it    = begin(seq);
 		itEnd = end(seq);
+		int n = 0;
 		
 		while(it != itEnd){
 			 if(*it == 'N') n++;
 			 ++it;
 		}
-		
 		return(n > m_maxUncalled);
 	}
- 	
+	
+	
+	unsigned long getNrLowPhredReads() const {
+		return m_nLowPhred;
+	}
+	
+	unsigned long getNrProcessedReads() const {
+		return m_nrReads;
+	}
+	
+	unsigned long getNrProcessedChars() const {
+		return m_nrChars;
+	}
+	
 };
 
 #endif

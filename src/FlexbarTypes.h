@@ -17,7 +17,7 @@ class SeqRead {
 	TSeqStr seq;
 	TString tag, qual;
 	
-	SeqRead(){}
+	// SeqRead(){}
 	
 	SeqRead(const TSeqStr& sequence, const TString& seqTag) :
 		seq(sequence),
@@ -87,8 +87,10 @@ namespace flexbar{
 	typedef SeqRead<FSeqStr, FString>    TSeqRead;
 	typedef PairedRead<FSeqStr, FString> TPairedRead;
 	
-	typedef seqan::StringSet<TSeqRead,    seqan::Dependent<seqan::Tight> > TSeqReads;
-	typedef seqan::StringSet<TPairedRead, seqan::Dependent<seqan::Tight> > TPairedReads;
+	typedef std::vector<TSeqRead* > TSeqReads;
+	// typedef seqan::StringSet<TSeqRead> TSeqReads;
+	// typedef seqan::StringSet<TSeqRead,    seqan::Dependent<seqan::Tight> > TSeqReads;
+	// typedef seqan::StringSet<TPairedRead, seqan::Dependent<seqan::Tight> > TPairedReads;
 	
 	typedef seqan::Align<FSeqStr, seqan::ArrayGaps> TAlign;
 	typedef seqan::StringSet<TAlign>                TAlignSet;
