@@ -68,7 +68,7 @@ public:
 	};
 	
 	
-	int alignSeqRead(void* item, const bool performRemoval, flexbar::TAlignments &alignments, flexbar::ComputeCycle cycle, unsigned int &idxAl){
+	int alignSeqRead(flexbar::TSeqRead* sr, const bool performRemoval, flexbar::TAlignments &alignments, flexbar::ComputeCycle cycle, unsigned int &idxAl){
 		
 		using namespace std;
 		using namespace flexbar;
@@ -78,7 +78,7 @@ public:
 		using seqan::infix;
 		
 		
-		SeqRead<TSeqStr, TString> &seqRead = *static_cast< SeqRead<TSeqStr, TString>* >(item);
+		TSeqRead &seqRead = *sr;
 		
 		int readLength = length(seqRead.seq);
 		
@@ -89,7 +89,7 @@ public:
 		
 		if(cycle == PRELOAD){
 			
-			if(idxAl++ == 0) reserve(alignments.first, m_bundleSize * m_queries->size());
+			if(idxAl == 0) reserve(alignments.first, m_bundleSize * m_queries->size());
 			
 			for(unsigned int i = 0; i < m_queries->size(); ++i){
 				
@@ -98,24 +98,28 @@ public:
 				
 				rseq = &seqRead.seq;
 				
-				TAlign align;
-				resize(rows(align), 2);
-				
 				if(m_trimEnd == LEFT_TAIL || m_trimEnd == RIGHT_TAIL){
 					int tailLength  = (m_tailLength > 0) ? m_tailLength : length(qseq);
 					
-					TSeqStr seq;
-					
 					if(tailLength < readLength){
+						
+						TSeqStr seq;
 						if(m_trimEnd == LEFT_TAIL) seq = prefix(seqRead.seq, tailLength);
 						else                       seq = suffix(seqRead.seq, readLength - tailLength);
+						
+						rseq = &seq;
 					}
-					rseq = &seq;
 				}
 				
-				assignSource(row(align, 0),  *rseq);
-				assignSource(row(align, 1),   qseq);
+				TAlign align;
+				
 				appendValue(alignments.first, align);
+				resize(rows(alignments.first[idxAl]), 2);
+				
+				assignSource(row(alignments.first[idxAl], 0), *rseq);
+				assignSource(row(alignments.first[idxAl], 1),  qseq);
+				
+				++idxAl;
 			}
 			return 0;
 		}
