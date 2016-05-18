@@ -105,9 +105,9 @@ public:
 						converter << ++m_tagCounter;
 						TString tagCount = converter.str();
 						
-						read1->tag = tagCount;
-						if(m_isPaired) read2->tag = tagCount;
-						if(m_useBarcodeRead) barRead->tag = tagCount;
+						read1->id = tagCount;
+						if(m_isPaired) read2->id = tagCount;
+						if(m_useBarcodeRead) barRead->id = tagCount;
 					}
 					
 					TPairedRead *pRead = new TPairedRead(read1, read2, barRead);

@@ -15,18 +15,16 @@ class SeqRead {
 	
 	public:
 	TSeqStr seq;
-	TString tag, qual;
+	TString id, qual;
 	
-	// SeqRead(){}
-	
-	SeqRead(const TSeqStr& sequence, const TString& seqTag) :
+	SeqRead(const TSeqStr& sequence, const TString& seqID) :
 		seq(sequence),
-		tag(seqTag){
+		id(seqID){
 	}
 	
-	SeqRead(const TSeqStr& sequence, const TString& seqTag, const TString& quality) :
+	SeqRead(const TSeqStr& sequence, const TString& seqID, const TString& quality) :
 		seq(sequence),
-		tag(seqTag),
+		id(seqID),
 		qual(quality){
 	}
 };
@@ -39,7 +37,7 @@ class PairedRead {
 	
 	public:
 	TSeqRead *r1, *r2, *b;
-	int barID, barID2;
+	unsigned int barID, barID2;
 	
 	PairedRead(TSeqRead *p_r1, TSeqRead *p_r2, TSeqRead *p_b) :
 		r1(p_r1),
@@ -86,19 +84,15 @@ namespace flexbar{
 	
 	typedef SeqRead<FSeqStr, FString>    TSeqRead;
 	typedef PairedRead<FSeqStr, FString> TPairedRead;
-	
-	typedef std::vector<TSeqRead* > TSeqReads;
-	// typedef seqan::StringSet<TSeqRead> TSeqReads;
-	// typedef seqan::StringSet<TSeqRead,    seqan::Dependent<seqan::Tight> > TSeqReads;
-	// typedef seqan::StringSet<TPairedRead, seqan::Dependent<seqan::Tight> > TPairedReads;
+	typedef std::vector<TSeqRead* >      TSeqReads;
 	
 	typedef seqan::Align<FSeqStr, seqan::ArrayGaps> TAlign;
 	typedef seqan::StringSet<TAlign>                TAlignSet;
 	typedef seqan::String<int>                      TAlignScores;
 	typedef std::pair<TAlignSet, TAlignScores>      TAlignments;
 	
-	// typedef seqan::StringSet<TAlign, seqan::Dependent<> >              TAlignSet;
-	// typedef seqan::StringSet<TAlign, seqan::Dependent<seqan::Tight> >  TAlignSet;
+	// typedef seqan::StringSet<TAlign, seqan::Dependent<> >             TAlignSet;
+	// typedef seqan::StringSet<TAlign, seqan::Dependent<seqan::Tight> > TAlignSet;
 	
 	typedef std::vector<TAlignments>                    TAlignBundle;
 	typedef std::vector<PairedRead<FSeqStr, FString>* > TPairedReadBundle;

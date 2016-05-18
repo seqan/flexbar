@@ -236,11 +236,11 @@ public:
 				m_queries->at(qIndex).rmFull++;
 				
 				if(m_writeTag){
-					append(seqRead.tag, "_Flexbar_removal");
+					append(seqRead.id, "_Flexbar_removal");
 					
 					if(! m_isBarcoding){
-						append(seqRead.tag, "_");
-						append(seqRead.tag, m_queries->at(qIndex).id);
+						append(seqRead.id, "_");
+						append(seqRead.id, m_queries->at(qIndex).id);
 					}
 				}
 				
@@ -252,8 +252,8 @@ public:
 			// valid alignment, not neccesarily removal
 			
 			if(m_randTag && am->randTag != ""){
-				append(seqRead.tag, "_");
-				append(seqRead.tag, am->randTag);
+				append(seqRead.id, "_");
+				append(seqRead.id, am->randTag);
 			}
 			
 			// alignment stats
@@ -271,7 +271,7 @@ public:
 				else s << "Sequence detection, no removal:\n";
 				
 				s << "  query tag        " << m_queries->at(qIndex).id      << "\n"
-				  << "  read tag         " << seqRead.tag                            << "\n"
+				  << "  read tag         " << seqRead.id                            << "\n"
 				  << "  read seq         " << seqRead.seq                            << "\n"
 				  << "  read pos         " << am->startPosS << "-" << am->endPosS    << "\n"
 				  << "  query pos        " << am->startPosA << "-" << am->endPosA    << "\n"
@@ -292,7 +292,7 @@ public:
 			else if(m_log == TAB){
 				
 				stringstream s;
-				s << seqRead.tag    << "\t" << m_queries->at(qIndex).id                  << "\t"
+				s << seqRead.id    << "\t" << m_queries->at(qIndex).id                  << "\t"
 				  << am->startPosA  << "\t" << am->endPosA           << "\t" << am->overlapLength << "\t"
 				  << am->mismatches << "\t" << am->gapsR + am->gapsA << "\t" << am->allowedErrors << endl;
 				*m_out << s.str();
@@ -302,7 +302,7 @@ public:
 			
 			stringstream s;
 			s << "No valid alignment:"       << "\n"
-			  << "read tag  " << seqRead.tag << "\n"
+			  << "read tag  " << seqRead.id << "\n"
 			  << "read seq  " << seqRead.seq << "\n\n" << endl;
 			*m_out << s.str();
 		}

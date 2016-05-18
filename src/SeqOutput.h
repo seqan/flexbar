@@ -114,16 +114,16 @@ public:
 		using namespace flexbar;
 		
 		if(m_useStdout && m_tagStr != ""){
-			append(seqRead.tag, "_");
-			append(seqRead.tag, m_tagStr);
+			append(seqRead.id, "_");
+			append(seqRead.id, m_tagStr);
 		}
 		
 		try{
 			if(m_format == FASTA){
-				writeRecord(seqFileOut, seqRead.tag, seqRead.seq);
+				writeRecord(seqFileOut, seqRead.id, seqRead.seq);
 			}
 			else if(m_format == FASTQ){
-				writeRecord(seqFileOut, seqRead.tag, seqRead.seq, seqRead.qual);
+				writeRecord(seqFileOut, seqRead.id, seqRead.seq, seqRead.qual);
 			}
 		}
 		catch(seqan::Exception const &e){
