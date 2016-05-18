@@ -23,7 +23,7 @@ private:
 	
 	// typedef seqan::String<char, seqan::MMap<> > TMMapString;
 	
-	const bool m_switch2Fasta, m_preProcess, m_useStdin, m_qtrimPostRm;
+	const bool m_preProcess, m_useStdin, m_qtrimPostRm;
 	const int m_maxUncalled, m_preTrimBegin, m_preTrimEnd, m_qtrimThresh, m_qtrimWinSize;
 	
 	tbb::atomic<unsigned long> m_nrReads, m_nrChars, m_nLowPhred;
@@ -34,7 +34,6 @@ public:
 		
 		m_preProcess(preProcess),
 		m_useStdin(useStdin),
-		m_switch2Fasta(o.switch2Fasta),
 		m_maxUncalled(o.maxUncalled),
 		m_preTrimBegin(o.cutLen_begin),
 		m_preTrimEnd(o.cutLen_end),
@@ -49,8 +48,6 @@ public:
 		m_nLowPhred = 0;
 		
 		using namespace std;
-		
-		if(m_switch2Fasta) m_format = flexbar::FASTQ;
 		
 		if(m_useStdin){
 			if(! open(seqFileIn, cin)){
@@ -72,7 +69,7 @@ public:
 	
 	
 	// returns number of read SeqReads
-	unsigned int getSeqReads(seqan::StringSet<bool> &uncalled, flexbar::TSeqReads &seqReads, const unsigned int nReads){
+	unsigned int getSeqReads(seqan::StringSet<bool> &uncalled, flexbar::TStrings &ids, flexbar::TSeqStrs &seqs, flexbar::TStrings &quals, const unsigned int nReads){
 		
 		using namespace std;
 		using namespace flexbar;
@@ -83,9 +80,6 @@ public:
 		
 		try{
 			if(! atEnd(seqFileIn)){
-				
-				TSeqStrs seqs;
-				TStrings ids, quals;
 				
 				reserve(ids,      nReads);
 				reserve(seqs,     nReads);
@@ -144,17 +138,6 @@ public:
 						if(m_format == FASTQ && m_qtrim != QOFF && ! m_qtrimPostRm){
 							if(qualTrim(seq, quals[i], m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
 						}
-					}
-					
-					TSeqRead *seqRead;
-					
-					if(m_format == FASTA || m_switch2Fasta){
-						seqRead = new TSeqRead(seq, id);
-						seqReads.push_back(seqRead);
-					}
-					else{
-						seqRead = new TSeqRead(seq, id, quals[i]);
-						seqReads.push_back(seqRead);
 					}
 				}
 				m_nrReads += length(ids);
