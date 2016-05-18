@@ -108,24 +108,22 @@ public:
 	}
 	
 	
-	void writeSeqRead(const SeqRead<TSeqStr, TString>& seqRead){
+	void writeSeqRead(SeqRead<TSeqStr, TString>& seqRead){
 		
 		using namespace std;
 		using namespace flexbar;
 		
-		TString tag = seqRead.tag;
-		
 		if(m_useStdout && m_tagStr != ""){
-			append(tag, "_");
-			append(tag, m_tagStr);
+			append(seqRead.tag, "_");
+			append(seqRead.tag, m_tagStr);
 		}
 		
 		try{
 			if(m_format == FASTA){
-				writeRecord(seqFileOut, tag, seqRead.seq);
+				writeRecord(seqFileOut, seqRead.tag, seqRead.seq);
 			}
 			else if(m_format == FASTQ){
-				writeRecord(seqFileOut, tag, seqRead.seq, seqRead.qual);
+				writeRecord(seqFileOut, seqRead.tag, seqRead.seq, seqRead.qual);
 			}
 		}
 		catch(seqan::Exception const &e){
@@ -148,7 +146,7 @@ public:
 	}
 	
 	
-	void *writeRead(void *item){
+	void* writeRead(void* item){
 		
 		using namespace std;
 		using namespace flexbar;
@@ -162,9 +160,8 @@ public:
 				
 				seqRead->seq = prefix(seqRead->seq, m_cutLen_read);
 				
-				if(m_format == FASTQ){
-					seqRead->qual = prefix(seqRead->qual, m_cutLen_read);
-				}
+				if(m_format == FASTQ)
+				seqRead->qual = prefix(seqRead->qual, m_cutLen_read);
 				
 				readLength = m_cutLen_read;
 			}
