@@ -10,6 +10,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <vector>
 
 #include <tbb/pipeline.h>
 #include <tbb/task_scheduler_init.h>
@@ -17,6 +18,9 @@
 
 #include <seqan/basic.h>
 #include <seqan/sequence.h>
+#include <seqan/align.h>
+// #include <seqan/find.h>
+// #include <seqan/index.h>
 #include <seqan/arg_parse.h>
 
 #include "FlexbarTypes.h"

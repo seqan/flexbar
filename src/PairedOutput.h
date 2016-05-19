@@ -301,9 +301,8 @@ public:
 								
 								pRead->r2->seq = "N";
 								
-								if(m_format == FASTQ){
-									pRead->r2->qual = prefix(pRead->r1->qual, 1);
-								}
+								if(m_format == FASTQ)
+								pRead->r2->qual = prefix(pRead->r1->qual, 1);
 								
 								m_outMap[outIdx].f1->writeRead(pRead->r1);
 								m_outMap[outIdx].f2->writeRead(pRead->r2);
@@ -319,9 +318,8 @@ public:
 								
 								pRead->r1->seq = "N";
 								
-								if(m_format == FASTQ){
-									pRead->r1->qual = prefix(pRead->r2->qual, 1);
-								}
+								if(m_format == FASTQ)
+								pRead->r1->qual = prefix(pRead->r2->qual, 1);
 								
 								m_outMap[outIdx].f1->writeRead(pRead->r1);
 								m_outMap[outIdx].f2->writeRead(pRead->r2);

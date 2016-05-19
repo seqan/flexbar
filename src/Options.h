@@ -658,20 +658,14 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		}
 	}
 	
-	if(isSet(parser, "fasta-output")){
-		if(o.format == FASTQ){
-			o.format = FASTA;
-			o.switch2Fasta = true;
-		}
-	}
-	
-	if(isSet(parser, "single-reads")) o.writeSingleReads  = true;
+	if(isSet(parser, "single-reads")) o.writeSingleReads = true;
 	
 	if(isSet(parser, "single-reads-paired")){
 		o.writeSingleReadsP = true;
 		o.writeSingleReads  = false;
 	}
 	
+	if(isSet(parser, "fasta-output")) o.switch2Fasta    = true;
 	if(isSet(parser, "length-dist"))  o.writeLengthDist = true;
 	if(isSet(parser, "number-tags"))  o.useNumberTag    = true;
 	if(isSet(parser, "removal-tags")) o.useRemovalTag   = true;

@@ -6,9 +6,6 @@
 #ifndef FLEXBAR_FLEXBARTYPES_H
 #define FLEXBAR_FLEXBARTYPES_H
 
-#include <vector>
-#include <seqan/align.h>
-
 
 template <typename TSeqStr, typename TString>
 class SeqRead {
@@ -81,10 +78,11 @@ namespace flexbar{
 	
 	typedef seqan::StringSet<FSeqStr> TSeqStrs;
 	typedef seqan::StringSet<FString> TStrings;
+	typedef seqan::StringSet<bool>    TBools;
 	
 	typedef SeqRead<FSeqStr, FString>    TSeqRead;
 	typedef PairedRead<FSeqStr, FString> TPairedRead;
-	typedef std::vector<TSeqRead* >      TSeqReads;
+	// typedef std::vector<TSeqRead* >      TSeqReads;
 	
 	typedef seqan::Align<FSeqStr, seqan::ArrayGaps> TAlign;
 	typedef seqan::StringSet<TAlign>                TAlignSet;

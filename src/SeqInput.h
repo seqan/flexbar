@@ -99,12 +99,12 @@ public:
 					TSeqStr &seq = seqs[i];
 					
 					if(length(id) < 1){
-						cerr << "\n\n" << "ERROR: read without name in input.\n" << endl;
+						cerr << "\n\n" << "ERROR: Read without name in input.\n" << endl;
 						close(seqFileIn);
 						exit(1);
 					}
 					if(length(seq) < 1){
-						cerr << "\n\n" << "ERROR: read without sequence in input.\n" << endl;
+						cerr << "\n\n" << "ERROR: Read without sequence in input.\n" << endl;
 						close(seqFileIn);
 						exit(1);
 					}
