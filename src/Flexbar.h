@@ -142,7 +142,7 @@ void loadBarcodesAndAdapters(Options &o){
 }
 
 
-void printComputationTime(Options &o, const time_t start){
+void printComputationTime(Options &o, const time_t start, const unsigned long nReads){
 	
 	using namespace std;
 	
@@ -158,11 +158,17 @@ void printComputationTime(Options &o, const time_t start){
 	
 	ostream *out = o.out;
 	
-	*out << "Computation time:  ";
+	*out << "Elapsed time:  ";
+	if(totalTime >= 1) *out << "     ";
+	
 	if(hours > 0)                               *out << hours     << " h ";
 	if(hours > 0 || minutes > 0)                *out << minutes   << " min ";
-	if(hours > 0 || minutes > 0 || seconds > 0) *out << seconds   << " sec\n\n\n";
-	else                                        *out              << "< 1 sec\n\n\n";
+	if(hours > 0 || minutes > 0 || seconds > 0) *out << seconds   << " sec\n";
+	else                                        *out              << "< 1 sec\n";
+	
+	if(totalTime >= 1)
+	*out << "Computation speed:  " << nReads / totalTime << " reads/s\n\n" << endl;
+	else *out << "\n" << endl;
 }
 
 
@@ -229,7 +235,10 @@ void startProcessing(Options &o){
 	if(o.logAlign == TAB) *out << "\n";
 	*out << "done.\n" << endl;
 	
-	printComputationTime(o, start);
+	
+	const unsigned long nReads = inputFilter.getNrProcessedReads();
+	
+	printComputationTime(o, start, nReads);
 	
 	
 	// barcode and adapter removal statistics
@@ -251,7 +260,6 @@ void startProcessing(Options &o){
 	
 	// summary statistics of filtering
 	
-	const unsigned long nReads   = inputFilter.getNrProcessedReads();
 	const unsigned long nChars   = inputFilter.getNrProcessedChars();
 	const unsigned long uncalled = inputFilter.getNrUncalledReads();
 	const unsigned long uPairs   = inputFilter.getNrUncalledPairedReads();
