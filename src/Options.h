@@ -20,7 +20,7 @@ struct Options{
 	
 	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, randTag, logStdout;
 	bool switch2Fasta, writeUnassigned, writeSingleReads, writeSingleReadsP, writeLengthDist;
-	bool useStdin, useStdout, relaxRegion, revCompAdapter, qtrimPostRm;
+	bool useStdin, useStdout, relaxRegion, revCompAdapter, qtrimPostRm, bAllowGaps;
 	
 	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len;
 	int qtrimThresh, qtrimWinSize;
@@ -70,6 +70,7 @@ struct Options{
 		relaxRegion       = false;
 		revCompAdapter    = false;
 		qtrimPostRm       = false;
+		bAllowGaps        = false;
 		
 		cutLen_begin  = 0;
 		cutLen_end    = 0;
@@ -162,8 +163,9 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("bt", "barcode-threshold", "Allowed mismatches and gaps per overlap of 10.", ARG::DOUBLE));
 	addOption(parser, ArgParseOption("bk", "barcode-keep", "Keep barcodes within reads instead of removal."));
 	addOption(parser, ArgParseOption("bu", "barcode-unassigned", "Include unassigned reads in output generation."));
-	addOption(parser, ArgParseOption("bm", "barcode-match", "Alignment match score.", ARG::INTEGER));
-	addOption(parser, ArgParseOption("bi", "barcode-mismatch", "Alignment mismatch score.", ARG::INTEGER));
+	addOption(parser, ArgParseOption("ba", "barcode-allow-gaps", "Alignment with gaps instead of hamming distance."));
+	addOption(parser, ArgParseOption("bm", "barcode-match", "Match score in case of allowed gaps.", ARG::INTEGER));
+	addOption(parser, ArgParseOption("bi", "barcode-mismatch", "Mismatch score if gaps allowed.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("bg", "barcode-gap", "Alignment gap score.", ARG::INTEGER));
 	
 	addSection(parser, "Adapter removal");
@@ -227,6 +229,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "barcode-tail-length");
 	setAdvanced(parser, "barcode-keep");
 	setAdvanced(parser, "barcode-unassigned");
+	setAdvanced(parser, "barcode-allow-gaps");
 	setAdvanced(parser, "barcode-match");
 	setAdvanced(parser, "barcode-mismatch");
 	setAdvanced(parser, "barcode-gap");
@@ -249,7 +252,6 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "stdout-reads");
 	setAdvanced(parser, "length-dist");
 	setAdvanced(parser, "single-reads-paired");
-	setAdvanced(parser, "stdout-log");
 	setAdvanced(parser, "number-tags");
 	setAdvanced(parser, "random-tags");
 	
@@ -707,22 +709,25 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		*out << "barcode-threshold:     " << o.b_threshold << endl;
 		
 		if(isSet(parser, "barcode-unassigned")) o.writeUnassigned = true;
+		if(isSet(parser, "barcode-allow-gaps")) o.bAllowGaps      = true;
 		
-		getOptionValue(o.b_match, parser, "barcode-match");
-		getOptionValue(o.b_mismatch, parser, "barcode-mismatch");
-		getOptionValue(o.b_gapCost, parser, "barcode-gap");
-		
-		*out << "barcode-match:        ";
-		if(o.b_match >= 0) *out << " ";
-		*out << o.b_match << endl;
-		
-		*out << "barcode-mismatch:     ";
-		if(o.b_mismatch >= 0) *out << " ";
-		*out << o.b_mismatch << endl;
-		
-		*out << "barcode-gap:          ";
-		if(o.b_gapCost >= 0) *out << " ";
-		*out << o.b_gapCost << "\n" << endl;
+		if(o.bAllowGaps){
+			getOptionValue(o.b_match, parser, "barcode-match");
+			getOptionValue(o.b_mismatch, parser, "barcode-mismatch");
+			getOptionValue(o.b_gapCost, parser, "barcode-gap");
+			
+			*out << "barcode-match:        ";
+			if(o.b_match >= 0) *out << " ";
+			*out << o.b_match << endl;
+			
+			*out << "barcode-mismatch:     ";
+			if(o.b_mismatch >= 0) *out << " ";
+			*out << o.b_mismatch << endl;
+			
+			*out << "barcode-gap:          ";
+			if(o.b_gapCost >= 0) *out << " ";
+			*out << o.b_gapCost << "\n" << endl;
+		}
 	}
 	
 	
