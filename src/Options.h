@@ -456,7 +456,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	*out << "Number of threads:     " << o.nThreads << endl;
 	
 	getOptionValue(o.bundleSize, parser, "bundle");
-	*out << "Fragments per bundle:  " << o.bundleSize << endl << endl;
+	*out << "Reads per bundle:      " << o.bundleSize << endl << endl;
 	
 	getOptionValue(o.targetName, parser, "target");
 	*out << "Target name:           " << o.targetName << endl;

@@ -8,8 +8,6 @@
 #define FLEXBAR_FLEXBARIO_H
 
 #include <fstream>
-#include <iostream>
-
 #include <seqan/seq_io.h>
 
 #if SEQAN_HAS_ZLIB
@@ -156,15 +154,12 @@ void checkInputType(const std::string path, flexbar::FileFormat &format, const b
 }
 
 
-std::string toFormatStr(const flexbar::FileFormat format){
+std::string getExtension(const flexbar::FileFormat format){
 	
 	using namespace flexbar;
 	
-	switch(format){
-		case FASTA:   return ".fasta";
-		case FASTQ:   return ".fastq";
-	}
-	return ".unknown";
+	if(format == FASTA) return ".fasta";
+	else                return ".fastq";
 }
 
 

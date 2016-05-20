@@ -31,10 +31,10 @@ private:
 	const flexbar::BarcodeDetect  m_barDetect;
 	const flexbar::QualTrimType   m_qtrim;
 	
-	typedef SeqOutput<TSeqStr, TString>  TOutputFilter;
-	typedef SeqOutputFiles<TSeqStr, TString> filters;
+	typedef SeqOutput<TSeqStr, TString>      TSeqOutput;
+	typedef SeqOutputFiles<TSeqStr, TString> TOutFiles;
 	
-	filters *m_outMap;
+	TOutFiles *m_outMap;
 	std::ostream *out;
 	
 	tbb::concurrent_vector<flexbar::TBar> *m_adapters,  *m_barcodes;
@@ -81,8 +81,8 @@ public:
 				int nBarcodes = m_barcodes->size();
 				if(m_twoBarcodes) nBarcodes *= m_barcodes2->size();
 				
-				m_mapsize   = nBarcodes + 1;
-				m_outMap = new filters[m_mapsize];
+				m_mapsize = nBarcodes + 1;
+				m_outMap  = new TOutFiles[m_mapsize];
 				
 				for(int i = 0; i < nBarcodes; ++i){
 					
@@ -102,30 +102,26 @@ public:
 					append(barcode1, "_1");
 					append(barcode2, "_2");
 					
-					stringstream ss;
+					stringstream b1, b2;
+					b1 << barcode1;
+					b2 << barcode2;
 					
-					ss << m_target << "_barcode_" << barcode1 << toFormatStr(m_format);
-					TOutputFilter *of1 = new TOutputFilter(ss.str(), barcode1, false, o);
-					ss.str("");
-					ss.clear();
+					string s = m_target + "_barcode_" + b1.str();
+					TSeqOutput *of1 = new TSeqOutput(s, barcode1, false, o);
 					
-					ss << m_target << "_barcode_" << barcode2 << toFormatStr(m_format);
-					TOutputFilter *of2 = new TOutputFilter(ss.str(), barcode2, false, o);
-					ss.str("");
-					ss.clear();
+					s = m_target + "_barcode_" + b2.str();
+					TSeqOutput *of2 = new TSeqOutput(s, barcode2, false, o);
 					
-					filters& f = m_outMap[i + 1];
-					f.f1       = of1;
-					f.f2       = of2;
+					TOutFiles& f = m_outMap[i + 1];
+					f.f1 = of1;
+					f.f2 = of2;
 					
 					if(m_writeSingleReads){
-						ss << m_target << "_barcode_" << barcode1 << "_single" << toFormatStr(m_format);
-						TOutputFilter *osingle1 = new TOutputFilter(ss.str(), "", true, o);
-						ss.str("");
-						ss.clear();
+						s = m_target + "_barcode_" + b1.str() + "_single";
+						TSeqOutput *osingle1 = new TSeqOutput(s, "", true, o);
 						
-						ss << m_target << "_barcode_" << barcode2 << "_single" << toFormatStr(m_format);
-						TOutputFilter *osingle2 = new TOutputFilter(ss.str(), "", true, o);
+						s = m_target + "_barcode_" + b2.str() + "_single";
+						TSeqOutput *osingle2 = new TSeqOutput(s, "", true, o);
 						
 						f.single1 = osingle1;
 						f.single2 = osingle2;
@@ -133,22 +129,22 @@ public:
 				}
 				
 				if(m_writeUnassigned){
-					string s = m_target + "_barcode_unassigned_1" + toFormatStr(m_format);
-					TOutputFilter *of1 = new TOutputFilter(s, "unassigned_1", false, o);
+					string s = m_target + "_barcode_unassigned_1";
+					TSeqOutput *of1 = new TSeqOutput(s, "unassigned_1", false, o);
 					
-					s = m_target + "_barcode_unassigned_2" + toFormatStr(m_format);
-					TOutputFilter *of2 = new TOutputFilter(s, "unassigned_2", false, o);
+					s = m_target + "_barcode_unassigned_2";
+					TSeqOutput *of2 = new TSeqOutput(s, "unassigned_2", false, o);
 					
-					filters& f = m_outMap[0];
-					f.f1       = of1;
-					f.f2       = of2;
+					TOutFiles& f = m_outMap[0];
+					f.f1 = of1;
+					f.f2 = of2;
 					
 					if(m_writeSingleReads){
-						s = m_target + "_barcode_unassigned_1_single" + toFormatStr(m_format);
-						TOutputFilter *osingle1 = new TOutputFilter(s, "", true, o);
+						s = m_target + "_barcode_unassigned_1_single";
+						TSeqOutput *osingle1 = new TSeqOutput(s, "", true, o);
 						
-						s = m_target + "_barcode_unassigned_2_single" + toFormatStr(m_format);
-						TOutputFilter *osingle2 = new TOutputFilter(s, "", true, o);
+						s = m_target + "_barcode_unassigned_2_single";
+						TSeqOutput *osingle2 = new TSeqOutput(s, "", true, o);
 						
 						f.single1 = osingle1;
 						f.single2 = osingle2;
@@ -160,24 +156,24 @@ public:
 			case PAIRED:{
 				
 				m_mapsize = 1;
-				m_outMap = new filters[m_mapsize];
+				m_outMap  = new TOutFiles[m_mapsize];
 				
-				string s = m_target + "_1" + toFormatStr(m_format);
-				TOutputFilter *of1 = new TOutputFilter(s, "1", false, o);
+				string s = m_target + "_1";
+				TSeqOutput *of1 = new TSeqOutput(s, "1", false, o);
 				
-				s = m_target + "_2" + toFormatStr(m_format);
-				TOutputFilter *of2 = new TOutputFilter(s, "2", false, o);
+				s = m_target + "_2";
+				TSeqOutput *of2 = new TSeqOutput(s, "2", false, o);
 				
-				filters& f = m_outMap[0];
-				f.f1       = of1;
-				f.f2       = of2;
+				TOutFiles& f = m_outMap[0];
+				f.f1 = of1;
+				f.f2 = of2;
 				
 				if(m_writeSingleReads){
-					s = m_target + "_1_single" + toFormatStr(m_format);
-					TOutputFilter *osingle1 = new TOutputFilter(s, "", true, o);
+					s = m_target + "_1_single";
+					TSeqOutput *osingle1 = new TSeqOutput(s, "", true, o);
 					
-					s = m_target + "_2_single" + toFormatStr(m_format);
-					TOutputFilter *osingle2 = new TOutputFilter(s, "", true, o);
+					s = m_target + "_2_single";
+					TSeqOutput *osingle2 = new TSeqOutput(s, "", true, o);
 					
 					f.single1 = osingle1;
 					f.single2 = osingle2;
@@ -188,12 +184,12 @@ public:
 			case SINGLE:{
 				
 				m_mapsize = 1;
-				m_outMap = new filters[m_mapsize];
+				m_outMap  = new TOutFiles[m_mapsize];
 				
-				string s = m_target + toFormatStr(m_format);
-				TOutputFilter *of1 = new TOutputFilter(s, "", false, o);
+				string s = m_target;
+				TSeqOutput *of1 = new TSeqOutput(s, "", false, o);
 				
-				filters& f = m_outMap[0];
+				TOutFiles& f = m_outMap[0];
 				f.f1 = of1;
 				
 				break;
@@ -202,25 +198,27 @@ public:
 			case SINGLE_BARCODED:{
 				
 				m_mapsize = m_barcodes->size() + 1;
-				m_outMap = new filters[m_mapsize];
+				m_outMap  = new TOutFiles[m_mapsize];
 				
 				for(int i = 0; i < m_barcodes->size(); ++i){
 					
 					TString barcode = m_barcodes->at(i).id;
 					
-					stringstream ss;
-					ss << m_target << "_barcode_" << barcode << toFormatStr(m_format);
-					TOutputFilter *of1 = new TOutputFilter(ss.str(), barcode, false, o);
+					stringstream b;
+					b << barcode;
 					
-					filters& f = m_outMap[i + 1];
+					string s = m_target + "_barcode_" + b.str();
+					TSeqOutput *of1 = new TSeqOutput(s, barcode, false, o);
+					
+					TOutFiles& f = m_outMap[i + 1];
 					f.f1 = of1;
 				}
 				
 				if(m_writeUnassigned){
-					string s = m_target + "_barcode_unassigned" + toFormatStr(m_format);
-					TOutputFilter *of1 = new TOutputFilter(s, "unassigned", false, o);
+					string s = m_target + "_barcode_unassigned";
+					TSeqOutput *of1 = new TSeqOutput(s, "unassigned", false, o);
 					
-					filters& f = m_outMap[0];
+					TOutFiles& f = m_outMap[0];
 					f.f1 = of1;
 				}
 			}
@@ -359,7 +357,9 @@ public:
 	void writeLengthDist(){
 		
 		for(unsigned int i = 0; i < m_mapsize; i++){
+			
 			m_outMap[i].f1->writeLengthDist();
+			
 			if(m_outMap[i].f2 != NULL)
 			m_outMap[i].f2->writeLengthDist();
 		}
@@ -476,9 +476,9 @@ public:
 			unsigned long nAdapOvl  = adapters->at(i).rmOverlap;
 			unsigned long nAdapFull = adapters->at(i).rmFull;
 			
-			stringstream ss;  ss << nAdapOvl;
+			stringstream s; s << nAdapOvl;
 			
-			int wsLen2 = maxSpaceLen - ss.str().length();
+			int wsLen2 = maxSpaceLen - s.str().length();
 			if(wsLen2 < 2) wsLen2 = 2;
 			string whiteSpace2 = string(wsLen2, ' ');
 			

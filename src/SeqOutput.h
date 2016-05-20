@@ -7,8 +7,6 @@
 #ifndef FLEXBAR_SEQOUTPUT_H
 #define FLEXBAR_SEQOUTPUT_H
 
-#include <fstream>
-
 
 template <typename TSeqStr, typename TString>
 class SeqOutput {
@@ -20,14 +18,13 @@ private:
 	const bool m_switch2Fasta, m_writeLenDist, m_useStdout;
 	const unsigned int m_minLength, m_cutLen_read;
 	
-	const std::string m_filePath;
+	std::string m_filePath;
 	const TString m_tagStr;
 	
 	const flexbar::FileFormat m_format;
 	const flexbar::CompressionType m_cmprsType;
 	
 	tbb::atomic<unsigned long> m_countGood, m_countGoodChars;
-	
 	tbb::concurrent_vector<unsigned long> *m_lengthDist;
 	
 public:
@@ -40,8 +37,7 @@ public:
 		m_cutLen_read(o.cutLen_read),
 		m_writeLenDist(o.writeLengthDist),
 		m_useStdout(o.useStdout && ! alwaysFile),
-		m_cmprsType(o.cmprsType),
-		m_filePath(filePath + o.outCompression){
+		m_cmprsType(o.cmprsType){
 		
 		using namespace std;
 		using namespace flexbar;
@@ -49,16 +45,19 @@ public:
 		m_countGood      = 0;
 		m_countGoodChars = 0;
 		
+		m_filePath = filePath;
+		
+		if(m_format == FASTA || m_switch2Fasta)
+		     m_filePath += getExtension(FASTA) + o.outCompression;
+		else m_filePath += getExtension(FASTQ) + o.outCompression;
+		
 		m_lengthDist = new tbb::concurrent_vector<unsigned long>(MAX_READLENGTH + 1, 0);
 		
 		if(m_useStdout){
 			
-			if(m_format == FASTA){
-				setFormat(seqFileOut, seqan::Fasta());
-			}
-			else if(m_format == FASTQ){
-				setFormat(seqFileOut, seqan::Fastq());
-			}
+			if(m_format == FASTA || m_switch2Fasta)
+			     setFormat(seqFileOut, seqan::Fasta());
+			else setFormat(seqFileOut, seqan::Fastq());
 			
 			if(! open(seqFileOut, cout)){
 				cerr << "\nERROR: Could not open output stream." << "\n" << endl;
@@ -123,7 +122,7 @@ public:
 			if(m_format == FASTA || m_switch2Fasta){
 				writeRecord(seqFileOut, seqRead.id, seqRead.seq);
 			}
-			else if(m_format == FASTQ){
+			else{
 				writeRecord(seqFileOut, seqRead.id, seqRead.seq, seqRead.qual);
 			}
 		}
