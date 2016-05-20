@@ -41,7 +41,7 @@ public:
 		setFormat(seqFileIn, seqan::Fasta());
 		
 		if(! open(seqFileIn, filePath.c_str())){
-			cerr << "ERROR: Could not open file: " << filePath << "\n" << endl;
+			cerr << "\nERROR: Could not open file " << filePath << "\n" << endl;
 			exit(1);
 		}
 		
@@ -87,7 +87,7 @@ public:
 			}
 		}
 		catch(seqan::Exception const &e){
-			cerr << "\n\n" << "ERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
+			cerr << "\nERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
 			close(seqFileIn);
 			exit(1);
 		}

@@ -51,13 +51,13 @@ public:
 		
 		if(m_useStdin){
 			if(! open(seqFileIn, cin)){
-				cerr << "ERROR: Could not open input stream.\n" << endl;
+				cerr << "\nERROR: Could not open input stream.\n" << endl;
 				exit(1);
 			}
 		}
 		else{
 			if(! open(seqFileIn, filePath.c_str())){
-				cerr << "ERROR: Could not open file: " << filePath << "\n" << endl;
+				cerr << "\nERROR: Could not open file " << filePath << "\n" << endl;
 				exit(1);
 			}
 		}
@@ -99,12 +99,12 @@ public:
 					TSeqStr &seq = seqs[i];
 					
 					if(length(id) < 1){
-						cerr << "\n\n" << "ERROR: Read without name in input.\n" << endl;
+						cerr << "\nERROR: Input read without name.\n" << endl;
 						close(seqFileIn);
 						exit(1);
 					}
 					if(length(seq) < 1){
-						cerr << "\n\n" << "ERROR: Read without sequence in input.\n" << endl;
+						cerr << "\nERROR: Input read without sequence.\n" << endl;
 						close(seqFileIn);
 						exit(1);
 					}
@@ -135,7 +135,7 @@ public:
 							if(m_format == FASTQ)
 							quals[i] = prefix(quals[i], length(quals[i]) - idx);
 						}
-						if(m_format == FASTQ && m_qtrim != QOFF && ! m_qtrimPostRm){
+						if(m_qtrim != QOFF && ! m_qtrimPostRm){
 							if(qualTrim(seq, quals[i], m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
 						}
 					}
@@ -148,7 +148,7 @@ public:
 			else return 0;  // end of file
 		}
 		catch(seqan::Exception const &e){
-			cerr << "\n\n" << "ERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
+			cerr << "\nERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
 			close(seqFileIn);
 			exit(1);
 		}

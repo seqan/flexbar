@@ -27,7 +27,7 @@ void openInputFile(std::fstream &strm, std::string path){
 	strm.open(path.c_str(), ios::in | ios::binary);
 	
 	if(! strm.good()){
-		cerr << "ERROR while opening file: " << path << "\n" << endl;
+		cerr << "\nERROR: Could not open file " << path << "\n" << endl;
 		exit(1);
 	}
 }
@@ -38,7 +38,7 @@ void openOutputFile(std::fstream &strm, std::string path){
 	strm.open(path.c_str(), ios::out | ios::binary);
 	
 	if(! strm.good()){
-		cerr << "ERROR while opening file: " << path << "\n" << endl;
+		cerr << "\nERROR: Could not open file " << path << "\n" << endl;
 		exit(1);
 	}
 }
@@ -67,7 +67,7 @@ void checkFileCompression(const std::string path){
 			#if SEQAN_HAS_ZLIB
 				cmprsType = GZ;
 			#else
-				cerr << "Input file decompression canceled.\n";
+				cerr << "\nInput file decompression canceled.\n";
 				cerr << "This build does not support zlib!\n" << endl;
 				exit(1);
 			#endif
@@ -80,7 +80,7 @@ void checkFileCompression(const std::string path){
 				#if SEQAN_HAS_BZIP2
 					cmprsType = BZ2;
 				#else
-					cerr << "Input file decompression canceled.\n";
+					cerr << "\nInput file decompression canceled.\n";
 		   			cerr << "This build does not support bzip2!\n" << endl;
 					exit(1);
 				#endif
@@ -103,14 +103,14 @@ void checkInputType(const std::string path, flexbar::FileFormat &format, const b
 		
 		if(cin) c = cin.peek();
 		else{
-			cerr << "Standard input reading error.\n" << endl;
+			cerr << "\nERROR: Could not read from standard input stream.\n" << endl;
 			exit(1);
 		}
 		
 		     if(c == '>') format = FASTA;
 		else if(c == '@') format = FASTQ;
 		else{
-			cerr << "Reads file type not conform.\n";
+			cerr << "\nERROR: Reads file type not conform.\n";
 			cerr << "Uncompressed fasta or fastq for stdin.\n" << endl;
 			exit(1);
 		}
@@ -120,7 +120,7 @@ void checkInputType(const std::string path, flexbar::FileFormat &format, const b
 		seqan::SeqFileIn seqFileIn;
 		
 		if(!open(seqFileIn, path.c_str())){
-			cerr << "ERROR: Could not open file: " << path << "\n" << endl;
+			cerr << "\nERROR: Could not open file " << path << "\n" << endl;
 			exit(1);
 		}
 		
@@ -140,13 +140,13 @@ void checkInputType(const std::string path, flexbar::FileFormat &format, const b
 				}
 			}
 			catch(seqan::Exception const &e){
-				cerr << "\n\n" << "ERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
+				cerr << "\nERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
 				close(seqFileIn);
 				exit(1);
 			}
 		}
 		else{
-			cerr << "Reads file seems to be empty.\n\n" << endl;
+			cerr << "\nReads file seems to be empty.\n\n" << endl;
 			close(seqFileIn);
 			exit(1);
 		}
@@ -177,7 +177,7 @@ std::string toFormatStr(const flexbar::FileFormat format){
 // 	string call = "qcCommand " + path + " &> qc.out";
 //
 // 	if(system(call.c_str()) != 0){
-// 		cerr << "ERROR in quality control.\n" << endl;
+// 		cerr << "\nERROR: quality control program execution.\n" << endl;
 // 	}
 // }
 

@@ -17,7 +17,7 @@ private:
 	
 	seqan::SeqFileOut seqFileOut;
 	
-	const bool m_writeLenDist, m_useStdout;
+	const bool m_switch2Fasta, m_writeLenDist, m_useStdout;
 	const unsigned int m_minLength, m_cutLen_read;
 	
 	const std::string m_filePath;
@@ -34,6 +34,7 @@ public:
 	
 	SeqOutput(const std::string &filePath, const TString tagStr, const bool alwaysFile, const Options &o) :
 		m_format(o.format),
+		m_switch2Fasta(o.switch2Fasta),
 		m_tagStr(tagStr),
 		m_minLength(o.min_readLen),
 		m_cutLen_read(o.cutLen_read),
@@ -60,13 +61,13 @@ public:
 			}
 			
 			if(! open(seqFileOut, cout)){
-				cerr << "ERROR: Could not open output stream." << "\n" << endl;
+				cerr << "\nERROR: Could not open output stream." << "\n" << endl;
 				exit(1);
 			}
 		}
 		else{
 			if(! open(seqFileOut, m_filePath.c_str())){
-				cerr << "ERROR: Could not open file: " << m_filePath << "\n" << endl;
+				cerr << "\nERROR: Could not open file " << m_filePath << "\n" << endl;
 				exit(1);
 			}
 		}
@@ -94,7 +95,7 @@ public:
 		lstream.open(fname.c_str(), ios::out | ios::binary);
 		
 		if(! lstream.is_open()){
-			cerr << "ERROR: Could not open file: " << fname << "\n";
+			cerr << "\nERROR: Could not open file " << fname << "\n";
 		}
 		else{
 			lstream << "Readlength\tCount" << "\n";
@@ -118,6 +119,8 @@ public:
 			append(seqRead.id, m_tagStr);
 		}
 		
+		// m_switch2Fasta(o.switch2Fasta),
+		
 		try{
 			if(m_format == FASTA){
 				writeRecord(seqFileOut, seqRead.id, seqRead.seq);
@@ -127,7 +130,7 @@ public:
 			}
 		}
 		catch(seqan::Exception const &e){
-			cerr << "\n\n" << "ERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
+			cerr << "\nERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
 			
 			close(seqFileOut);
 			delete m_lengthDist;

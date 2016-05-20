@@ -77,7 +77,7 @@ public:
 			unsigned int nReads2 = m_f2->getSeqReads(uncalled2, ids2, seqs2, quals2, m_bundleSize);
 			
 			if(nReads != nReads2){
-				cerr << "ERROR: Single read in paired input mode.\n" << endl;
+				cerr << "\nERROR: Single read in paired input mode.\n" << endl;
 				exit(1);
 			}
 		}
@@ -85,11 +85,11 @@ public:
 			unsigned int nBarReads = m_b->getSeqReads(uncalledBR, idsBR, seqsBR, qualsBR, m_bundleSize);
 			
 			if(nReads < nBarReads){
-				cerr << "ERROR: Barcode read without read in input.\n" << endl;
+				cerr << "\nERROR: Barcode read without read in input.\n" << endl;
 				exit(1);
 			}
 			else if(nReads > nBarReads){
-				cerr << "ERROR: Read without barcode read in input.\n" << endl;
+				cerr << "\nERROR: Read without barcode read in input.\n" << endl;
 				exit(1);
 			}
 		}
@@ -164,10 +164,6 @@ public:
 				// delete prBundle;
 			}
 		}
-		
-		// 	     if(pRead == NULL && i == 0) return NULL;
-		// 	else if(pRead == NULL)           break;
-		// 	else                             prBundle->push_back(pRead);
 		
 		return prBundle;
 	}
