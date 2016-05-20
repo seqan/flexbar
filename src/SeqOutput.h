@@ -109,7 +109,7 @@ public:
 	}
 	
 	
-	void writeSeqRead(SeqRead<TSeqStr, TString>& seqRead){
+	void writeSeqRead(SeqRead<TSeqStr, TString> &seqRead){
 		
 		using namespace std;
 		using namespace flexbar;
@@ -119,10 +119,8 @@ public:
 			append(seqRead.id, m_tagStr);
 		}
 		
-		// m_switch2Fasta(o.switch2Fasta),
-		
 		try{
-			if(m_format == FASTA){
+			if(m_format == FASTA || m_switch2Fasta){
 				writeRecord(seqFileOut, seqRead.id, seqRead.seq);
 			}
 			else if(m_format == FASTQ){
@@ -174,6 +172,7 @@ public:
 			++m_countGood;
 			
 			// store read length distribution
+			
 			if(m_writeLenDist && readLength <= MAX_READLENGTH)
 				m_lengthDist->at(readLength)++;
 			else if(m_writeLenDist)

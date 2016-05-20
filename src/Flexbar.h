@@ -50,7 +50,7 @@ void loadBarcodes(Options &o, const bool secondSet){
 		lf.printBars("Barcode2");
 		
 		if(o.barcodes2.size() == 0){
-			cerr << "No barcodes found in file.\n" << endl;
+			cerr << "\nERROR: No barcodes found in file.\n" << endl;
 			exit(1);
 		}
 	}
@@ -59,7 +59,7 @@ void loadBarcodes(Options &o, const bool secondSet){
 		lf.printBars("Barcode");
 
 		if(o.barcodes.size() == 0){
-			cerr << "No barcodes found in file.\n" << endl;
+			cerr << "\nERROR: No barcodes found in file.\n" << endl;
 			exit(1);
 		}
 	}
@@ -84,7 +84,7 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 			o.adapters2 = lf.getBars();
 			
 			if(o.adapters2.size() == 0){
-				cerr << "No adapters found in file.\n" << endl;
+				cerr << "\nERROR: No adapters found in file.\n" << endl;
 				exit(1);
 			}
 		}
@@ -92,7 +92,7 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 			o.adapters = lf.getBars();
 			
 			if(o.adapters.size() == 0){
-				cerr << "No adapters found in file.\n" << endl;
+				cerr << "\nERROR: No adapters found in file.\n" << endl;
 				exit(1);
 			}
 		}
@@ -112,7 +112,6 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 			barRC.seq = adapterSeqRC;
 			o.adapters.push_back(barRC);
 		}
-		
 		lf.setBars(o.adapters);
 	}
 	
@@ -249,6 +248,8 @@ void startProcessing(Options &o){
 	
 	outputFilter.printFileSummary();
 	
+	
+	// summary statistics of filtering
 	
 	const unsigned long nReads   = inputFilter.getNrProcessedReads();
 	const unsigned long nChars   = inputFilter.getNrProcessedChars();
