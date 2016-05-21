@@ -152,19 +152,19 @@ public:
 		
 		using namespace flexbar;
 		
-		TPairedReadBundle *prBundle;
+		TPairedReadBundle *prBundle = NULL;
 		bool isEmpty = true;
 		
 		while(isEmpty){
-			prBundle = static_cast<TPairedReadBundle* >(getPairedReadBundle());
+			prBundle = static_cast< TPairedReadBundle* >(getPairedReadBundle());
 			
 			if(prBundle == NULL)          return NULL;
 			else if(prBundle->size() > 0) isEmpty = false;
 			else{
-				// delete prBundle;
+				delete prBundle;
+				prBundle = NULL;
 			}
 		}
-		
 		return prBundle;
 	}
 	
