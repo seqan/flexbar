@@ -231,11 +231,9 @@ public:
 	};
 	
 	
-	void writePairedRead(void* item){
+	void writePairedRead(PairedRead<TSeqStr, TString>* pRead){
 		
 		using namespace flexbar;
-		
-		PairedRead<TSeqStr, TString> *pRead = static_cast< PairedRead<TSeqStr, TString>* >(item);
 		
 		bool l1ok = false, l2ok = false;
 		

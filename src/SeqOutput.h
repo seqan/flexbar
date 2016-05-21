@@ -79,13 +79,14 @@ public:
 	};
 	
 	
-	const std::string getFileName() const {
+	const std::string getFileName(){
 		if(! m_useStdout) return m_filePath;
 		else              return "stdout";
 	}
 	
 	
-	void writeLengthDist() const {
+	void writeLengthDist(){
+		
 		using namespace std;
 		
 		string fname = m_filePath + ".lengthdist";

@@ -130,12 +130,8 @@ void checkInputType(const std::string path, flexbar::FileFormat &format, const b
 				
 				readRecord(tag, rseq, qual, seqFileIn);
 				
-				if(qual == ""){
-					format = FASTA;
-				}
-				else{
-					format = FASTQ;
-				}
+				if(qual == "") format = FASTA;
+				else           format = FASTQ;
 			}
 			catch(seqan::Exception const &e){
 				cerr << "\nERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;

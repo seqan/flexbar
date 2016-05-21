@@ -15,10 +15,9 @@ class SeqOutputFiles {
 	
 public:
 	
-	typedef SeqOutput<TSeqStr, TString> TOutputFilter;
+	typedef SeqOutput<TSeqStr, TString> TSeqOutput;
 	
-	TOutputFilter *f1, *f2, *single1, *single2;
-	
+	TSeqOutput *f1, *f2, *single1, *single2;
 	tbb::atomic<unsigned long> m_nShort_1, m_nShort_2;
 	
 	SeqOutputFiles() :
@@ -42,7 +41,8 @@ public:
 
 private:
 	
-	// forbid copying this object to call destructor only once (pointing to unique objects)
+	// forbid copying this object to call destructor only once
+	// (pointing to unique objects)
 	SeqOutputFiles(SeqOutputFiles&);
 	
 	SeqOutputFiles& operator =(const SeqOutputFiles& rhs);
