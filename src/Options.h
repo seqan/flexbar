@@ -224,12 +224,13 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	
 	hideOption(parser, "version");
+	hideOption(parser, "barcode-allow-gaps");
 	
 	setAdvanced(parser, "barcodes2");
 	setAdvanced(parser, "barcode-tail-length");
 	setAdvanced(parser, "barcode-keep");
 	setAdvanced(parser, "barcode-unassigned");
-	setAdvanced(parser, "barcode-allow-gaps");
+	// setAdvanced(parser, "barcode-allow-gaps");
 	setAdvanced(parser, "barcode-match");
 	setAdvanced(parser, "barcode-mismatch");
 	setAdvanced(parser, "barcode-gap");
@@ -456,7 +457,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	*out << "Number of threads:     " << o.nThreads << endl;
 	
 	getOptionValue(o.bundleSize, parser, "bundle");
-	*out << "Reads per bundle:      " << o.bundleSize << endl << endl;
+	*out << "Bundled fragments:     " << o.bundleSize << endl << endl;
 	
 	getOptionValue(o.targetName, parser, "target");
 	*out << "Target name:           " << o.targetName << endl;
@@ -711,7 +712,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		if(isSet(parser, "barcode-unassigned")) o.writeUnassigned = true;
 		if(isSet(parser, "barcode-allow-gaps")) o.bAllowGaps      = true;
 		
-		if(o.bAllowGaps){
+		// if(o.bAllowGaps){
 			getOptionValue(o.b_match, parser, "barcode-match");
 			getOptionValue(o.b_mismatch, parser, "barcode-mismatch");
 			getOptionValue(o.b_gapCost, parser, "barcode-gap");
@@ -727,7 +728,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 			*out << "barcode-gap:          ";
 			if(o.b_gapCost >= 0) *out << " ";
 			*out << o.b_gapCost << "\n" << endl;
-		}
+		// }
 	}
 	
 	

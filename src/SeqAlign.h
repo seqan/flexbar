@@ -77,7 +77,6 @@ public:
 		using seqan::suffix;
 		using seqan::infix;
 		
-		
 		TSeqRead &seqRead = *sr;
 		
 		int readLength = length(seqRead.seq);
@@ -86,6 +85,7 @@ public:
 			if(cycle != PRELOAD) ++m_nPreShortReads;
 			return 0;
 		}
+		
 		
 		if(cycle == PRELOAD){
 			
@@ -317,12 +317,15 @@ public:
 	
 	std::string getOverlapStatsString(){
 		
+		using namespace std;
 		using namespace flexbar;
 		
 		unsigned long nValues = 0, halfValues = 0, cumValues = 0, lenSum = 0;
-		int min = 1000000, max = 0, median = 0, mean = 0;
+		unsigned int max = 0, median = 0, mean = 0;
 		
-		for (int i = 0; i <= MAX_READLENGTH; ++i){
+		unsigned int min = numeric_limits<unsigned int>::max();
+		
+		for(unsigned int i = 0; i <= MAX_READLENGTH; ++i){
 			unsigned long lenCount = m_rmOverlaps->at(i);
 			
 			if(lenCount > 0 && i < min) min = i;
@@ -334,7 +337,7 @@ public:
 		
 		halfValues = nValues / 2;
 		
-		for (int i = 0; i <= MAX_READLENGTH; ++i){
+		for(unsigned int i = 0; i <= MAX_READLENGTH; ++i){
 			cumValues += m_rmOverlaps->at(i);
 			
 			if(cumValues >= halfValues){
@@ -345,9 +348,9 @@ public:
 		
 		if(m_modified > 0) mean = lenSum / m_modified;
 		
-		std::stringstream s;
+		stringstream s;
 		
-		s << "Min, max, mean and median adapter overlap: ";
+		s << "Min, max, mean, and median overlap: ";
 		s << min << " / " << max << " / " << mean << " / " << median;
 		
 		return s.str();

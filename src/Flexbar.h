@@ -310,7 +310,7 @@ void startProcessing(Options &o){
 	*out << "Remaining reads                   " << alignValue(len, nGoodReads);
 	
 	if(nReads > 0)
-	*out << "   (" << fixed << setprecision(2) << 100 * nGoodReads / nReads << "% of input)";
+	*out << "   (" << fixed << setprecision(2) << 100 * nGoodReads / nReads << "%)";
 	
 	stringstream schar; schar << inputFilter.getNrProcessedChars();
 	int clen = schar.str().length();
