@@ -69,7 +69,7 @@ public:
 	
 	
 	// returns number of read SeqReads
-	unsigned int getSeqReads(seqan::StringSet<bool> &uncalled, flexbar::TStrings &ids, flexbar::TSeqStrs &seqs, flexbar::TStrings &quals, const unsigned int nReads){
+	unsigned int loadSeqReads(seqan::StringSet<bool> &uncalled, flexbar::TStrings &ids, flexbar::TSeqStrs &seqs, flexbar::TStrings &quals, const unsigned int nReads){
 		
 		using namespace std;
 		using namespace flexbar;

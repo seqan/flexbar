@@ -68,7 +68,7 @@ public:
 	};
 	
 	
-	int alignSeqRead(flexbar::TSeqRead* sr, const bool performRemoval, flexbar::TAlignments &alignments, flexbar::ComputeCycle cycle, unsigned int &idxAl){
+	int alignSeqRead(flexbar::TSeqRead* sr, const bool performRemoval, flexbar::TAlignments &alignments, flexbar::ComputeCycle &cycle, unsigned int &idxAl){
 		
 		using namespace std;
 		using namespace flexbar;

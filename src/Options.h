@@ -97,7 +97,7 @@ const std::string getFlexbarBanner(const seqan::CharString version){
 	std::string banner = "";
 	
 	banner += "               ________          __              \n";
-	banner += "              / ____/ /__  _  __/ /_  ____  _____\n";
+	banner += "              / ____/ /__  _  __/ /_  ____ ______\n";
 	banner += "             / /_  / / _ \\| |/ / __ \\/ __ `/ ___/\n";
 	banner += "            / __/ / /  __/>  </ /_/ / /_/ / /    \n";
 	banner += "           /_/   /_/\\___/_/|_/_.___/\\__._/_/     \n\n";
@@ -224,13 +224,12 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	
 	hideOption(parser, "version");
-	hideOption(parser, "barcode-allow-gaps");
 	
 	setAdvanced(parser, "barcodes2");
 	setAdvanced(parser, "barcode-tail-length");
 	setAdvanced(parser, "barcode-keep");
 	setAdvanced(parser, "barcode-unassigned");
-	// setAdvanced(parser, "barcode-allow-gaps");
+	setAdvanced(parser, "barcode-allow-gaps");
 	setAdvanced(parser, "barcode-match");
 	setAdvanced(parser, "barcode-mismatch");
 	setAdvanced(parser, "barcode-gap");
@@ -712,7 +711,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		if(isSet(parser, "barcode-unassigned")) o.writeUnassigned = true;
 		if(isSet(parser, "barcode-allow-gaps")) o.bAllowGaps      = true;
 		
-		// if(o.bAllowGaps){
+		if(o.bAllowGaps){
 			getOptionValue(o.b_match, parser, "barcode-match");
 			getOptionValue(o.b_mismatch, parser, "barcode-mismatch");
 			getOptionValue(o.b_gapCost, parser, "barcode-gap");
@@ -728,7 +727,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 			*out << "barcode-gap:          ";
 			if(o.b_gapCost >= 0) *out << " ";
 			*out << o.b_gapCost << "\n" << endl;
-		// }
+		}
 	}
 	
 	

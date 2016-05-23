@@ -60,7 +60,7 @@ public:
 	}
 	
 	
-	void* getPairedReadBundle(){
+	void* loadPairedReadBundle(){
 		
 		using namespace std;
 		using namespace flexbar;
@@ -71,10 +71,10 @@ public:
 		
 		seqan::StringSet<bool> uncalled, uncalled2, uncalledBR;
 		
-		unsigned int nReads = m_f1->getSeqReads(uncalled, ids, seqs, quals, m_bundleSize);
+		unsigned int nReads = m_f1->loadSeqReads(uncalled, ids, seqs, quals, m_bundleSize);
 		
 		if(m_isPaired){
-			unsigned int nReads2 = m_f2->getSeqReads(uncalled2, ids2, seqs2, quals2, m_bundleSize);
+			unsigned int nReads2 = m_f2->loadSeqReads(uncalled2, ids2, seqs2, quals2, m_bundleSize);
 			
 			if(nReads != nReads2){
 				cerr << "\nERROR: Single read in paired input mode.\n" << endl;
@@ -82,7 +82,7 @@ public:
 			}
 		}
 		if(m_useBarRead){
-			unsigned int nBarReads = m_b->getSeqReads(uncalledBR, idsBR, seqsBR, qualsBR, m_bundleSize);
+			unsigned int nBarReads = m_b->loadSeqReads(uncalledBR, idsBR, seqsBR, qualsBR, m_bundleSize);
 			
 			if(nReads < nBarReads){
 				cerr << "\nERROR: Barcode read without read in input.\n" << endl;
@@ -137,9 +137,7 @@ public:
 					if(m_useBarRead) barRead->id = tagCount;
 				}
 				
-				TPairedRead *pRead = new TPairedRead(read1, read2, barRead);
-				
-				prBundle->push_back(pRead);
+				prBundle->push_back(new TPairedRead(read1, read2, barRead));
 			}
 		}
 		
@@ -153,13 +151,14 @@ public:
 		using namespace flexbar;
 		
 		TPairedReadBundle *prBundle = NULL;
-		bool isEmpty = true;
 		
-		while(isEmpty){
-			prBundle = static_cast< TPairedReadBundle* >(getPairedReadBundle());
+		bool empty = true;
+		
+		while(empty){
+			prBundle = static_cast< TPairedReadBundle* >(loadPairedReadBundle());
 			
 			if(prBundle == NULL)          return NULL;
-			else if(prBundle->size() > 0) isEmpty = false;
+			else if(prBundle->size() > 0) empty = false;
 			else{
 				delete prBundle;
 				prBundle = NULL;
