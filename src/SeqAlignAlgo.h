@@ -123,11 +123,7 @@ public:
 		// cout << startPosS << endl << startPosA << endl;
 		// cout << endPosS   << endl << endPosA   << endl;
 		
-		if(m_log != flexbar::NONE){
-			stringstream al;
-			al << align;
-			a.alString = al.str();
-		}
+		if(m_log != NONE) a.alString << align;
 		
 		if(m_randTag) a.randTag = "";
 		

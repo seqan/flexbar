@@ -86,7 +86,6 @@ public:
 			return 0;
 		}
 		
-		
 		if(cycle == PRELOAD){
 			
 			if(idxAl == 0) reserve(alignments.first, m_bundleSize * m_queries->size());
@@ -126,6 +125,7 @@ public:
 		
 		
 		TAlignResults *am;
+		TAlignResults a;
 		
 		int qIndex  = -1;
 		int amScore = numeric_limits<int>::min();
@@ -135,7 +135,7 @@ public:
 			
 			if(i > 0) cycle = RESULTS;
 			
-			TAlignResults a;
+			a = TAlignResults();
 			
 			// global sequence alignment
 			algo->alignGlobal(a, alignments, cycle, idxAl++);
@@ -158,7 +158,7 @@ public:
 				validAl = false;
 			}
 			
-			// check if alignment is valid, score is max, number of errors and overlap length
+			// check if alignment is valid, score max, number of errors and overlap length
 			if(validAl && a.score > amScore && madeErrors <= a.allowedErrors && a.overlapLength >= minOverlap){
 				
 				am      = &a;
@@ -167,6 +167,8 @@ public:
 			}
 		}
 		
+		
+		stringstream s;
 		
 		// valid alignment
 		if(qIndex >= 0){
@@ -263,8 +265,6 @@ public:
 			// alignment stats
 			if(m_log == ALL || (m_log == MOD && performRemoval)){
 				
-				stringstream s;
-				
 				if(performRemoval){
 					s << "Sequence removal:";
 					
@@ -274,9 +274,8 @@ public:
 				}
 				else s << "Sequence detection, no removal:\n";
 				
-				s << "  query tag        " << m_queries->at(qIndex).id      << "\n"
-				  << "  read tag         " << seqRead.id                            << "\n"
-				  << "  read seq         " << seqRead.seq                            << "\n"
+				s << "  query tag        " << m_queries->at(qIndex).id               << "\n"
+				  << "  read tag         " << seqRead.id                             << "\n"
 				  << "  read pos         " << am->startPosS << "-" << am->endPosS    << "\n"
 				  << "  query pos        " << am->startPosA << "-" << am->endPosA    << "\n"
 				  << "  score            " << am->score                              << "\n"
@@ -290,26 +289,21 @@ public:
 					if(m_format == FASTQ)
 					s << "  remaining qual   " << seqRead.qual << "\n";
 				}
-				s << "\n  Alignment:\n" << endl << am->alString;
-				*m_out << s.str();
+				s << "\n  Alignment:\n" << endl << am->alString.str();
 			}
 			else if(m_log == TAB){
-				
-				stringstream s;
-				s << seqRead.id    << "\t" << m_queries->at(qIndex).id                  << "\t"
-				  << am->startPosA  << "\t" << am->endPosA           << "\t" << am->overlapLength << "\t"
-				  << am->mismatches << "\t" << am->gapsR + am->gapsA << "\t" << am->allowedErrors << endl;
-				*m_out << s.str();
+				s << seqRead.id     << "\t" << m_queries->at(qIndex).id << "\t"
+				  << am->startPosA  << "\t" << am->endPosA              << "\t" << am->overlapLength << "\t"
+				  << am->mismatches << "\t" << am->gapsR + am->gapsA    << "\t" << am->allowedErrors << endl;
 			}
 		}
 		else if(m_log == ALL){
-			
-			stringstream s;
 			s << "No valid alignment:"       << "\n"
-			  << "read tag  " << seqRead.id << "\n"
+			  << "read tag  " << seqRead.id  << "\n"
 			  << "read seq  " << seqRead.seq << "\n\n" << endl;
-			*m_out << s.str();
 		}
+		
+		*m_out << s.str();
 		
 		return ++qIndex;
 	}
@@ -350,7 +344,7 @@ public:
 		
 		stringstream s;
 		
-		s << "Min, max, mean, and median overlap: ";
+		s << "Min, max, mean and median overlap: ";
 		s << min << " / " << max << " / " << mean << " / " << median;
 		
 		return s.str();
