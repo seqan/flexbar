@@ -78,7 +78,7 @@
 				--barcode-min-overlap $cBarcodes.cbMinOverlap.bMinOverlap
 			#end if
 			
-			--barcode-threshold $cBarcodes.bThresh
+			--barcode-error-rate $cBarcodes.bThresh
 			
 			#if $cBarcodes.cbAlignScores.select == "yes":
 				--barcode-match    $bMatch
@@ -107,7 +107,7 @@
 			$cAdapters.aReadSet
 			
 			--adapter-min-overlap $cAdapters.aMinOverlap
-			--adapter-threshold   $cAdapters.aThresh
+			--adapter-error-rate   $cAdapters.aThresh
 			
 			#if $cAdapters.caAlignScores.select == "yes":
 				--adapter-match    $aMatch
