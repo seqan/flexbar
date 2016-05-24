@@ -711,10 +711,11 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		if(isSet(parser, "barcode-unassigned")) o.writeUnassigned = true;
 		if(isSet(parser, "barcode-allow-gaps")) o.bAllowGaps      = true;
 		
+		getOptionValue(o.b_match, parser, "barcode-match");
+		getOptionValue(o.b_mismatch, parser, "barcode-mismatch");
+		getOptionValue(o.b_gapCost, parser, "barcode-gap");
+		
 		if(o.bAllowGaps){
-			getOptionValue(o.b_match, parser, "barcode-match");
-			getOptionValue(o.b_mismatch, parser, "barcode-mismatch");
-			getOptionValue(o.b_gapCost, parser, "barcode-gap");
 			
 			*out << "barcode-match:        ";
 			if(o.b_match >= 0) *out << " ";
@@ -726,8 +727,9 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 			
 			*out << "barcode-gap:          ";
 			if(o.b_gapCost >= 0) *out << " ";
-			*out << o.b_gapCost << "\n" << endl;
+			*out << o.b_gapCost << endl;
 		}
+		*out << endl;
 	}
 	
 	

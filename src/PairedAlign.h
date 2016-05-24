@@ -81,7 +81,7 @@ public:
 		// barcode detection
 		if(m_barType != BOFF){
 			switch(m_barType){
-				case BARCODE_READ:         pRead->barID  = m_bfilter->alignSeqRead(pRead->b,  false, alBundle[0], cycle, idxAl); break;
+				case BARCODE_READ:         pRead->barID  = m_bfilter->alignSeqRead(pRead->b,   false, alBundle[0], cycle, idxAl); break;
 				
 				case WITHIN_READ_REMOVAL2: pRead->barID2 = m_b2filter->alignSeqRead(pRead->r2, true,  alBundle[2], cycle, idxAl);
 				case WITHIN_READ_REMOVAL:  pRead->barID  = m_bfilter->alignSeqRead(pRead->r1,  true,  alBundle[1], cycle, idxAl); break;
