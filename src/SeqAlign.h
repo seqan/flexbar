@@ -21,7 +21,7 @@ private:
 	
 	const bool m_isBarcoding, m_writeTag, m_randTag, m_strictRegion;
 	const int m_minLength, m_minOverlap, m_tailLength;
-	const float m_threshold;
+	const float m_errorRate;
 	
 	const unsigned int m_bundleSize;
 	
@@ -35,10 +35,10 @@ private:
 	
 public:
 	
-	SeqAlign(tbb::concurrent_vector<flexbar::TBar> *queries, const Options &o, int minOverlap, float threshold, const int tailLength, const int match, const int mismatch, const int gapCost, const flexbar::TrimEnd end, const bool isBarcoding):
+	SeqAlign(tbb::concurrent_vector<flexbar::TBar> *queries, const Options &o, int minOverlap, float errorRate, const int tailLength, const int match, const int mismatch, const int gapCost, const flexbar::TrimEnd end, const bool isBarcoding):
 			
 			m_minOverlap(minOverlap),
-			m_threshold(threshold),
+			m_errorRate(errorRate),
 			m_tailLength(tailLength),
 			m_trimEnd(end),
 			m_isBarcoding(isBarcoding),
@@ -144,7 +144,7 @@ public:
 			a->tailLength  = (m_tailLength > 0) ? m_tailLength : a->queryLength;
 			
 			a->overlapLength = a->endPos - a->startPos;
-			a->allowedErrors = m_threshold * a->overlapLength / 10.0f;
+			a->allowedErrors = m_errorRate * a->overlapLength;
 			
 			float madeErrors = static_cast<float>(a->mismatches + a->gapsR + a->gapsA);
 			int minOverlap   = (m_isBarcoding && m_minOverlap == 0) ? a->queryLength : m_minOverlap;

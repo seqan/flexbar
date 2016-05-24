@@ -27,7 +27,7 @@ struct Options{
 	int maxUncalled, min_readLen, a_min_overlap, b_min_overlap, nThreads, bundleSize;
 	int match, mismatch, gapCost, b_match, b_mismatch, b_gapCost;
 	
-	float a_threshold, b_threshold;
+	float a_errorRate, b_errorRate;
 	
 	flexbar::TrimEnd         end, b_end;
 	flexbar::FileFormat      format;
@@ -157,10 +157,10 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("b",  "barcodes", "Fasta file with barcodes for demultiplexing, may contain N.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("b2", "barcodes2", "Additional barcodes file for second read set in paired mode.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("br", "barcode-reads", "Fasta/q file containing separate barcode reads for detection.", ARG::INPUT_FILE));
-	addOption(parser, ArgParseOption("be", "barcode-trim-end", "Type of detection, see section trim-end modes.", ARG::STRING));
+	addOption(parser, ArgParseOption("bt", "barcode-trim-end", "Type of detection, see section trim-end modes.", ARG::STRING));
 	addOption(parser, ArgParseOption("bn", "barcode-tail-length", "Region size in tail trim-end modes. Default: barcode length.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("bo", "barcode-min-overlap", "Minimum overlap of barcode and read. Default: barcode length.", ARG::INTEGER));
-	addOption(parser, ArgParseOption("bt", "barcode-threshold", "Allowed mismatches and gaps per overlap of 10.", ARG::DOUBLE));
+	addOption(parser, ArgParseOption("be", "barcode-error-rate", "Error rate threshold for mismatches and gaps.", ARG::DOUBLE));
 	addOption(parser, ArgParseOption("bk", "barcode-keep", "Keep barcodes within reads instead of removal."));
 	addOption(parser, ArgParseOption("bu", "barcode-unassigned", "Include unassigned reads in output generation."));
 	addOption(parser, ArgParseOption("ba", "barcode-allow-gaps", "Alignment with gaps instead of hamming distance."));
@@ -174,11 +174,11 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("as", "adapter-seq", "Single adapter sequence as alternative to adapters option.", ARG::STRING));
 	addOption(parser, ArgParseOption("ar", "adapter-read-set", "Consider only single read set for adapters.", ARG::STRING));
 	addOption(parser, ArgParseOption("ac", "adapter-revcomp", "Consider also reverse complement of each adapter in search."));
-	addOption(parser, ArgParseOption("ae", "adapter-trim-end", "Type of removal, see section trim-end modes.", ARG::STRING));
+	addOption(parser, ArgParseOption("at", "adapter-trim-end", "Type of removal, see section trim-end modes.", ARG::STRING));
 	addOption(parser, ArgParseOption("an", "adapter-tail-length", "Region size for tail trim-end modes. Default: adapter length.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ad", "adapter-relaxed", "Skip restriction to pass read ends in right and left modes."));
 	addOption(parser, ArgParseOption("ao", "adapter-min-overlap", "Minimum overlap of adapter and read for removal.", ARG::INTEGER));
-	addOption(parser, ArgParseOption("at", "adapter-threshold", "Allowed mismatches and gaps per overlap of 10.", ARG::DOUBLE));
+	addOption(parser, ArgParseOption("ae", "adapter-error-rate", "Error rate threshold for mismatches and gaps.", ARG::DOUBLE));
 	addOption(parser, ArgParseOption("am", "adapter-match", "Alignment match score.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ai", "adapter-mismatch", "Alignment mismatch score.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ag", "adapter-gap", "Alignment gap score.", ARG::INTEGER));
@@ -273,14 +273,14 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	// setValidValues(parser, "adapter-trim-end", "ANY LEFT RIGHT LEFT_TAIL RIGHT_TAIL");
 	// setMinValue(parser, "adapter-tail-length", "1");
 	// setMinValue(parser, "adapter-min-overlap", "1");
-	// setMinValue(parser, "adapter-threshold",   "0");
-	// setMaxValue(parser, "adapter-threshold",   "10");
+	// setMinValue(parser, "adapter-error-rate",   "0");
+	// setMaxValue(parser, "adapter-error-rate",   "10");
 	
 	// setValidValues(parser, "barcode-trim-end", "ANY LEFT RIGHT LEFT_TAIL RIGHT_TAIL");
 	// setMinValue(parser, "barcode-tail-length", "1");
 	// setMinValue(parser, "barcode-min-overlap", "1");
-	// setMinValue(parser, "barcode-threshold",   "0");
-	// setMaxValue(parser, "barcode-threshold",   "10");
+	// setMinValue(parser, "barcode-error-rate",   "0");
+	// setMaxValue(parser, "barcode-error-rate",   "10");
 	
 	// setMinValue(parser, "max-uncalled",     "0");
 	// setMinValue(parser, "pre-trim-left",    "1");
@@ -303,14 +303,14 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setDefaultValue(parser, "min-read-length", "18");
 	
 	setDefaultValue(parser, "barcode-trim-end",  "ANY");
-	setDefaultValue(parser, "barcode-threshold", "1.0");
+	setDefaultValue(parser, "barcode-error-rate", "0.1");
 	setDefaultValue(parser, "barcode-match",     "1");
 	setDefaultValue(parser, "barcode-mismatch", "-1");
 	setDefaultValue(parser, "barcode-gap",      "-9");
 	
 	setDefaultValue(parser, "adapter-trim-end",    "RIGHT");
 	setDefaultValue(parser, "adapter-min-overlap", "3");
-	setDefaultValue(parser, "adapter-threshold",   "3.0");
+	setDefaultValue(parser, "adapter-error-rate",   "0.3");
 	setDefaultValue(parser, "adapter-match",       "1");
 	setDefaultValue(parser, "adapter-mismatch",   "-1");
 	setDefaultValue(parser, "adapter-gap",        "-6");
@@ -705,8 +705,8 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 			*out << "barcode-min-overlap:   " << o.b_min_overlap << endl;
 		}
 		
-		getOptionValue(o.b_threshold, parser, "barcode-threshold");
-		*out << "barcode-threshold:     " << o.b_threshold << endl;
+		getOptionValue(o.b_errorRate, parser, "barcode-error-rate");
+		*out << "barcode-error-rate:    " << o.b_errorRate << endl;
 		
 		if(isSet(parser, "barcode-unassigned")) o.writeUnassigned = true;
 		if(isSet(parser, "barcode-allow-gaps")) o.bAllowGaps      = true;
@@ -779,8 +779,8 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		getOptionValue(o.a_min_overlap, parser, "adapter-min-overlap");
 		*out << "adapter-min-overlap:   " << o.a_min_overlap << endl;
 		
-		getOptionValue(o.a_threshold, parser, "adapter-threshold");
-		*out << "adapter-threshold:     " << o.a_threshold << endl;
+		getOptionValue(o.a_errorRate, parser, "adapter-error-rate");
+		*out << "adapter-error-rate:    " << o.a_errorRate << endl;
 		
 		
 		getOptionValue(o.match, parser, "adapter-match");
