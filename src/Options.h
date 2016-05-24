@@ -224,12 +224,13 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	
 	hideOption(parser, "version");
+	hideOption(parser, "barcode-allow-gaps");
 	
 	setAdvanced(parser, "barcodes2");
 	setAdvanced(parser, "barcode-tail-length");
 	setAdvanced(parser, "barcode-keep");
 	setAdvanced(parser, "barcode-unassigned");
-	setAdvanced(parser, "barcode-allow-gaps");
+	// setAdvanced(parser, "barcode-allow-gaps");
 	setAdvanced(parser, "barcode-match");
 	setAdvanced(parser, "barcode-mismatch");
 	setAdvanced(parser, "barcode-gap");
