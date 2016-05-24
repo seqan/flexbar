@@ -62,7 +62,7 @@ struct AlignResults{
 	
 	float allowedErrors;
 	TSeqStr randTag;
-	std::stringstream alString;
+	std::string alString;
 	
 	AlignResults(){
 	}

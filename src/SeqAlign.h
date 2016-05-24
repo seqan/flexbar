@@ -125,7 +125,9 @@ public:
 		
 		
 		TAlignResults *am;
-		TAlignResults a;
+		TAlignResults *a = new TAlignResults();
+		
+		bool a2ndExists = false;
 		
 		int qIndex  = -1;
 		int amScore = numeric_limits<int>::min();
@@ -135,35 +137,42 @@ public:
 			
 			if(i > 0) cycle = RESULTS;
 			
-			a = TAlignResults();
-			
 			// global sequence alignment
-			algo->alignGlobal(a, alignments, cycle, idxAl++);
+			algo->alignGlobal(*a, alignments, cycle, idxAl++);
 			
-			a.queryLength = length(m_queries->at(i).seq);
-			a.tailLength  = (m_tailLength > 0) ? m_tailLength : a.queryLength;
+			a->queryLength = length(m_queries->at(i).seq);
+			a->tailLength  = (m_tailLength > 0) ? m_tailLength : a->queryLength;
 			
-			a.overlapLength = a.endPos - a.startPos;
-			a.allowedErrors = m_threshold * a.overlapLength / 10.0f;
+			a->overlapLength = a->endPos - a->startPos;
+			a->allowedErrors = m_threshold * a->overlapLength / 10.0f;
 			
-			float madeErrors = static_cast<float>(a.mismatches + a.gapsR + a.gapsA);
-			int minOverlap   = (m_isBarcoding && m_minOverlap == 0) ? a.queryLength : m_minOverlap;
+			float madeErrors = static_cast<float>(a->mismatches + a->gapsR + a->gapsA);
+			int minOverlap   = (m_isBarcoding && m_minOverlap == 0) ? a->queryLength : m_minOverlap;
 			
 			bool validAl = true;
 			
-			if(((m_trimEnd == RIGHT_TAIL || m_trimEnd == RIGHT) && a.startPosA < a.startPosS && m_strictRegion) ||
-			   ((m_trimEnd == LEFT_TAIL  || m_trimEnd == LEFT)  && a.endPosA   > a.endPosS   && m_strictRegion) ||
-			     a.overlapLength < 1){
+			if(((m_trimEnd == RIGHT_TAIL || m_trimEnd == RIGHT) && a->startPosA < a->startPosS && m_strictRegion) ||
+			   ((m_trimEnd == LEFT_TAIL  || m_trimEnd == LEFT)  && a->endPosA   > a->endPosS   && m_strictRegion) ||
+			     a->overlapLength < 1){
 				
 				validAl = false;
 			}
 			
 			// check if alignment is valid, score max, number of errors and overlap length
-			if(validAl && a.score > amScore && madeErrors <= a.allowedErrors && a.overlapLength >= minOverlap){
+			if(validAl && a->score > amScore && madeErrors <= a->allowedErrors && a->overlapLength >= minOverlap){
 				
-				am      = &a;
-				amScore = a.score;
+				TAlignResults *tmp = a2ndExists ? am : NULL;
+				
+				am      = a;
+				amScore = a->score;
 				qIndex  = i;
+				
+				if(! a2ndExists && (i + 1) < m_queries->size()){
+					
+					a = new TAlignResults();
+					a2ndExists = true;
+				}
+				else if(a2ndExists) a = tmp;
 			}
 		}
 		
@@ -289,18 +298,26 @@ public:
 					if(m_format == FASTQ)
 					s << "  remaining qual   " << seqRead.qual << "\n";
 				}
-				s << "\n  Alignment:\n" << endl << am->alString.str();
+				s << "\n  Alignment:\n" << endl << am->alString;
 			}
 			else if(m_log == TAB){
 				s << seqRead.id     << "\t" << m_queries->at(qIndex).id << "\t"
 				  << am->startPosA  << "\t" << am->endPosA              << "\t" << am->overlapLength << "\t"
 				  << am->mismatches << "\t" << am->gapsR + am->gapsA    << "\t" << am->allowedErrors << endl;
 			}
+			
+			if(a2ndExists) delete a;
+			
+			delete am;
 		}
-		else if(m_log == ALL){
-			s << "No valid alignment:"       << "\n"
-			  << "read tag  " << seqRead.id  << "\n"
-			  << "read seq  " << seqRead.seq << "\n\n" << endl;
+		else{
+			delete a;
+			
+			if(m_log == ALL){
+				s << "No valid alignment:"       << "\n"
+				  << "read tag  " << seqRead.id  << "\n"
+				  << "read seq  " << seqRead.seq << "\n\n" << endl;
+			}
 		}
 		
 		*m_out << s.str();

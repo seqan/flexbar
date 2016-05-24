@@ -114,16 +114,17 @@ public:
 		a.endPosS   = toViewPosition(row1, length(source(row1)));
 		a.endPosA   = toViewPosition(row2, length(source(row2)));
 		
-		if(a.startPosA > a.startPosS) a.startPos = a.startPosA;
-		else                          a.startPos = a.startPosS;
-		
-		if(a.endPosA > a.endPosS) a.endPos = a.endPosS;
-		else                      a.endPos = a.endPosA;
+		a.startPos = (a.startPosA > a.startPosS) ? a.startPosA : a.startPosS;
+		a.endPos   = (a.endPosA   > a.endPosS)   ? a.endPosS   : a.endPosA;
 		
 		// cout << startPosS << endl << startPosA << endl;
 		// cout << endPosS   << endl << endPosA   << endl;
 		
-		if(m_log != NONE) a.alString << align;
+		if(m_log != NONE){
+			stringstream s;
+			s << align;
+			a.alString = s.str();
+		}
 		
 		if(m_randTag) a.randTag = "";
 		

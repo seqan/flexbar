@@ -96,6 +96,7 @@ public:
 		
 		if(nReads == 0) return NULL;
 		
+		
 		TPairedReadBundle *prBundle = new TPairedReadBundle();
 		
 		prBundle->reserve(m_bundleSize);
@@ -108,8 +109,7 @@ public:
 				
 				if(uncalled[i])                ++m_uncalled;
 				if(m_isPaired && uncalled2[i]) ++m_uncalled;
-				
-				if(m_isPaired) ++m_uncalledPairs;
+				if(m_isPaired)                 ++m_uncalledPairs;
 			}
 			// else if(m_useBarRead && uncalledBR[i]){
 			//
@@ -141,6 +141,13 @@ public:
 			}
 		}
 		
+		// if(prBundle->size() == 0){
+		//
+		// 	delete prBundle;
+		// 	prBundle = NULL;
+		// 	return loadPairedReadBundle();
+		// }
+		
 		return prBundle;
 	}
 	
@@ -155,6 +162,7 @@ public:
 		bool empty = true;
 		
 		while(empty){
+			
 			prBundle = static_cast< TPairedReadBundle* >(loadPairedReadBundle());
 			
 			if(prBundle == NULL)          return NULL;
