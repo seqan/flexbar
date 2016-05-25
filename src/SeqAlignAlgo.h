@@ -64,40 +64,40 @@ public:
 		using namespace flexbar;
 		
 		
-		appendValue(alignments.second, 0);
-		
-		if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
-			
-			AlignConfig<true, false, true, true> ac;
-			alignments.second[idxAl] = globalAlignment(alignments.first[idxAl], m_scoreMatrix, ac);
-		}
-		else if(m_trimEnd == LEFT || m_trimEnd == LEFT_TAIL){
-			
-			AlignConfig<true, true, false, true> ac;
-			alignments.second[idxAl] = globalAlignment(alignments.first[idxAl], m_scoreMatrix, ac);
-		}
-		else{
-			AlignConfig<true, true, true, true> ac;
-			alignments.second[idxAl] = globalAlignment(alignments.first[idxAl], m_scoreMatrix, ac);
-		}
-		
-		// if(cycle == COMPUTE){
+		// appendValue(alignments.second, 0);
 		//
-		// 	if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
+		// if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
 		//
-		// 		AlignConfig<true, false, true, true> ac;
-		// 		alignments.second = globalAlignment(alignments.first, m_score, ac);
-		// 	}
-		// 	else if(m_trimEnd == LEFT || m_trimEnd == LEFT_TAIL){
-		//
-		// 		AlignConfig<true, true, false, true> ac;
-		// 		alignments.second = globalAlignment(alignments.first, m_score, ac);
-		// 	}
-		// 	else{
-		// 		AlignConfig<true, true, true, true> ac;
-		// 		alignments.second = globalAlignment(alignments.first, m_score, ac);
-		// 	}
+		// 	AlignConfig<true, false, true, true> ac;
+		// 	alignments.second[idxAl] = globalAlignment(alignments.first[idxAl], m_scoreMatrix, ac);
 		// }
+		// else if(m_trimEnd == LEFT || m_trimEnd == LEFT_TAIL){
+		//
+		// 	AlignConfig<true, true, false, true> ac;
+		// 	alignments.second[idxAl] = globalAlignment(alignments.first[idxAl], m_scoreMatrix, ac);
+		// }
+		// else{
+		// 	AlignConfig<true, true, true, true> ac;
+		// 	alignments.second[idxAl] = globalAlignment(alignments.first[idxAl], m_scoreMatrix, ac);
+		// }
+		
+		if(cycle == COMPUTE){
+
+			if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
+
+				AlignConfig<true, false, true, true> ac;
+				alignments.second = globalAlignment(alignments.first, m_score, ac);
+			}
+			else if(m_trimEnd == LEFT || m_trimEnd == LEFT_TAIL){
+
+				AlignConfig<true, true, false, true> ac;
+				alignments.second = globalAlignment(alignments.first, m_score, ac);
+			}
+			else{
+				AlignConfig<true, true, true, true> ac;
+				alignments.second = globalAlignment(alignments.first, m_score, ac);
+			}
+		}
 		
 		TAlign &align = alignments.first[idxAl];
 		a.score       = alignments.second[idxAl];
@@ -119,6 +119,7 @@ public:
 		
 		// cout << startPosS << endl << startPosA << endl;
 		// cout << endPosS   << endl << endPosA   << endl;
+		
 		
 		if(m_log != NONE){
 			stringstream s;
