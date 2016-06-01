@@ -66,6 +66,9 @@ public:
 		
 		// appendValue(alignments.second, 0);
 		//
+		// int band1 = overhang;
+		// int band2 = readLen - minOvl
+		//
 		// if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
 		//
 		// 	AlignConfig<true, false, true, true> ac;
@@ -78,7 +81,7 @@ public:
 		// }
 		// else{
 		// 	AlignConfig<true, true, true, true> ac;
-		// 	alignments.second[idxAl] = globalAlignment(alignments.first[idxAl], m_scoreMatrix, ac);
+		// 	alignments.second[idxAl] = globalAlignment(alignments.first[idxAl], m_scoreMatrix, ac, band1, band2);
 		// }
 		
 		if(cycle == COMPUTE){
