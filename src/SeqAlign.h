@@ -124,10 +124,12 @@ public:
 		}
 		
 		
-		TAlignResults *am;
-		TAlignResults *a = new TAlignResults();
+		TAlignResults a1, a2;
 		
-		bool a2ndExists = false;
+		TAlignResults* a = &a1;
+		TAlignResults* am;
+		
+		bool a1used = true;
 		
 		int qIndex  = -1;
 		int amScore = numeric_limits<int>::min();
@@ -161,18 +163,18 @@ public:
 			// check if alignment is valid, score max, number of errors and overlap length
 			if(validAl && a->score > amScore && madeErrors <= a->allowedErrors && a->overlapLength >= minOverlap){
 				
-				TAlignResults *tmp = a2ndExists ? am : NULL;
-				
 				am      = a;
 				amScore = a->score;
 				qIndex  = i;
 				
-				if(! a2ndExists && (i + 1) < m_queries->size()){
-					
-					a = new TAlignResults();
-					a2ndExists = true;
+				if(a1used){
+					a1used = false;
+					a = &a2;
 				}
-				else if(a2ndExists) a = tmp;
+				else{
+					a1used = true;
+					a = &a1;
+				}
 			}
 		}
 		
@@ -283,14 +285,14 @@ public:
 				}
 				else s << "Sequence detection, no removal:\n";
 				
-				s << "  query tag        " << m_queries->at(qIndex).id               << "\n"
-				  << "  read tag         " << seqRead.id                             << "\n"
+				s << "  query id         " << m_queries->at(qIndex).id               << "\n"
+  				  << "  query pos        " << am->startPosA << "-" << am->endPosA    << "\n"
+				  << "  read id          " << seqRead.id                             << "\n"
 				  << "  read pos         " << am->startPosS << "-" << am->endPosS    << "\n"
-				  << "  query pos        " << am->startPosA << "-" << am->endPosA    << "\n"
 				  << "  score            " << am->score                              << "\n"
 				  << "  overlap          " << am->overlapLength                      << "\n"
 				  << "  errors           " << am->gapsR + am->gapsA + am->mismatches << "\n"
-				  << "  allowed errors   " << am->allowedErrors                      << "\n";
+				  << "  error threshold  " << am->allowedErrors                      << "\n";
 				
 				if(performRemoval){
 					s << "  remaining read   "  << seqRead.seq << "\n";
@@ -305,19 +307,11 @@ public:
 				  << am->startPosA  << "\t" << am->endPosA              << "\t" << am->overlapLength << "\t"
 				  << am->mismatches << "\t" << am->gapsR + am->gapsA    << "\t" << am->allowedErrors << endl;
 			}
-			
-			if(a2ndExists) delete a;
-			
-			delete am;
 		}
-		else{
-			delete a;
-			
-			if(m_log == ALL){
-				s << "No valid alignment:"       << "\n"
-				  << "read tag  " << seqRead.id  << "\n"
-				  << "read seq  " << seqRead.seq << "\n\n" << endl;
-			}
+		else if(m_log == ALL){
+			s << "Unvalid alignment:"        << "\n"
+			  << "read id   " << seqRead.id  << "\n"
+			  << "read seq  " << seqRead.seq << "\n\n" << endl;
 		}
 		
 		*m_out << s.str();

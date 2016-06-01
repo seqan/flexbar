@@ -175,6 +175,11 @@ public:
 		return prBundle;
 	}
 	
+	// virtual
+	void finalize(void* item){
+		
+	}
+	
 	
 	unsigned long getNrUncalledReads() const{
 		return m_uncalled;
