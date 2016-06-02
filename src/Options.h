@@ -23,7 +23,7 @@ struct Options{
 	bool useStdin, useStdout, relaxRegion, revCompAdapter, qtrimPostRm, bNoMBV;
 	
 	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len;
-	int qtrimThresh, qtrimWinSize;
+	int qtrimThresh, qtrimWinSize, a_overhang;
 	int maxUncalled, min_readLen, a_min_overlap, b_min_overlap, nThreads, bundleSize;
 	int match, mismatch, gapCost, b_match, b_mismatch, b_gapCost;
 	
@@ -176,7 +176,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("ac", "adapter-revcomp", "Consider also reverse complement of each adapter in search."));
 	addOption(parser, ArgParseOption("at", "adapter-trim-end", "Type of removal, see section trim-end modes.", ARG::STRING));
 	addOption(parser, ArgParseOption("an", "adapter-tail-length", "Region size for tail trim-end modes. Default: adapter length.", ARG::INTEGER));
-	// addOption(parser, ArgParseOption("ah", "adapter-overhang", "Overhang at read ends in right and left modes.", ARG::INTEGER));
+	addOption(parser, ArgParseOption("ah", "adapter-overhang", "Overhang at read ends in right and left modes.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ad", "adapter-relaxed", "Skip restriction to pass read ends in right and left modes."));
 	addOption(parser, ArgParseOption("ao", "adapter-min-overlap", "Minimum overlap of adapter and read for removal.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ae", "adapter-error-rate", "Error rate threshold for mismatches and gaps.", ARG::DOUBLE));
@@ -229,6 +229,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "adapters2");
 	setAdvanced(parser, "adapter-revcomp");
 	setAdvanced(parser, "adapter-tail-length");
+	setAdvanced(parser, "adapter-overhang");
 	setAdvanced(parser, "adapter-relaxed");
 	setAdvanced(parser, "adapter-read-set");
 	setAdvanced(parser, "adapter-match");
@@ -302,7 +303,8 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	setDefaultValue(parser, "adapter-trim-end",    "RIGHT");
 	setDefaultValue(parser, "adapter-min-overlap", "3");
-	setDefaultValue(parser, "adapter-error-rate",   "0.3");
+	setDefaultValue(parser, "adapter-error-rate",  "0.3");
+	setDefaultValue(parser, "adapter-overhang",    "0");
 	setDefaultValue(parser, "adapter-match",       "1");
 	setDefaultValue(parser, "adapter-mismatch",   "-1");
 	setDefaultValue(parser, "adapter-gap",        "-6");
@@ -703,9 +705,9 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		if(isSet(parser, "barcode-unassigned")) o.writeUnassigned = true;
 		if(isSet(parser, "barcode-no-mbv"))     o.bNoMBV          = true;
 		
-		getOptionValue(o.b_match, parser,    "barcode-match");
+		getOptionValue(o.b_match,    parser, "barcode-match");
 		getOptionValue(o.b_mismatch, parser, "barcode-mismatch");
-		getOptionValue(o.b_gapCost, parser,  "barcode-gap");
+		getOptionValue(o.b_gapCost,  parser, "barcode-gap");
 		
 		if(o.bNoMBV){
 			
@@ -774,10 +776,13 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		getOptionValue(o.a_errorRate, parser, "adapter-error-rate");
 		*out << "adapter-error-rate:    " << o.a_errorRate << endl;
 		
+		getOptionValue(o.a_overhang, parser, "adapter-overhang");
+		*out << "adapter-overhang:      " << o.a_overhang << endl;
 		
-		getOptionValue(o.match, parser,    "adapter-match");
+		
+		getOptionValue(o.match,    parser, "adapter-match");
 		getOptionValue(o.mismatch, parser, "adapter-mismatch");
-		getOptionValue(o.gapCost, parser,  "adapter-gap");
+		getOptionValue(o.gapCost,  parser, "adapter-gap");
 		
 		*out << "adapter-match:        ";
 		if(o.match >= 0) *out << " ";
