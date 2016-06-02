@@ -20,7 +20,7 @@ struct Options{
 	
 	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, randTag, logStdout;
 	bool switch2Fasta, writeUnassigned, writeSingleReads, writeSingleReadsP, writeLengthDist;
-	bool useStdin, useStdout, relaxRegion, revCompAdapter, qtrimPostRm, bAllowGaps;
+	bool useStdin, useStdout, relaxRegion, revCompAdapter, qtrimPostRm, bNoMBV;
 	
 	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len;
 	int qtrimThresh, qtrimWinSize;
@@ -70,7 +70,7 @@ struct Options{
 		relaxRegion       = false;
 		revCompAdapter    = false;
 		qtrimPostRm       = false;
-		bAllowGaps        = false;
+		bNoMBV            = false;
 		
 		cutLen_begin  = 0;
 		cutLen_end    = 0;
@@ -163,7 +163,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("be", "barcode-error-rate", "Error rate threshold for mismatches and gaps.", ARG::DOUBLE));
 	addOption(parser, ArgParseOption("bk", "barcode-keep", "Keep barcodes within reads instead of removal."));
 	addOption(parser, ArgParseOption("bu", "barcode-unassigned", "Include unassigned reads in output generation."));
-	addOption(parser, ArgParseOption("ba", "barcode-allow-gaps", "Alignment with gaps instead of hamming distance."));
+	addOption(parser, ArgParseOption("ba", "barcode-no-mbv", "Turn off bit-vector alignment with edit distance."));
 	addOption(parser, ArgParseOption("bm", "barcode-match", "Match score in case of allowed gaps.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("bi", "barcode-mismatch", "Mismatch score if gaps allowed.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("bg", "barcode-gap", "Alignment gap score.", ARG::INTEGER));
@@ -176,21 +176,13 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("ac", "adapter-revcomp", "Consider also reverse complement of each adapter in search."));
 	addOption(parser, ArgParseOption("at", "adapter-trim-end", "Type of removal, see section trim-end modes.", ARG::STRING));
 	addOption(parser, ArgParseOption("an", "adapter-tail-length", "Region size for tail trim-end modes. Default: adapter length.", ARG::INTEGER));
+	// addOption(parser, ArgParseOption("ah", "adapter-overhang", "Overhang at read ends in right and left modes.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ad", "adapter-relaxed", "Skip restriction to pass read ends in right and left modes."));
 	addOption(parser, ArgParseOption("ao", "adapter-min-overlap", "Minimum overlap of adapter and read for removal.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ae", "adapter-error-rate", "Error rate threshold for mismatches and gaps.", ARG::DOUBLE));
 	addOption(parser, ArgParseOption("am", "adapter-match", "Alignment match score.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ai", "adapter-mismatch", "Alignment mismatch score.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ag", "adapter-gap", "Alignment gap score.", ARG::INTEGER));
-	
-	// addSection(parser, "Joining paired reads");
-	// addOption(parser, ArgParseOption("j",  "join", "Fasta file with adapters for removal that may contain N.", ARG::STRING));
-	// addOption(parser, ArgParseOption("jo", "join-min-overlap", "Minimum overlap of adapter and read sequence.", ARG::INTEGER));
-	// addOption(parser, ArgParseOption("jn", "join-max-overlap", "Region size for tail trim-end modes. Default: adapter length.", ARG::INTEGER));
-	// addOption(parser, ArgParseOption("jt", "join-threshold", "Allowed mismatches and gaps per 10 bases overlap.", ARG::DOUBLE));
-	// addOption(parser, ArgParseOption("jm", "join-match", "Alignment match score.", ARG::INTEGER));
-	// addOption(parser, ArgParseOption("ji", "join-mismatch", "Alignment mismatch score.", ARG::INTEGER));
-	// addOption(parser, ArgParseOption("jg", "join-gap", "Alignment gap score.", ARG::INTEGER));
 	
 	addSection(parser, "Filtering and trimming");
 	addOption(parser, ArgParseOption("u", "max-uncalled", "Allowed uncalled bases N for each read.", ARG::INTEGER));
@@ -224,13 +216,12 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	
 	hideOption(parser, "version");
-	hideOption(parser, "barcode-allow-gaps");
 	
 	setAdvanced(parser, "barcodes2");
 	setAdvanced(parser, "barcode-tail-length");
 	setAdvanced(parser, "barcode-keep");
 	setAdvanced(parser, "barcode-unassigned");
-	// setAdvanced(parser, "barcode-allow-gaps");
+	setAdvanced(parser, "barcode-no-mbv");
 	setAdvanced(parser, "barcode-match");
 	setAdvanced(parser, "barcode-mismatch");
 	setAdvanced(parser, "barcode-gap");
@@ -710,13 +701,13 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		*out << "barcode-error-rate:    " << o.b_errorRate << endl;
 		
 		if(isSet(parser, "barcode-unassigned")) o.writeUnassigned = true;
-		if(isSet(parser, "barcode-allow-gaps")) o.bAllowGaps      = true;
+		if(isSet(parser, "barcode-no-mbv"))     o.bNoMBV          = true;
 		
-		getOptionValue(o.b_match, parser, "barcode-match");
+		getOptionValue(o.b_match, parser,    "barcode-match");
 		getOptionValue(o.b_mismatch, parser, "barcode-mismatch");
-		getOptionValue(o.b_gapCost, parser, "barcode-gap");
+		getOptionValue(o.b_gapCost, parser,  "barcode-gap");
 		
-		if(o.bAllowGaps){
+		if(o.bNoMBV){
 			
 			*out << "barcode-match:        ";
 			if(o.b_match >= 0) *out << " ";
@@ -784,9 +775,9 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		*out << "adapter-error-rate:    " << o.a_errorRate << endl;
 		
 		
-		getOptionValue(o.match, parser, "adapter-match");
+		getOptionValue(o.match, parser,    "adapter-match");
 		getOptionValue(o.mismatch, parser, "adapter-mismatch");
-		getOptionValue(o.gapCost, parser, "adapter-gap");
+		getOptionValue(o.gapCost, parser,  "adapter-gap");
 		
 		*out << "adapter-match:        ";
 		if(o.match >= 0) *out << " ";
