@@ -93,20 +93,18 @@ public:
 			for(unsigned int i = 0; i < m_queries->size(); ++i){
 				
 				TSeqStr &qseq = m_queries->at(i).seq;
-				TSeqStr *rseq;
+				TSeqStr *rseq = &seqRead.seq;
 				
-				rseq = &seqRead.seq;
+				TSeqStr tmp;
 				
 				if(m_trimEnd == LEFT_TAIL || m_trimEnd == RIGHT_TAIL){
 					int tailLength  = (m_tailLength > 0) ? m_tailLength : length(qseq);
 					
 					if(tailLength < readLength){
+						if(m_trimEnd == LEFT_TAIL) tmp = prefix(seqRead.seq, tailLength);
+						else                       tmp = suffix(seqRead.seq, readLength - tailLength);
 						
-						TSeqStr seq;
-						if(m_trimEnd == LEFT_TAIL) seq = prefix(seqRead.seq, tailLength);
-						else                       seq = suffix(seqRead.seq, readLength - tailLength);
-						
-						rseq = &seq;
+						rseq = &tmp;
 					}
 				}
 				
