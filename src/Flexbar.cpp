@@ -25,12 +25,10 @@
 int main(int argc, const char* argv[]){
 	
 	using namespace std;
-	using namespace flexbar;
-	
-	using seqan::ArgumentParser;
+	using namespace seqan;
 	
 	const string version = "3.0 dev";
-	const string date    = "May 2016";
+	const string date    = "June 2016";
 	
 	ArgumentParser parser("flexbar");
 	
