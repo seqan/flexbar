@@ -1,7 +1,4 @@
-/*
- *   FlexbarTypes.h
- *
- */
+// FlexbarTypes.h
 
 #ifndef FLEXBAR_FLEXBARTYPES_H
 #define FLEXBAR_FLEXBARTYPES_H
@@ -95,9 +92,8 @@ namespace flexbar{
 	typedef std::vector<PairedRead<FSeqStr, FString>* > TPairedReadBundleVec;
 	
 	
-	class SeqReadData {
+	struct SeqReadData {
 		
-		public:
 		TSeqStrs seqs;
 		TStrings ids, quals;
 		TBools uncalled;
@@ -107,23 +103,12 @@ namespace flexbar{
 	};
 	
 	
-	class PairedReadBundle {
+	struct PairedReadBundle {
 		
-		public:
-		SeqReadData *srd, *srd2, *srdBR;
-		
+		SeqReadData srd, srd2, srdBR;
 		TPairedReadBundleVec prbv;
 		
-		PairedReadBundle(SeqReadData *p_srd, SeqReadData *p_srd2, SeqReadData *p_srdBR) :
-		srd(p_srd),
-		srd2(p_srd2),
-		srdBR(p_srdBR){
-		}
-		
-		virtual ~PairedReadBundle(){
-			delete srd;
-			delete srd2;
-			delete srdBR;
+		PairedReadBundle(){
 		}
 	};
 	

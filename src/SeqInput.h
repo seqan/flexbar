@@ -1,8 +1,4 @@
-/*
- *   SeqInput.h
- *
- *   Authors: mat and jtr
- */
+// SeqInput.h
 
 #ifndef FLEXBAR_SEQINPUT_H
 #define FLEXBAR_SEQINPUT_H
@@ -17,15 +13,12 @@ class SeqInput {
 private:
 	
 	seqan::SeqFileIn seqFileIn;
-	
 	const flexbar::QualTrimType m_qtrim;
-	flexbar::FileFormat m_format;
-	
+	const flexbar::FileFormat m_format;
 	// typedef seqan::String<char, seqan::MMap<> > TMMapString;
 	
 	const bool m_preProcess, m_useStdin, m_qtrimPostRm;
 	const int m_maxUncalled, m_preTrimBegin, m_preTrimEnd, m_qtrimThresh, m_qtrimWinSize;
-	
 	tbb::atomic<unsigned long> m_nrReads, m_nrChars, m_nLowPhred;
 	
 public:
@@ -41,11 +34,10 @@ public:
 		m_qtrimThresh(o.qtrimThresh),
 		m_qtrimWinSize(o.qtrimWinSize),
 		m_qtrimPostRm(o.qtrimPostRm),
-		m_format(o.format){
-		
-		m_nrReads   = 0;
-		m_nrChars   = 0;
-		m_nLowPhred = 0;
+		m_format(o.format),
+		m_nrReads(0),
+		m_nrChars(0),
+		m_nLowPhred(0){
 		
 		using namespace std;
 		
