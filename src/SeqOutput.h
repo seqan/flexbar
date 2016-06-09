@@ -31,13 +31,12 @@ public:
 		m_cutLen_read(o.cutLen_read),
 		m_writeLenDist(o.writeLengthDist),
 		m_useStdout(o.useStdout && ! alwaysFile),
-		m_cmprsType(o.cmprsType){
+		m_cmprsType(o.cmprsType),
+		m_countGood(0),
+		m_countGoodChars(0){
 		
 		using namespace std;
 		using namespace flexbar;
-		
-		m_countGood      = 0;
-		m_countGoodChars = 0;
 		
 		m_filePath = filePath;
 		
@@ -102,7 +101,7 @@ public:
 	}
 	
 	
-	void writeSeqRead(SeqRead<TSeqStr, TString> &seqRead){
+	void writeSeqRead(flexbar::TSeqRead &seqRead){
 		
 		using namespace std;
 		using namespace flexbar;
