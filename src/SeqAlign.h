@@ -1,8 +1,4 @@
-/*
- *   SeqAlign.h
- *
- *   Authors: mat and jtr
- */
+// SeqAlign.h
 
 #ifndef FLEXBAR_SEQALIGN_H
 #define FLEXBAR_SEQALIGN_H
@@ -22,11 +18,9 @@ private:
 	const bool m_isBarcoding, m_writeTag, m_randTag, m_strictRegion;
 	const int m_minLength, m_minOverlap, m_tailLength;
 	const float m_errorRate;
-	
 	const unsigned int m_bundleSize;
 	
 	tbb::atomic<unsigned long> m_nPreShortReads, m_modified;
-	
 	tbb::concurrent_vector<flexbar::TBar> *m_queries;
 	tbb::concurrent_vector<unsigned long> *m_rmOverlaps;
 	
@@ -49,15 +43,13 @@ public:
 			m_writeTag(o.useRemovalTag),
 			m_strictRegion(! o.relaxRegion),
 			m_bundleSize(o.bundleSize),
-			m_out(o.out){
+			m_out(o.out),
+			m_nPreShortReads(0),
+			m_modified(0){
 		
 		m_queries = queries;
 		
-		m_nPreShortReads = 0;
-		m_modified       = 0;
-		
 		algo = new TAlgorithm(o, match, mismatch, gapCost, m_trimEnd);
-		
 		m_rmOverlaps = new tbb::concurrent_vector<unsigned long>(flexbar::MAX_READLENGTH + 1, 0);
 	};
 	

@@ -1,7 +1,4 @@
-/*
- *   SeqAlignAlgo.h
- *
- */
+// SeqAlignAlgo.h
 
 #ifndef FLEXBAR_SEQALIGNALGO_H
 #define FLEXBAR_SEQALIGNALGO_H

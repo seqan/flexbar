@@ -1,8 +1,4 @@
-/*
- *   SeqOutputFiles.h
- *
- *   Author: mat and jtr
- */
+// SeqOutputFiles.h
 
 #ifndef FLEXBAR_SEQOUTPUTFILES_H
 #define FLEXBAR_SEQOUTPUTFILES_H
@@ -24,12 +20,10 @@ public:
 		f1(0),
 		f2(0),
 		single1(0),
-		single2(0){
-		
-		m_nShort_1 = 0;
-		m_nShort_2 = 0;
+		single2(0),
+		m_nShort_1(0),
+		m_nShort_2(0){
 	};
-	
 	
 	virtual ~SeqOutputFiles(){
     	delete f1;
@@ -37,7 +31,7 @@ public:
     	delete single1;
     	delete single2;
 	};
-	
+
 
 private:
 	

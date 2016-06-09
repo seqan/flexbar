@@ -1,8 +1,4 @@
-/*
- *   PairedOutput.h
- *
- *   Authors: mat and jtr
- */
+// PairedOutput.h
 
 #ifndef FLEXBAR_PAIREDOUTPUT_H
 #define FLEXBAR_PAIREDOUTPUT_H
@@ -231,7 +227,7 @@ public:
 	};
 	
 	
-	void writePairedRead(PairedRead<TSeqStr, TString>* pRead){
+	void writePairedRead(flexbar::TPairedRead* pRead){
 		
 		using namespace flexbar;
 		

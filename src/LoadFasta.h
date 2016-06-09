@@ -1,7 +1,4 @@
-/*
- *   LoadFasta.h
- *
- */
+// LoadFasta.h
 
 #ifndef FLEXBAR_LOADFASTA_H
 #define FLEXBAR_LOADFASTA_H
