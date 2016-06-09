@@ -263,13 +263,13 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	// setValidValues(parser, "adapters", "fasta fa");
 	// setValidValues(parser, "adapters2", "fasta fa");
 	
-	// setValidValues(parser, "adapter-trim-end", "ANY LEFT RIGHT LEFT_TAIL RIGHT_TAIL");
+	// setValidValues(parser, "adapter-trim-end", "ANY LEFT RIGHT LTAIL RTAIL");
 	// setMinValue(parser, "adapter-tail-length", "1");
 	// setMinValue(parser, "adapter-min-overlap", "1");
 	// setMinValue(parser, "adapter-error-rate",   "0");
 	// setMaxValue(parser, "adapter-error-rate",   "10");
 	
-	// setValidValues(parser, "barcode-trim-end", "ANY LEFT RIGHT LEFT_TAIL RIGHT_TAIL");
+	// setValidValues(parser, "barcode-trim-end", "ANY LEFT RIGHT LTAIL RTAIL");
 	// setMinValue(parser, "barcode-tail-length", "1");
 	// setMinValue(parser, "barcode-min-overlap", "1");
 	// setMinValue(parser, "barcode-error-rate",   "0");
@@ -295,33 +295,33 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setDefaultValue(parser, "max-uncalled",    "0");
 	setDefaultValue(parser, "min-read-length", "18");
 	
-	setDefaultValue(parser, "barcode-trim-end",  "ANY");
+	setDefaultValue(parser, "barcode-trim-end",   "LTAIL");
 	setDefaultValue(parser, "barcode-error-rate", "0.1");
-	setDefaultValue(parser, "barcode-match",     "1");
-	setDefaultValue(parser, "barcode-mismatch", "-1");
-	setDefaultValue(parser, "barcode-gap",      "-9");
+	setDefaultValue(parser, "barcode-match",      "1");
+	setDefaultValue(parser, "barcode-mismatch",   "-1");
+	setDefaultValue(parser, "barcode-gap",        "-9");
 	
 	setDefaultValue(parser, "adapter-trim-end",    "RIGHT");
 	setDefaultValue(parser, "adapter-min-overlap", "3");
 	setDefaultValue(parser, "adapter-error-rate",  "0.3");
 	setDefaultValue(parser, "adapter-overhang",    "0");
 	setDefaultValue(parser, "adapter-match",       "1");
-	setDefaultValue(parser, "adapter-mismatch",   "-1");
-	setDefaultValue(parser, "adapter-gap",        "-6");
+	setDefaultValue(parser, "adapter-mismatch",    "-1");
+	setDefaultValue(parser, "adapter-gap",         "-6");
 	
-	setDefaultValue(parser, "qtrim-threshold",    "20");
-	setDefaultValue(parser, "qtrim-win-size",     "5");
+	setDefaultValue(parser, "qtrim-threshold", "20");
+	setDefaultValue(parser, "qtrim-win-size",  "5");
 	
 	
 	addTextSection(parser, "TRIM-END MODES");
-	addText(parser._toolDoc, "\\fBANY:\\fP longer side of read remains after removal of overlap",   false);
-	addText(parser._toolDoc, "\\fBLEFT:\\fP right side remains after removal, align <= read end",   false);
+	addText(parser._toolDoc, "\\fBANY:\\fP   longer side of read remains after removal of overlap", false);
+	addText(parser._toolDoc, "\\fBLEFT:\\fP  right side remains after removal, align <= read end",  false);
 	addText(parser._toolDoc, "\\fBRIGHT:\\fP left part remains after removal, align >= read start", false);
-	addText(parser._toolDoc, "\\fBLEFT_TAIL:\\fP consider first n bases of reads in alignment",     false);
-	addText(parser._toolDoc, "\\fBRIGHT_TAIL:\\fP use only last n bases, see tail-length options",  false);
+	addText(parser._toolDoc, "\\fBLTAIL:\\fP consider first n bases of reads in alignment",         false);
+	addText(parser._toolDoc, "\\fBRTAIL:\\fP use only last n bases, see tail-length options",       false);
 	
 	addTextSection(parser, "EXAMPLES");
-	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq \\fB-t\\fP target \\fB-b\\fP brc.fa \\fB-be\\fP LEFT_TAIL \\fB-a\\fP adp.fa", false);
+	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq \\fB-t\\fP target \\fB-b\\fP brc.fa \\fB-be\\fP LTAIL \\fB-a\\fP adp.fa", false);
 	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq.gz \\fB-q\\fP TAIL \\fB-qf\\fP i1.8 \\fB-a\\fP adp.fa \\fB-ao\\fP 5 \\fB-at\\fP 4");
 }
 
@@ -590,8 +590,8 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 			
 			     if(quality == "sanger") o.qual = SANGER;
 			else if(quality == "solexa") o.qual = SOLEXA;
-			else if(quality == "i1.3")   o.qual = ILLUMINA13;
-			else if(quality == "i1.5")   o.qual = ILLUMINA13;
+			else if(quality == "i1.3")   o.qual = ILLUMINA;
+			else if(quality == "i1.5")   o.qual = ILLUMINA;
 			else if(quality == "i1.8")   o.qual = SANGER;
 			
 			*out << "qtrim-format:          " << quality << endl;
@@ -611,7 +611,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 					break;
 				case SOLEXA:      o.qtrimThresh += 59;
 					break;
-				case ILLUMINA13:  o.qtrimThresh += 64;
+				case ILLUMINA:  o.qtrimThresh += 64;
 			}
 			*out << "  (" << o.qtrimThresh << ")" << endl;
 		}
@@ -680,8 +680,8 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		     if(b_trim_end == "LEFT")        o.b_end = LEFT;
 		else if(b_trim_end == "RIGHT")       o.b_end = RIGHT;
 		else if(b_trim_end == "ANY")         o.b_end = ANY;
-		else if(b_trim_end == "LEFT_TAIL")   o.b_end = LEFT_TAIL;
-		else if(b_trim_end == "RIGHT_TAIL")  o.b_end = RIGHT_TAIL;
+		else if(b_trim_end == "LTAIL")   o.b_end = LTAIL;
+		else if(b_trim_end == "RTAIL")  o.b_end = RTAIL;
 		else{
 			cerr << "Specified barcode trim-end is unknown!\n" << endl;
 			exit(1);
@@ -737,8 +737,8 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		if     (a_trim_end == "LEFT")        o.end = LEFT;
 		else if(a_trim_end == "RIGHT")       o.end = RIGHT;
 		else if(a_trim_end == "ANY")         o.end = ANY;
-		else if(a_trim_end == "LEFT_TAIL")   o.end = LEFT_TAIL;
-		else if(a_trim_end == "RIGHT_TAIL")  o.end = RIGHT_TAIL;
+		else if(a_trim_end == "LTAIL")   o.end = LTAIL;
+		else if(a_trim_end == "RTAIL")  o.end = RTAIL;
 		else {
 			cerr << "Specified adapter trim-end is unknown!\n" << endl;
 			exit(1);

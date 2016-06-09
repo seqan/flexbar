@@ -145,8 +145,8 @@ namespace flexbar{
 		ANY,
 		LEFT,
 		RIGHT,
-		LEFT_TAIL,
-		RIGHT_TAIL
+		LTAIL,
+		RTAIL
 	};
 	
 	enum FileFormat {
@@ -157,7 +157,7 @@ namespace flexbar{
 	enum QualityType {
 		SANGER,
 		SOLEXA,
-		ILLUMINA13
+		ILLUMINA
 	};
 	
 	enum QualTrimType {

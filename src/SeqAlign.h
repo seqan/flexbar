@@ -97,11 +97,11 @@ public:
 				
 				TSeqStr tmp;
 				
-				if(m_trimEnd == LEFT_TAIL || m_trimEnd == RIGHT_TAIL){
+				if(m_trimEnd == LTAIL || m_trimEnd == RTAIL){
 					int tailLength  = (m_tailLength > 0) ? m_tailLength : length(qseq);
 					
 					if(tailLength < readLength){
-						if(m_trimEnd == LEFT_TAIL) tmp = prefix(seqRead.seq, tailLength);
+						if(m_trimEnd == LTAIL) tmp = prefix(seqRead.seq, tailLength);
 						else                       tmp = suffix(seqRead.seq, readLength - tailLength);
 						
 						rseq = &tmp;
@@ -151,8 +151,8 @@ public:
 			
 			bool validAl = true;
 			
-			if(((m_trimEnd == RIGHT_TAIL || m_trimEnd == RIGHT) && a->startPosA < a->startPosS && m_strictRegion) ||
-			   ((m_trimEnd == LEFT_TAIL  || m_trimEnd == LEFT)  && a->endPosA   > a->endPosS   && m_strictRegion) ||
+			if(((m_trimEnd == RTAIL || m_trimEnd == RIGHT) && a->startPosA < a->startPosS && m_strictRegion) ||
+			   ((m_trimEnd == LTAIL  || m_trimEnd == LEFT)  && a->endPosA   > a->endPosS   && m_strictRegion) ||
 			     a->overlapLength < 1){
 				
 				validAl = false;
@@ -203,7 +203,7 @@ public:
 					
 					int rCutPos;
 					
-					case LEFT_TAIL:
+					case LTAIL:
 					case LEFT:
 						rCutPos = am->endPos;
 						
@@ -222,7 +222,7 @@ public:
 						
 						break;
 					
-					case RIGHT_TAIL:
+					case RTAIL:
 						// adjust cut pos to original read length
 						am->startPos += readLength - am->tailLength;
 					
@@ -277,8 +277,8 @@ public:
 				if(performRemoval){
 					s << "Sequence removal:";
 					
-					     if(trimEnd == LEFT  || trimEnd == LEFT_TAIL)  s << " left side\n";
-					else if(trimEnd == RIGHT || trimEnd == RIGHT_TAIL) s << " right side\n";
+					     if(trimEnd == LEFT  || trimEnd == LTAIL)  s << " left side\n";
+					else if(trimEnd == RIGHT || trimEnd == RTAIL) s << " right side\n";
 					else                                               s << " any side\n";
 				}
 				else s << "Sequence detection, no removal:\n";

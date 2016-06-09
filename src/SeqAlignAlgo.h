@@ -72,11 +72,11 @@ public:
 		// AlignConfig<true, true, true, true> ac;
 		// alignments.second[idxAl] = globalAlignment(alignments.first[idxAl], m_scoreMatrix, ac, band1, band2);
 		
-		// if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
+		// if(m_trimEnd == RIGHT || m_trimEnd == RTAIL){
 		// 	AlignConfig<true, false, true, true> ac;
 		// 	alignments.second[idxAl] = globalAlignment(alignments.first[idxAl], m_scoreMatrix, ac);
 		// }
-		// else if(m_trimEnd == LEFT || m_trimEnd == LEFT_TAIL){
+		// else if(m_trimEnd == LEFT || m_trimEnd == LTAIL){
 		// 	AlignConfig<true, true, false, true> ac;
 		// 	alignments.second[idxAl] = globalAlignment(alignments.first[idxAl], m_scoreMatrix, ac);
 		// }
@@ -87,12 +87,12 @@ public:
 		
 		if(cycle == COMPUTE){
 
-			if(m_trimEnd == RIGHT || m_trimEnd == RIGHT_TAIL){
+			if(m_trimEnd == RIGHT || m_trimEnd == RTAIL){
 
 				AlignConfig<true, false, true, true> ac;
 				alignments.second = globalAlignment(alignments.first, m_score, ac);
 			}
-			else if(m_trimEnd == LEFT || m_trimEnd == LEFT_TAIL){
+			else if(m_trimEnd == LEFT || m_trimEnd == LTAIL){
 
 				AlignConfig<true, true, false, true> ac;
 				alignments.second = globalAlignment(alignments.first, m_score, ac);
