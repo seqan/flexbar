@@ -65,88 +65,98 @@ public:
 		using namespace std;
 		using namespace flexbar;
 		
-		TSeqStrs seqs,  seqs2,  seqsBR;
-		TStrings ids,   ids2,   idsBR;
-		TStrings quals, quals2, qualsBR;
+		SeqReadData *srd = new SeqReadData();
 		
-		seqan::StringSet<bool> uncalled, uncalled2, uncalledBR;
+		SeqReadData *srd2 = NULL, *srdBR = NULL;
 		
-		unsigned int nReads = m_f1->loadSeqReads(uncalled, ids, seqs, quals, m_bundleSize);
+		unsigned int nReads = m_f1->loadSeqReads(srd->uncalled, srd->ids, srd->seqs, srd->quals, m_bundleSize);
 		
 		if(m_isPaired){
-			unsigned int nReads2 = m_f2->loadSeqReads(uncalled2, ids2, seqs2, quals2, m_bundleSize);
+			
+			srd2 = new SeqReadData();
+			
+			unsigned int nReads2 = m_f2->loadSeqReads(srd2->uncalled, srd2->ids, srd2->seqs, srd2->quals, m_bundleSize);
 			
 			if(nReads != nReads2){
 				cerr << "\nERROR: Single read in paired input mode.\n" << endl;
+				delete srd2;
 				exit(1);
 			}
 		}
 		if(m_useBarRead){
-			unsigned int nBarReads = m_b->loadSeqReads(uncalledBR, idsBR, seqsBR, qualsBR, m_bundleSize);
+			
+			srdBR = new SeqReadData();
+			
+			unsigned int nBarReads = m_b->loadSeqReads(srdBR->uncalled, srdBR->ids, srdBR->seqs, srdBR->quals, m_bundleSize);
 			
 			if(nReads < nBarReads){
 				cerr << "\nERROR: Barcode read without read in input.\n" << endl;
+				delete srdBR;
 				exit(1);
 			}
 			else if(nReads > nBarReads){
 				cerr << "\nERROR: Read without barcode read in input.\n" << endl;
+				delete srdBR;
 				exit(1);
 			}
 		}
 		
-		if(nReads == 0) return NULL;
+		PairedReadBundle *prBundle = new PairedReadBundle(srd, srd2, srdBR);
 		
+		if(nReads == 0){
+			delete prBundle;
+			return NULL;
+		}
 		
-		TPairedReadBundle *prBundle = new TPairedReadBundle();
+		unsigned int nEntries = 0;
 		
-		prBundle->reserve(m_bundleSize);
-		
-		for(unsigned int i = 0; i < length(ids); ++i){
+		for(unsigned int i = 0; i < length(srd->ids); ++i){
 			
-			TSeqRead *read1 = NULL, *read2 = NULL, *barRead = NULL;
-			
-			if(uncalled[i] || (m_isPaired && uncalled2[i])){
+			if(srd->uncalled[i] || (m_isPaired && srd2->uncalled[i])){
 				
-				if(uncalled[i])                ++m_uncalled;
-				if(m_isPaired && uncalled2[i]) ++m_uncalled;
-				if(m_isPaired)                 ++m_uncalledPairs;
+				if(srd->uncalled[i])                ++m_uncalled;
+				if(m_isPaired && srd2->uncalled[i]) ++m_uncalled;
+				if(m_isPaired)                      ++m_uncalledPairs;
 			}
 			// else if(m_useBarRead && uncalledBR[i]){
 			//
 			// 	// to be handled
 			// }
 			else{
-				if(m_format == FASTA){
-					                 read1   = new TSeqRead(seqs[i],   ids[i]);
-					if(m_isPaired)   read2   = new TSeqRead(seqs2[i],  ids2[i]);
-					if(m_useBarRead) barRead = new TSeqRead(seqsBR[i], idsBR[i]);
-				}
-				else{
-					                 read1   = new TSeqRead(seqs[i],   ids[i],   quals[i]);
-					if(m_isPaired)   read2   = new TSeqRead(seqs2[i],  ids2[i],  quals2[i]);
-					if(m_useBarRead) barRead = new TSeqRead(seqsBR[i], idsBR[i], qualsBR[i]);
-				}
+				++nEntries;
 				
 				if(m_useNumberTag){
 					stringstream converter;
 					converter << ++m_tagCounter;
 					TString tagCount = converter.str();
 					
-					                 read1->id   = tagCount;
-					if(m_isPaired)   read2->id   = tagCount;
-					if(m_useBarRead) barRead->id = tagCount;
+					                 srd->ids[i]   = tagCount;
+					if(m_isPaired)   srd2->ids[i]  = tagCount;
+					if(m_useBarRead) srdBR->ids[i] = tagCount;
 				}
 				
-				prBundle->push_back(new TPairedRead(read1, read2, barRead));
+				TSeqRead *read1 = NULL, *read2 = NULL, *barRead = NULL;
+				
+				if(m_format == FASTA){
+					                 read1   = new TSeqRead(srd->seqs[i],   srd->ids[i],   srd->ids[i]);
+					if(m_isPaired)   read2   = new TSeqRead(srd2->seqs[i],  srd2->ids[i],  srd2->ids[i]);
+					if(m_useBarRead) barRead = new TSeqRead(srdBR->seqs[i], srdBR->ids[i], srdBR->ids[i]);
+				}
+				else{
+					                 read1   = new TSeqRead(srd->seqs[i],   srd->ids[i],   srd->quals[i]);
+					if(m_isPaired)   read2   = new TSeqRead(srd2->seqs[i],  srd2->ids[i],  srd2->quals[i]);
+					if(m_useBarRead) barRead = new TSeqRead(srdBR->seqs[i], srdBR->ids[i], srdBR->quals[i]);
+				}
+				
+				prBundle->prbv.push_back(new TPairedRead(read1, read2, barRead));
 			}
 		}
 		
-		// if(prBundle->size() == 0){
-		//
-		// 	delete prBundle;
-		// 	prBundle = NULL;
-		// 	return loadPairedReadBundle();
-		// }
+		if(nEntries == 0){
+			delete prBundle;
+			prBundle = NULL;
+			return loadPairedReadBundle();
+		}
 		
 		return prBundle;
 	}
@@ -157,21 +167,10 @@ public:
 		
 		using namespace flexbar;
 		
-		TPairedReadBundle *prBundle = NULL;
+		PairedReadBundle *prBundle = NULL;
 		
-		bool empty = true;
+		prBundle = static_cast< PairedReadBundle* >(loadPairedReadBundle());
 		
-		while(empty){
-			
-			prBundle = static_cast< TPairedReadBundle* >(loadPairedReadBundle());
-			
-			if(prBundle == NULL)          return NULL;
-			else if(prBundle->size() > 0) empty = false;
-			else{
-				delete prBundle;
-				prBundle = NULL;
-			}
-		}
 		return prBundle;
 	}
 	

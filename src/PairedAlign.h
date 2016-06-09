@@ -119,7 +119,7 @@ public:
 		
 		if(item != NULL){
 			
-			TPairedReadBundle *prBundle = static_cast<TPairedReadBundle* >(item);
+			PairedReadBundle *prBundle = static_cast<PairedReadBundle* >(item);
 			
 			TAlignBundle alBundle;
 			alBundle.reserve(5);
@@ -136,17 +136,27 @@ public:
 			unsigned int idxAl = 0;
 			ComputeCycle cycle = PRELOAD;
 			
-			for(unsigned int i = 0; i < prBundle->size(); ++i)
-				alignPairedRead(prBundle->at(i), alBundle, cycle, idxAl);
+			// TPairedReadBundleVec prbv;
+			//
+			// for(unsigned int i = 0; i < length(prBundle->srd->ids); ++i){
+			//
+			// 	if(! srd->uncalled[i] && ! (m_isPaired && srd2->uncalled[i])){
+			//
+			//
+			// 	}
+			// }
+			
+			for(unsigned int i = 0; i < prBundle->prbv.size(); ++i)
+				alignPairedRead(prBundle->prbv.at(i), alBundle, cycle, idxAl);
 			
 			idxAl = 0;
 			cycle = COMPUTE;
 			
-			for(unsigned int i = 0; i < prBundle->size(); ++i){
+			for(unsigned int i = 0; i < prBundle->prbv.size(); ++i){
 				
 				if(i > 0) cycle = RESULTS;
 				
-				alignPairedRead(prBundle->at(i), alBundle, cycle, idxAl);
+				alignPairedRead(prBundle->prbv.at(i), alBundle, cycle, idxAl);
 			}
 			
 			return prBundle;

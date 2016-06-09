@@ -338,12 +338,12 @@ public:
 		
 		if(item != NULL){
 			
-			TPairedReadBundle *prBundle = static_cast< TPairedReadBundle* >(item);
+			PairedReadBundle *prBundle = static_cast< PairedReadBundle* >(item);
 			
-			for(unsigned int i = 0; i < prBundle->size(); ++i){
+			for(unsigned int i = 0; i < prBundle->prbv.size(); ++i){
 				
-				writePairedRead(prBundle->at(i));
-				delete prBundle->at(i);
+				writePairedRead(prBundle->prbv.at(i));
+				delete prBundle->prbv.at(i);
 			}
 			delete prBundle;
 		}
