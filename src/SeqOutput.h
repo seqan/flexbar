@@ -1,8 +1,4 @@
-/*
- *   SeqOutput.h
- *
- *   Authors: mat and jtr
- */
+// SeqOutput.h
 
 #ifndef FLEXBAR_SEQOUTPUT_H
 #define FLEXBAR_SEQOUTPUT_H
@@ -14,18 +10,16 @@ class SeqOutput {
 private:
 	
 	seqan::SeqFileOut seqFileOut;
+	std::string m_filePath;
 	
+	const TString m_tagStr;
+	const flexbar::FileFormat m_format;
+	const flexbar::CompressionType m_cmprsType;
 	const bool m_switch2Fasta, m_writeLenDist, m_useStdout;
 	const unsigned int m_minLength, m_cutLen_read;
 	
-	std::string m_filePath;
-	const TString m_tagStr;
-	
-	const flexbar::FileFormat m_format;
-	const flexbar::CompressionType m_cmprsType;
-	
 	tbb::atomic<unsigned long> m_countGood, m_countGoodChars;
-	tbb::concurrent_vector<unsigned long> *m_lengthDist;
+	tbb::concurrent_vector<unsigned long> m_lengthDist;
 	
 public:
 	
@@ -51,7 +45,7 @@ public:
 		     m_filePath += getExtension(FASTA) + o.outCompression;
 		else m_filePath += getExtension(FASTQ) + o.outCompression;
 		
-		m_lengthDist = new tbb::concurrent_vector<unsigned long>(MAX_READLENGTH + 1, 0);
+		m_lengthDist = tbb::concurrent_vector<unsigned long>(MAX_READLENGTH + 1, 0);
 		
 		if(m_useStdout){
 			
@@ -74,7 +68,6 @@ public:
 	
 	
 	virtual ~SeqOutput(){
-		delete m_lengthDist;
 		if(! m_useStdout) close(seqFileOut);
 	};
 	
@@ -101,8 +94,8 @@ public:
 			lstream << "Readlength\tCount" << "\n";
 			
 			for (int i = 0; i <= flexbar::MAX_READLENGTH; ++i){
-				if(m_lengthDist->at(i) > 0)
-					lstream << i << "\t" << m_lengthDist->at(i) << "\n";
+				if(m_lengthDist.at(i) > 0)
+					lstream << i << "\t" << m_lengthDist.at(i) << "\n";
 			}
 			lstream.close();
 		}
@@ -131,7 +124,6 @@ public:
 			cerr << "\nERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
 			
 			close(seqFileOut);
-			delete m_lengthDist;
 			exit(1);
 		}
 	}
@@ -174,7 +166,7 @@ public:
 			// store read length distribution
 			
 			if(m_writeLenDist && readLength <= MAX_READLENGTH)
-				m_lengthDist->at(readLength)++;
+				m_lengthDist.at(readLength)++;
 			else if(m_writeLenDist)
 				cerr << "\nCompile Flexbar with larger max read length to get correct length dist.\n" << endl;
 			
