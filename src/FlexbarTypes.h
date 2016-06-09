@@ -11,11 +11,6 @@ class SeqRead {
 	TSeqStr &seq;
 	TString &id, &qual;
 	
-	// SeqRead(TSeqStr& sequence, TString& seqID) :
-	// 	seq(sequence),
-	// 	id(seqID){
-	// }
-	
 	SeqRead(TSeqStr& sequence, TString& seqID, TString& quality) :
 		seq(sequence),
 		id(seqID),

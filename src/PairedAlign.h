@@ -23,8 +23,8 @@ private:
 	tbb::concurrent_vector<flexbar::TBar> *m_adapters, *m_adapters2;
 	tbb::concurrent_vector<flexbar::TBar> *m_barcodes, *m_barcodes2;
 	
-	typedef SeqAlign<TSeqStr, TString, SeqAlignAlgo<TSeqStr> > TAlignFilter;
-	TAlignFilter *m_afilter, *m_bfilter, *m_a2filter, *m_b2filter;
+	typedef SeqAlign<TSeqStr, TString, SeqAlignAlgo<TSeqStr> > TSeqAlign;
+	TSeqAlign *m_a1, *m_b1, *m_a2, *m_b2;
 	
 	std::ostream *out;
 	
@@ -48,11 +48,11 @@ public:
 		m_barcodes2 = &o.barcodes2;
 		m_adapters2 = &o.adapters2;
 		
-		m_bfilter = new TAlignFilter(m_barcodes, o, o.b_min_overlap, o.b_errorRate, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, o.b_end, true);
-		m_afilter = new TAlignFilter(m_adapters, o, o.a_min_overlap, o.a_errorRate, o.a_tail_len, o.match, o.mismatch, o.gapCost, o.end, false);
+		m_b1 = new TSeqAlign(m_barcodes, o, o.b_min_overlap, o.b_errorRate, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, o.b_end, true);
+		m_a1 = new TSeqAlign(m_adapters, o, o.a_min_overlap, o.a_errorRate, o.a_tail_len, o.match, o.mismatch, o.gapCost, o.end, false);
 		
-		m_b2filter = new TAlignFilter(m_barcodes2, o, o.b_min_overlap, o.b_errorRate, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, o.b_end, true);
-		m_a2filter = new TAlignFilter(m_adapters2, o, o.a_min_overlap, o.a_errorRate, o.a_tail_len, o.match, o.mismatch, o.gapCost, o.end, false);
+		m_b2 = new TSeqAlign(m_barcodes2, o, o.b_min_overlap, o.b_errorRate, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, o.b_end, true);
+		m_a2 = new TSeqAlign(m_adapters2, o, o.a_min_overlap, o.a_errorRate, o.a_tail_len, o.match, o.mismatch, o.gapCost, o.end, false);
 		
 		if(m_log == flexbar::TAB)
 		*out << "ReadTag\tQueryTag\tQueryStart\tQueryEnd\tOverlapLength\tMismatches\tIndels\tAllowedErrors" << std::endl;
@@ -60,10 +60,10 @@ public:
 	
 	
 	virtual ~PairedAlign(){
-		delete m_bfilter;
-		delete m_afilter;
-		delete m_b2filter;
-		delete m_a2filter;
+		delete m_b1;
+		delete m_a1;
+		delete m_b2;
+		delete m_a2;
 	};
 	
 	
@@ -71,21 +71,21 @@ public:
 		
 		using namespace flexbar;
 		
+		bool skipAdapRem = false;
+		
 		// barcode detection
 		if(m_barType != BOFF){
 			switch(m_barType){
-				case BARCODE_READ:         pRead->barID  = m_bfilter->alignSeqRead(pRead->b,   false, alBundle[0], cycle, idxAl); break;
+				case BARCODE_READ:         pRead->barID  = m_b1->alignSeqRead(pRead->b,  false, alBundle[0], cycle, idxAl); break;
 				
-				case WITHIN_READ_REMOVAL2: pRead->barID2 = m_b2filter->alignSeqRead(pRead->r2, true,  alBundle[2], cycle, idxAl);
-				case WITHIN_READ_REMOVAL:  pRead->barID  = m_bfilter->alignSeqRead(pRead->r1,  true,  alBundle[1], cycle, idxAl); break;
+				case WITHIN_READ_REMOVAL2: pRead->barID2 = m_b2->alignSeqRead(pRead->r2, true,  alBundle[2], cycle, idxAl);
+				case WITHIN_READ_REMOVAL:  pRead->barID  = m_b1->alignSeqRead(pRead->r1, true,  alBundle[1], cycle, idxAl); break;
 				
-				case WITHIN_READ2:         pRead->barID2 = m_b2filter->alignSeqRead(pRead->r2, false, alBundle[2], cycle, idxAl);
-				case WITHIN_READ:          pRead->barID  = m_bfilter->alignSeqRead(pRead->r1,  false, alBundle[1], cycle, idxAl); break;
+				case WITHIN_READ2:         pRead->barID2 = m_b2->alignSeqRead(pRead->r2, false, alBundle[2], cycle, idxAl);
+				case WITHIN_READ:          pRead->barID  = m_b1->alignSeqRead(pRead->r1, false, alBundle[1], cycle, idxAl); break;
 				
 				case BOFF: break;
 			}
-			
-			bool skipAdapRem = false;
 			
 			if(pRead->barID == 0 || (m_twoBarcodes && pRead->barID2 == 0)){
 				
@@ -97,11 +97,11 @@ public:
 		// adapter removal
 		if(m_adapRem != AOFF && ! skipAdapRem){
 			if(m_adapRem != ATWO)
-			m_afilter->alignSeqRead(pRead->r1, true, alBundle[3], cycle, idxAl);
+			m_a1->alignSeqRead(pRead->r1, true, alBundle[3], cycle, idxAl);
 			
 			if(pRead->r2 != NULL && m_adapRem != AONE){
-				if(m_adapRem != NORMAL2) m_afilter->alignSeqRead(pRead->r2,  true, alBundle[4], cycle, idxAl);
-				else                     m_a2filter->alignSeqRead(pRead->r2, true, alBundle[4], cycle, idxAl);
+				if(m_adapRem != NORMAL2) m_a1->alignSeqRead(pRead->r2, true, alBundle[4], cycle, idxAl);
+				else                     m_a2->alignSeqRead(pRead->r2, true, alBundle[4], cycle, idxAl);
 			}
 		}
 	}
@@ -163,8 +163,8 @@ public:
 		
 		using namespace flexbar;
 		
-		if(m_adapRem != NORMAL2) return m_afilter->getNrPreShortReads();
-		else return m_afilter->getNrPreShortReads() + m_a2filter->getNrPreShortReads();
+		if(m_adapRem != NORMAL2) return m_a1->getNrPreShortReads();
+		else return m_a1->getNrPreShortReads() + m_a2->getNrPreShortReads();
 	}
 	
 	
@@ -172,8 +172,8 @@ public:
 		
 		using namespace flexbar;
 		
-		if(m_afilter->getNrModifiedReads() > 0)
-			*out << m_afilter->getOverlapStatsString() << "\n\n";
+		if(m_a1->getNrModifiedReads() > 0)
+			*out << m_a1->getOverlapStatsString() << "\n\n";
 		
 		if(m_adapRem != NORMAL2) *out << std::endl;
 	}
@@ -181,8 +181,8 @@ public:
 	
 	void printAdapterOverlapStats2(){
 		
-		if(m_a2filter->getNrModifiedReads() > 0)
-			*out << m_a2filter->getOverlapStatsString() << "\n\n";
+		if(m_a2->getNrModifiedReads() > 0)
+			*out << m_a2->getOverlapStatsString() << "\n\n";
 		
 		*out << std::endl;
 	}
