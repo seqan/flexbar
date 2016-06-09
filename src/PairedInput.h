@@ -11,13 +11,11 @@ class PairedInput : public tbb::filter {
 
 private:
 	
-	flexbar::FileFormat m_format;
-	
+	const flexbar::FileFormat m_format;
 	const bool m_isPaired, m_useBarRead, m_useNumberTag;
 	const unsigned int m_bundleSize;
 	
 	tbb::atomic<unsigned long> m_uncalled, m_uncalledPairs, m_tagCounter;
-	
 	SeqInput<TSeqStr, TString> *m_f1, *m_f2, *m_b;
 	
 public:
@@ -128,7 +126,7 @@ public:
 					if(m_useBarRead) barRead = new TSeqRead(b->srdBR.seqs[i], b->srdBR.ids[i], b->srdBR.quals[i]);
 				}
 				
-				b->prbv.push_back(new TPairedRead(read1, read2, barRead));
+				b->pReads.push_back(new TPairedRead(read1, read2, barRead));
 			}
 		}
 		

@@ -1,8 +1,4 @@
-/*
- *   PairedAlign.h
- *
- *   Authors: mat and jtr
- */
+// PairedAlign.h
 
 #ifndef FLEXBAR_PAIREDALIGN_H
 #define FLEXBAR_PAIREDALIGN_H
@@ -24,7 +20,6 @@ private:
 	const flexbar::AdapterRemoval m_adapRem;
 	
 	tbb::atomic<unsigned long> m_unassigned;
-	
 	tbb::concurrent_vector<flexbar::TBar> *m_adapters, *m_adapters2;
 	tbb::concurrent_vector<flexbar::TBar> *m_barcodes, *m_barcodes2;
 	
@@ -76,8 +71,6 @@ public:
 		
 		using namespace flexbar;
 		
-		bool skipAdapRem = false;
-		
 		// barcode detection
 		if(m_barType != BOFF){
 			switch(m_barType){
@@ -91,6 +84,8 @@ public:
 				
 				case BOFF: break;
 			}
+			
+			bool skipAdapRem = false;
 			
 			if(pRead->barID == 0 || (m_twoBarcodes && pRead->barID2 == 0)){
 				
@@ -136,27 +131,17 @@ public:
 			unsigned int idxAl = 0;
 			ComputeCycle cycle = PRELOAD;
 			
-			// TPairedReadBundleVec prbv;
-			//
-			// for(unsigned int i = 0; i < length(prBundle->srd->ids); ++i){
-			//
-			// 	if(! srd->uncalled[i] && ! (m_isPaired && srd2->uncalled[i])){
-			//
-			//
-			// 	}
-			// }
-			
-			for(unsigned int i = 0; i < prBundle->prbv.size(); ++i)
-				alignPairedRead(prBundle->prbv.at(i), alBundle, cycle, idxAl);
+			for(unsigned int i = 0; i < prBundle->pReads.size(); ++i)
+				alignPairedRead(prBundle->pReads.at(i), alBundle, cycle, idxAl);
 			
 			idxAl = 0;
 			cycle = COMPUTE;
 			
-			for(unsigned int i = 0; i < prBundle->prbv.size(); ++i){
+			for(unsigned int i = 0; i < prBundle->pReads.size(); ++i){
 				
 				if(i > 0) cycle = RESULTS;
 				
-				alignPairedRead(prBundle->prbv.at(i), alBundle, cycle, idxAl);
+				alignPairedRead(prBundle->pReads.at(i), alBundle, cycle, idxAl);
 			}
 			
 			return prBundle;
@@ -187,9 +172,8 @@ public:
 		
 		using namespace flexbar;
 		
-		if(m_afilter->getNrModifiedReads() > 0){
+		if(m_afilter->getNrModifiedReads() > 0)
 			*out << m_afilter->getOverlapStatsString() << "\n\n";
-		}
 		
 		if(m_adapRem != NORMAL2) *out << std::endl;
 	}
@@ -197,9 +181,9 @@ public:
 	
 	void printAdapterOverlapStats2(){
 		
-		if(m_a2filter->getNrModifiedReads() > 0){
+		if(m_a2filter->getNrModifiedReads() > 0)
 			*out << m_a2filter->getOverlapStatsString() << "\n\n";
-		}
+		
 		*out << std::endl;
 	}
 	

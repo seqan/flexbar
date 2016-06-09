@@ -340,10 +340,10 @@ public:
 			
 			PairedReadBundle *prBundle = static_cast< PairedReadBundle* >(item);
 			
-			for(unsigned int i = 0; i < prBundle->prbv.size(); ++i){
+			for(unsigned int i = 0; i < prBundle->pReads.size(); ++i){
 				
-				writePairedRead(prBundle->prbv.at(i));
-				delete prBundle->prbv.at(i);
+				writePairedRead(prBundle->pReads.at(i));
+				delete prBundle->pReads.at(i);
 			}
 			delete prBundle;
 		}
