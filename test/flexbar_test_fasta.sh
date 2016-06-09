@@ -39,7 +39,7 @@ echo "Test 3 OK"
 fi
 
 
-flexbar --reads reads.fasta --target result_left_tail --adapter-min-overlap 4 --adapters adapters.fasta --min-read-length 10 --adapter-error-rate 0.1 --adapter-trim-end LEFT_TAIL > /dev/null
+flexbar --reads reads.fasta --target result_left_tail --adapter-min-overlap 4 --adapters adapters.fasta --min-read-length 10 --adapter-error-rate 0.1 --adapter-trim-end LTAIL > /dev/null
 
 a=`diff correct_result_left_tail.fasta result_left_tail.fasta`
 
@@ -52,7 +52,7 @@ echo "Test 4 OK"
 fi
 
 
-flexbar --reads reads.fasta --target result_right_tail --adapter-min-overlap 4 --adapters adapters.fasta --min-read-length 10 --adapter-error-rate 0.1 --adapter-trim-end RIGHT_TAIL > /dev/null
+flexbar --reads reads.fasta --target result_right_tail --adapter-min-overlap 4 --adapters adapters.fasta --min-read-length 10 --adapter-error-rate 0.1 --adapter-trim-end RTAIL > /dev/null
 
 a=`diff correct_result_right_tail.fasta result_right_tail.fasta`
 
