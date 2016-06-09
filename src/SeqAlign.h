@@ -22,10 +22,10 @@ private:
 	
 	tbb::atomic<unsigned long> m_nPreShortReads, m_modified;
 	tbb::concurrent_vector<flexbar::TBar> *m_queries;
-	tbb::concurrent_vector<unsigned long> *m_rmOverlaps;
+	tbb::concurrent_vector<unsigned long> m_rmOverlaps;
 	
 	std::ostream *m_out;
-	TAlgorithm *algo;
+	TAlgorithm algo;
 	
 public:
 	
@@ -45,18 +45,11 @@ public:
 			m_bundleSize(o.bundleSize),
 			m_out(o.out),
 			m_nPreShortReads(0),
-			m_modified(0){
+			m_modified(0),
+			algo(TAlgorithm(o, match, mismatch, gapCost, m_trimEnd)){
 		
-		m_queries = queries;
-		
-		algo = new TAlgorithm(o, match, mismatch, gapCost, m_trimEnd);
-		m_rmOverlaps = new tbb::concurrent_vector<unsigned long>(flexbar::MAX_READLENGTH + 1, 0);
-	};
-	
-	
-	virtual ~SeqAlign(){
-		delete algo;
-		delete m_rmOverlaps;
+		m_queries    = queries;
+		m_rmOverlaps = tbb::concurrent_vector<unsigned long>(flexbar::MAX_READLENGTH + 1, 0);
 	};
 	
 	
@@ -113,9 +106,7 @@ public:
 			return 0;
 		}
 		
-		
 		TAlignResults a1, a2;
-		
 		TAlignResults* a = &a1;
 		TAlignResults* am;
 		
@@ -130,7 +121,7 @@ public:
 			if(i > 0) cycle = RESULTS;
 			
 			// global sequence alignment
-			algo->alignGlobal(*a, alignments, cycle, idxAl++);
+			algo.alignGlobal(*a, alignments, cycle, idxAl++);
 			
 			a->queryLength = length(m_queries->at(i).seq);
 			a->tailLength  = (m_tailLength > 0) ? m_tailLength : a->queryLength;
@@ -252,7 +243,7 @@ public:
 				}
 				
 				// store overlap occurrences
-				if(am->overlapLength <= MAX_READLENGTH) m_rmOverlaps->at(am->overlapLength)++;
+				if(am->overlapLength <= MAX_READLENGTH) m_rmOverlaps.at(am->overlapLength)++;
 				else cerr << "\nCompile Flexbar with larger max read length for correct overlap stats.\n" << endl;
 			}
 			
@@ -321,7 +312,7 @@ public:
 		unsigned int min = numeric_limits<unsigned int>::max();
 		
 		for(unsigned int i = 0; i <= MAX_READLENGTH; ++i){
-			unsigned long lenCount = m_rmOverlaps->at(i);
+			unsigned long lenCount = m_rmOverlaps.at(i);
 			
 			if(lenCount > 0 && i < min) min = i;
 			if(lenCount > 0 && i > max) max = i;
@@ -333,7 +324,7 @@ public:
 		halfValues = nValues / 2;
 		
 		for(unsigned int i = 0; i <= MAX_READLENGTH; ++i){
-			cumValues += m_rmOverlaps->at(i);
+			cumValues += m_rmOverlaps.at(i);
 			
 			if(cumValues >= halfValues){
 				median = i;

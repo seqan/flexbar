@@ -39,9 +39,8 @@ public:
 		m_adapRem(o.adapRm),
 		m_writeUnassigned(o.writeUnassigned),
 		m_twoBarcodes(o.barDetect == flexbar::WITHIN_READ_REMOVAL2 || o.barDetect == flexbar::WITHIN_READ2),
-		out(o.out){
-		
-		m_unassigned = 0;
+		out(o.out),
+		m_unassigned(0){
 		
 		m_barcodes  = &o.barcodes;
 		m_adapters  = &o.adapters;
@@ -77,13 +76,10 @@ public:
 		if(m_barType != BOFF){
 			switch(m_barType){
 				case BARCODE_READ:         pRead->barID  = m_b1->alignSeqRead(pRead->b,  false, alBundle[0], cycle, idxAl); break;
-				
 				case WITHIN_READ_REMOVAL2: pRead->barID2 = m_b2->alignSeqRead(pRead->r2, true,  alBundle[2], cycle, idxAl);
 				case WITHIN_READ_REMOVAL:  pRead->barID  = m_b1->alignSeqRead(pRead->r1, true,  alBundle[1], cycle, idxAl); break;
-				
 				case WITHIN_READ2:         pRead->barID2 = m_b2->alignSeqRead(pRead->r2, false, alBundle[2], cycle, idxAl);
 				case WITHIN_READ:          pRead->barID  = m_b1->alignSeqRead(pRead->r1, false, alBundle[1], cycle, idxAl); break;
-				
 				case BOFF: break;
 			}
 			

@@ -50,10 +50,6 @@ public:
 	};
 	
 	
-	virtual ~SeqAlignAlgo(){
-	};
-	
-	
 	void alignGlobal(TAlignResults &a, flexbar::TAlignments &alignments, const flexbar::ComputeCycle &cycle, const unsigned int idxAl){
 		
 		using namespace std;
