@@ -11,6 +11,12 @@ class SeqRead {
 	TSeqStr &seq;
 	TString &id, &qual;
 	
+	SeqRead(TSeqStr& sequence, TString& seqID) :
+		seq(sequence),
+		id(seqID),
+		qual(seqID){
+	}
+	
 	SeqRead(TSeqStr& sequence, TString& seqID, TString& quality) :
 		seq(sequence),
 		id(seqID),
@@ -85,31 +91,29 @@ namespace flexbar{
 	
 	// typedef seqan::StringSet<TAlign, seqan::Dependent<seqan::Tight> > TAlignSet;
 	
+	// struct Alignments {
+	// 	TAlignSet data;
+	// 	TAlignScores scores;
+	// };
 	
 	struct SeqReadData {
-		
 		TSeqStrs seqs;
 		TStrings ids, quals;
 		TBools uncalled;
 		
-		SeqReadData(){
-		}
+		SeqReadData(){}
 	};
 	
-	
 	struct PairedReadBundle {
-		
 		SeqReadData srd, srd2, srdBR;
 		TPairedReads pReads;
 		
-		PairedReadBundle(){
-		}
+		PairedReadBundle(){}
 	};
 	
 	
-	class TBar {
+	struct TBar {
 		
-		public:
 		FString id;
 		FSeqStr seq;
 		

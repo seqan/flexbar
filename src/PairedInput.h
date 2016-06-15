@@ -86,8 +86,6 @@ public:
 			return NULL;
 		}
 		
-		unsigned int nEntries = 0;
-		
 		for(unsigned int i = 0; i < length(b->srd.ids); ++i){
 			
 			if(b->srd.uncalled[i] || (m_isPaired && b->srd2.uncalled[i])){
@@ -101,7 +99,6 @@ public:
 			// 	// to be handled
 			// }
 			else{
-				++nEntries;
 				
 				if(m_useNumberTag){
 					stringstream converter;
@@ -116,9 +113,9 @@ public:
 				TSeqRead *read1 = NULL, *read2 = NULL, *barRead = NULL;
 				
 				if(m_format == FASTA){
-					                 read1   = new TSeqRead(b->srd.seqs[i],   b->srd.ids[i],   b->srd.ids[i]);
-					if(m_isPaired)   read2   = new TSeqRead(b->srd2.seqs[i],  b->srd2.ids[i],  b->srd2.ids[i]);
-					if(m_useBarRead) barRead = new TSeqRead(b->srdBR.seqs[i], b->srdBR.ids[i], b->srdBR.ids[i]);
+					                 read1   = new TSeqRead(b->srd.seqs[i],   b->srd.ids[i]);
+					if(m_isPaired)   read2   = new TSeqRead(b->srd2.seqs[i],  b->srd2.ids[i]);
+					if(m_useBarRead) barRead = new TSeqRead(b->srdBR.seqs[i], b->srdBR.ids[i]);
 				}
 				else{
 					                 read1   = new TSeqRead(b->srd.seqs[i],   b->srd.ids[i],   b->srd.quals[i]);
@@ -130,7 +127,7 @@ public:
 			}
 		}
 		
-		if(nEntries == 0){
+		if(b->pReads.size() == 0){
 			delete b;
 			b = NULL;
 			return loadPairedReadBundle();
