@@ -46,7 +46,7 @@ public:
 			m_out(o.out),
 			m_nPreShortReads(0),
 			m_modified(0),
-			algo(TAlgorithm(o, match, mismatch, gapCost, m_trimEnd)){
+			algo(TAlgorithm(o, match, mismatch, gapCost, end)){
 		
 		m_queries    = queries;
 		m_rmOverlaps = tbb::concurrent_vector<unsigned long>(flexbar::MAX_READLENGTH + 1, 0);
@@ -60,11 +60,9 @@ public:
 		
 		using seqan::prefix;
 		using seqan::suffix;
-		using seqan::infix;
 		
 		TSeqRead &seqRead = *sr;
-		
-		int readLength = length(seqRead.seq);
+		int readLength    = length(seqRead.seq);
 		
 		if(! m_isBarcoding && readLength < m_minLength){
 			if(cycle != PRELOAD) ++m_nPreShortReads;
@@ -79,7 +77,6 @@ public:
 				
 				TSeqStr &qseq = m_queries->at(i).seq;
 				TSeqStr *rseq = &seqRead.seq;
-				
 				TSeqStr tmp;
 				
 				if(m_trimEnd == LTAIL || m_trimEnd == RTAIL){
@@ -87,14 +84,12 @@ public:
 					
 					if(tailLength < readLength){
 						if(m_trimEnd == LTAIL) tmp = prefix(seqRead.seq, tailLength);
-						else                       tmp = suffix(seqRead.seq, readLength - tailLength);
-						
+						else                   tmp = suffix(seqRead.seq, readLength - tailLength);
 						rseq = &tmp;
 					}
 				}
 				
 				TAlign align;
-				
 				appendValue(alignments.first, align);
 				resize(rows(alignments.first[idxAl]), 2);
 				
@@ -134,7 +129,7 @@ public:
 			
 			bool validAl = true;
 			
-			if(((m_trimEnd == RTAIL || m_trimEnd == RIGHT) && a->startPosA < a->startPosS && m_strictRegion) ||
+			if(((m_trimEnd == RTAIL  || m_trimEnd == RIGHT) && a->startPosA < a->startPosS && m_strictRegion) ||
 			   ((m_trimEnd == LTAIL  || m_trimEnd == LEFT)  && a->endPosA   > a->endPosS   && m_strictRegion) ||
 			     a->overlapLength < 1){
 				
@@ -158,7 +153,6 @@ public:
 				}
 			}
 		}
-		
 		
 		stringstream s;
 		

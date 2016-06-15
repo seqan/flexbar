@@ -167,7 +167,7 @@ void printComputationTime(Options &o, const time_t start, const unsigned long nR
 	else                                        *out              << "< 1 sec\n";
 	
 	if(totalTime >= 1)
-	*out << "Computation speed:  " << nReads / totalTime << " reads/s\n\n" << endl;
+	*out << "Processing speed:   " << nReads / totalTime << " reads/s\n\n" << endl;
 	else *out << "\n" << endl;
 }
 
