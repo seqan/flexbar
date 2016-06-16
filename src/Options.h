@@ -164,9 +164,9 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("bk", "barcode-keep", "Keep barcodes within reads instead of removal."));
 	addOption(parser, ArgParseOption("bu", "barcode-unassigned", "Include unassigned reads in output generation."));
 	addOption(parser, ArgParseOption("ba", "barcode-no-mbv", "Turn off bit-vector alignment with edit distance."));
-	addOption(parser, ArgParseOption("bm", "barcode-match", "Match score in case of allowed gaps.", ARG::INTEGER));
-	addOption(parser, ArgParseOption("bi", "barcode-mismatch", "Mismatch score if gaps allowed.", ARG::INTEGER));
-	addOption(parser, ArgParseOption("bg", "barcode-gap", "Alignment gap score.", ARG::INTEGER));
+	addOption(parser, ArgParseOption("bm", "barcode-match", "Alignment match score in case of no-mbv.", ARG::INTEGER));
+	addOption(parser, ArgParseOption("bi", "barcode-mismatch", "Standard alignment mismatch score.", ARG::INTEGER));
+	addOption(parser, ArgParseOption("bg", "barcode-gap", "Standard alignment gap score.", ARG::INTEGER));
 	
 	addSection(parser, "Adapter removal");
 	addOption(parser, ArgParseOption("a",  "adapters", "Fasta file with adapters for removal that may contain N.", ARG::INPUT_FILE));
