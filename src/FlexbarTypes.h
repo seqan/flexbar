@@ -86,8 +86,8 @@ namespace flexbar{
 	typedef seqan::String<int>                      TAlignScores;
 	typedef std::pair<TAlignSet, TAlignScores>      TAlignments;
 	
-	typedef std::vector<TAlignments>                    TAlignBundle;
-	typedef std::vector<PairedRead<FSeqStr, FString>* > TPairedReads;
+	typedef std::vector<TAlignments>   TAlignBundle;
+	typedef std::vector<TPairedRead* > TPairedReads;
 	
 	// typedef seqan::StringSet<TAlign, seqan::Dependent<seqan::Tight> > TAlignSet;
 	

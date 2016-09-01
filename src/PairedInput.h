@@ -60,11 +60,6 @@ public:
 		
 		unsigned int nReads = m_f1->loadSeqReads(b->srd.uncalled, b->srd.ids, b->srd.seqs, b->srd.quals, m_bundleSize);
 		
-		if(nReads == 0){
-			delete b;
-			return NULL;
-		}
-		
 		if(m_isPaired){
 			unsigned int nReads2 = m_f2->loadSeqReads(b->srd2.uncalled, b->srd2.ids, b->srd2.seqs, b->srd2.quals, m_bundleSize);
 			
@@ -85,6 +80,11 @@ public:
 				cerr << "\nERROR: Barcode read without read in input.\n" << endl;
 				exit(1);
 			}
+		}
+		
+		if(nReads == 0){
+			delete b;
+			return NULL;
 		}
 		
 		for(unsigned int i = 0; i < length(b->srd.ids); ++i){
