@@ -2,11 +2,18 @@ cmake_minimum_required( VERSION 2.8.2 )
 
 include(CheckCXXCompilerFlag)
 CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
+CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
 
 if(COMPILER_SUPPORTS_CXX11)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 else()
 	message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Use a different compiler.")
+endif()
+
+if(COMPILER_SUPPORTS_CXX14)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+else()
+	message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++14 support. Use a different compiler.")
 endif()
 
 
@@ -24,7 +31,7 @@ else()
 	# if( WIN32 )
 	# 	link_directories( ${FLEXBAR_SOURCE_DIR}/lib/win32 )
 	# else()
-	# 	message( FATAL_ERROR "Platform not supported!" )
+	# 	message( FATAL_ERROR "Platform not supported." )
 	# endif()
 endif()
 
@@ -38,7 +45,7 @@ if( ZLIB_FOUND )
     target_link_libraries( flexbar ${ZLIB_LIBRARIES} )
 	add_definitions( "-DSEQAN_HAS_ZLIB=1" )
 else()
-	message( STATUS "Build will not support zlib!" )
+	message( STATUS "Build will not support zlib." )
 endif()
 
 find_package( BZip2 )
@@ -47,7 +54,7 @@ if( BZIP2_FOUND )
 	target_link_libraries( flexbar ${BZIP2_LIBRARIES} )
 	add_definitions( "-DSEQAN_HAS_BZIP2=1" )
 else()
-	message( STATUS "Build will not support bzip2!" )
+	message( STATUS "Build will not support bzip2." )
 endif()
 
 
