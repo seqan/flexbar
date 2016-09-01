@@ -60,30 +60,31 @@ public:
 		
 		unsigned int nReads = m_f1->loadSeqReads(b->srd.uncalled, b->srd.ids, b->srd.seqs, b->srd.quals, m_bundleSize);
 		
+		if(nReads == 0){
+			delete b;
+			return NULL;
+		}
+		
 		if(m_isPaired){
 			unsigned int nReads2 = m_f2->loadSeqReads(b->srd2.uncalled, b->srd2.ids, b->srd2.seqs, b->srd2.quals, m_bundleSize);
 			
 			if(nReads != nReads2){
-				cerr << "\nERROR: Single read in paired input mode.\n" << endl;
-				exit(1);
-			}
-		}
-		if(m_useBarRead){
-			unsigned int nBarReads = m_b->loadSeqReads(b->srdBR.uncalled, b->srdBR.ids, b->srdBR.seqs, b->srdBR.quals, m_bundleSize);
-			
-			if(nReads < nBarReads){
-				cerr << "\nERROR: Barcode read without read in input.\n" << endl;
-				exit(1);
-			}
-			else if(nReads > nBarReads){
-				cerr << "\nERROR: Read without barcode read in input.\n" << endl;
+				cerr << "\nERROR: Read without counterpart in paired input mode.\n" << endl;
 				exit(1);
 			}
 		}
 		
-		if(nReads == 0){
-			delete b;
-			return NULL;
+		if(m_useBarRead){
+			unsigned int nBarReads = m_b->loadSeqReads(b->srdBR.uncalled, b->srdBR.ids, b->srdBR.seqs, b->srdBR.quals, m_bundleSize);
+			
+			if(nReads > nBarReads){
+				cerr << "\nERROR: Read without barcode read in input.\n" << endl;
+				exit(1);
+			}
+			else if(nReads < nBarReads){
+				cerr << "\nERROR: Barcode read without read in input.\n" << endl;
+				exit(1);
+			}
 		}
 		
 		for(unsigned int i = 0; i < length(b->srd.ids); ++i){
@@ -94,7 +95,7 @@ public:
 				if(m_isPaired && b->srd2.uncalled[i]) ++m_uncalled;
 				if(m_isPaired)                        ++m_uncalledPairs;
 			}
-			// else if(m_useBarRead && uncalledBR[i]){
+			// else if(m_useBarRead && b->srdBR.uncalled[i]){
 			//
 			// 	// to be handled
 			// }
