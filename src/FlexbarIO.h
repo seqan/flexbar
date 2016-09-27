@@ -66,7 +66,7 @@ void checkFileCompression(const std::string path){
 				cmprsType = GZ;
 			#else
 				cerr << "\nInput file decompression canceled.\n";
-				cerr << "This build does not support zlib!\n" << endl;
+				cerr << "This build does not support zlib.\n" << endl;
 				exit(1);
 			#endif
 		}
@@ -79,7 +79,7 @@ void checkFileCompression(const std::string path){
 					cmprsType = BZ2;
 				#else
 					cerr << "\nInput file decompression canceled.\n";
-		   			cerr << "This build does not support bzip2!\n" << endl;
+		   			cerr << "This build does not support bzip2.\n" << endl;
 					exit(1);
 				#endif
 			}
