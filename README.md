@@ -1,7 +1,5 @@
 ## Flexbar — flexible barcode and adapter removal
 
-###### release 2.7
-
 The program Flexbar preprocesses high-throughput sequencing data efficiently. It demultiplexes barcoded runs and removes adapter sequences. Moreover, trimming and filtering features are provided. Flexbar increases read mapping rates and improves genome as well as transcriptome assemblies. It supports next-generation sequencing data in fasta and fastq format, e.g. from Roche 454 and the Illumina platform.
 
 This is the Flexbar repository by Johannes Roehr. Flexbar is in the process of being adapted to SeqAn and incorporates features from the seqan flexcat repository. Refer to the [manual](https://github.com/seqan/flexbar/wiki) or contact [jtroehr](https://github.com/jtroehr) for support with this application.
@@ -16,10 +14,10 @@ See article on [PubMed](http://www.ncbi.nlm.nih.gov/pubmed/24832523).
 
 ### Download
 
-Flexbar source code as well as pre-compiled binaries for Linux and Mac OS X can be downloaded on the [release](https://github.com/seqan/flexbar/releases) page. Please follow instructions for building or setup of binaries below. Additionally, Flexbar is available via package manager on Debian systems. Versions before 2.4 can be found on the [old](https://sourceforge.net/projects/flexbar) page.
+Flexbar source code as well as binaries for Linux and Mac OS X can be downloaded on the [release](https://github.com/seqan/flexbar/releases) page. Please follow instructions for building or setup of binaries below. Additionally, Flexbar is available via package manager on Debian systems. Versions before 2.4 can be found on the [old](https://sourceforge.net/projects/flexbar) page.
 
 
-#### Building from source
+### Building from source
 
 Make sure that `cmake` is available, as well as development and runtime files of the TBB library 4.0 or later (Intel Threading Building Blocks). Using a package manager is a simple way to install them. Furthermore, the SeqAn library is required:
 
@@ -39,16 +37,16 @@ Use these commands for building:
 Releases prior to 2.7 use SeqAn library 1.4.2 instead.
 
 
-#### Pre-compiled binaries
+### Binaries
 
 For execution of provided Flexbar binaries, the corresponding TBB library has to be available. Downloads contain the library file for runtime. Follow the platform specific instructions below.
 
-##### Linux
+#### Linux
 Adjust lib search path to include the absolute path of the Flexbar directory containing the lib file libtbb.so.2 for the current terminal session, or permanently in shell startup scripts:
 
         export LD_LIBRARY_PATH=/path/FlexbarDir:$LD_LIBRARY_PATH
 
-##### Mac OS X
+#### Mac OS X
 It applies the same as for Linux. Make the file libtbb.dylib available by setting the lib search path:
 
         export DYLD_LIBRARY_PATH=/path/FlexbarDir:$DYLD_LIBRARY_PATH
