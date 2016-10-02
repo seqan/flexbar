@@ -115,8 +115,8 @@ public:
 			TAlignBundle alBundle;
 			alBundle.reserve(5);
 			
-			TAlignments r1AlignmentsB, r2AlignmentsB, bAlignmentsB;
-			TAlignments r1AlignmentsA, r2AlignmentsA;
+			Alignments r1AlignmentsB, r2AlignmentsB, bAlignmentsB;
+			Alignments r1AlignmentsA, r2AlignmentsA;
 			
 			alBundle.push_back(bAlignmentsB);
 			alBundle.push_back(r1AlignmentsB);

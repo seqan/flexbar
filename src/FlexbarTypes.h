@@ -62,8 +62,7 @@ struct AlignResults{
 	TSeqStr randTag;
 	std::string alString;
 	
-	AlignResults(){
-	}
+	AlignResults(){}
 };
 
 
@@ -84,17 +83,18 @@ namespace flexbar{
 	typedef seqan::Align<FSeqStr, seqan::ArrayGaps> TAlign;
 	typedef seqan::StringSet<TAlign>                TAlignSet;
 	typedef seqan::String<int>                      TAlignScores;
-	typedef std::pair<TAlignSet, TAlignScores>      TAlignments;
+	// typedef std::pair<TAlignSet, TAlignScores>      TAlignments;
 	
-	typedef std::vector<TAlignments>   TAlignBundle;
+	struct Alignments {
+		TAlignSet aset;
+		TAlignScores ascores;
+	};
+	
+	typedef std::vector<Alignments>    TAlignBundle;
 	typedef std::vector<TPairedRead* > TPairedReads;
 	
 	// typedef seqan::StringSet<TAlign, seqan::Dependent<seqan::Tight> > TAlignSet;
 	
-	// struct Alignments {
-	// 	TAlignSet data;
-	// 	TAlignScores scores;
-	// };
 	
 	struct SeqReadData {
 		TSeqStrs seqs;

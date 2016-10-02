@@ -50,54 +50,54 @@ public:
 	};
 	
 	
-	void alignGlobal(TAlignResults &a, flexbar::TAlignments &alignments, const flexbar::ComputeCycle &cycle, const unsigned int idxAl){
+	void alignGlobal(TAlignResults &a, flexbar::Alignments &alignments, const flexbar::ComputeCycle &cycle, const unsigned int idxAl){
 		
 		using namespace std;
 		using namespace seqan;
 		using namespace flexbar;
 		
 		
-		// appendValue(alignments.second, 0);
-		//
+		// appendValue(alignments.ascores, 0);
+		
 		// int band1 = overhang;
 		// int band2 = readLen - minOvl;
 		
 		// AlignConfig<true, true, true, true> ac;
-		// alignments.second[idxAl] = globalAlignment(alignments.first[idxAl], m_scoreMatrix, ac, band1, band2);
+		// alignments.ascores[idxAl] = globalAlignment(alignments.aset[idxAl], m_scoreMatrix, ac, band1, band2);
 		
 		// if(m_trimEnd == RIGHT || m_trimEnd == RTAIL){
 		// 	AlignConfig<true, false, true, true> ac;
-		// 	alignments.second[idxAl] = globalAlignment(alignments.first[idxAl], m_scoreMatrix, ac);
+		// 	alignments.ascores[idxAl] = globalAlignment(alignments.aset[idxAl], m_scoreMatrix, ac);
 		// }
 		// else if(m_trimEnd == LEFT || m_trimEnd == LTAIL){
 		// 	AlignConfig<true, true, false, true> ac;
-		// 	alignments.second[idxAl] = globalAlignment(alignments.first[idxAl], m_scoreMatrix, ac);
+		// 	alignments.ascores[idxAl] = globalAlignment(alignments.aset[idxAl], m_scoreMatrix, ac);
 		// }
 		// else{
 		// 	AlignConfig<true, true, true, true> ac;
-		// 	alignments.second[idxAl] = globalAlignment(alignments.first[idxAl], m_scoreMatrix, ac);
+		// 	alignments.ascores[idxAl] = globalAlignment(alignments.aset[idxAl], m_scoreMatrix, ac);
 		// }
 		
 		if(cycle == COMPUTE){
-
+			
 			if(m_trimEnd == RIGHT || m_trimEnd == RTAIL){
-
+				
 				AlignConfig<true, false, true, true> ac;
-				alignments.second = globalAlignment(alignments.first, m_score, ac);
+				alignments.ascores = globalAlignment(alignments.aset, m_score, ac);
 			}
 			else if(m_trimEnd == LEFT || m_trimEnd == LTAIL){
-
+				
 				AlignConfig<true, true, false, true> ac;
-				alignments.second = globalAlignment(alignments.first, m_score, ac);
+				alignments.ascores = globalAlignment(alignments.aset, m_score, ac);
 			}
 			else{
 				AlignConfig<true, true, true, true> ac;
-				alignments.second = globalAlignment(alignments.first, m_score, ac);
+				alignments.ascores = globalAlignment(alignments.aset, m_score, ac);
 			}
 		}
 		
-		TAlign &align = alignments.first[idxAl];
-		a.score       = alignments.second[idxAl];
+		TAlign &align = alignments.aset[idxAl];
+		a.score       = alignments.ascores[idxAl];
 		
 		// cout << "Score: " << a.score << endl;
 		// cout << "Align: " << align << endl;

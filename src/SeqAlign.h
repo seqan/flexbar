@@ -53,7 +53,7 @@ public:
 	};
 	
 	
-	int alignSeqRead(flexbar::TSeqRead* sr, const bool performRemoval, flexbar::TAlignments &alignments, flexbar::ComputeCycle &cycle, unsigned int &idxAl){
+	int alignSeqRead(flexbar::TSeqRead* sr, const bool performRemoval, flexbar::Alignments &alignments, flexbar::ComputeCycle &cycle, unsigned int &idxAl){
 		
 		using namespace std;
 		using namespace flexbar;
@@ -71,7 +71,7 @@ public:
 		
 		if(cycle == PRELOAD){
 			
-			if(idxAl == 0) reserve(alignments.first, m_bundleSize * m_queries->size());
+			if(idxAl == 0) reserve(alignments.aset, m_bundleSize * m_queries->size());
 			
 			for(unsigned int i = 0; i < m_queries->size(); ++i){
 				
@@ -90,11 +90,11 @@ public:
 				}
 				
 				TAlign align;
-				appendValue(alignments.first, align);
-				resize(rows(alignments.first[idxAl]), 2);
+				appendValue(alignments.aset, align);
+				resize(rows(alignments.aset[idxAl]), 2);
 				
-				assignSource(row(alignments.first[idxAl], 0), *rseq);
-				assignSource(row(alignments.first[idxAl], 1),  qseq);
+				assignSource(row(alignments.aset[idxAl], 0), *rseq);
+				assignSource(row(alignments.aset[idxAl], 1),  qseq);
 				
 				++idxAl;
 			}
