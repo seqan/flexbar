@@ -22,7 +22,7 @@ Flexbar source code as well as binaries for Linux and Mac OS X can be downloaded
 Make sure that `cmake` is available, as well as development and runtime files of the TBB library 4.0 or later (Intel Threading Building Blocks). Using a package manager is a simple way to install them. Furthermore, the SeqAn library is required:
 
 * Get SeqAn library version 2.1.1 [here](https://github.com/seqan/seqan/releases)
-* Download Flexbar source code [release](https://github.com/seqan/flexbar/releases)
+* Download Flexbar 2.7 source code [release](https://github.com/seqan/flexbar/releases)
 
 Decompress both and move SeqAn include folder to Flexbar:
 
@@ -34,7 +34,9 @@ Use these commands for building:
         cmake .
         make
 
-Releases prior to 2.7 use SeqAn library 1.4.2 instead.
+The latest sources require SeqAn 2.2.0 instead.
+
+Releases prior to 2.7 use the SeqAn 1.4.2 library.
 
 
 ### Binaries
@@ -64,11 +66,11 @@ Refer to the help screen `flexbar -h` or [manual](https://github.com/seqan/flexb
 
 In this example, reads that are barcoded on left side are demultiplexed by specifying a file with barcodes in fasta format. After separation of reads, given adapters are removed from the right side if they do not align before read start. The left side of reads is kept if long enough. Remaining reads are written to the file `target.fastq` in same format as the input.
 
-		flexbar -r reads.fq -t target -b brc.fa -be LEFT_TAIL -a adp.fa
+		flexbar -r reads.fq -t target -b brc.fa -be LTAIL -a adp.fa
 
-The second example shows how to trim compressed reads based on their quality scores in illumina version 1.8 format. Afterwards, provided adapters are removed in right trim-end mode, only if the overlap of adapter and read has at least length five with at most four errors per ten base pairs.
+The second example shows how to trim compressed reads based on their quality scores in illumina version 1.8 format. Afterwards, provided adapters are removed in right trim-end mode, only if the overlap of adapter and read has at least length five with at most 40% errors.
 
-		flexbar -r reads.fq.gz -q TAIL -qf i1.8 -a adp.fa -ao 5 -at 4
+		flexbar -r reads.fq.gz -q TAIL -qf i1.8 -a adp.fa -ao 5 -at 0.4
 
 For further examples visit the [manual](https://github.com/seqan/flexbar/wiki) page.
 
