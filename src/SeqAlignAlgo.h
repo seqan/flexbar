@@ -18,7 +18,7 @@ private:
 	typedef seqan::Score<int, seqan::Simple>                              TScoreSimple;
 	typedef seqan::Score<int, seqan::ScoreMatrix<TChar, seqan::Default> > TScoreMatrix;
 	
-	TScoreSimple m_score;
+	// TScoreSimple m_score;
 	TScoreMatrix m_scoreMatrix;
 	
 	const bool m_randTag;
@@ -34,7 +34,7 @@ public:
 		
 		using namespace seqan;
 		
-		m_score       = Score<int, Simple>(match, mismatch, gapCost);
+		// m_score       = Score<int, Simple>(match, mismatch, gapCost);
 		m_scoreMatrix = TScoreMatrix(gapCost);
 		
 		for(unsigned i = 0; i < ValueSize<TChar>::VALUE; ++i){
@@ -56,43 +56,30 @@ public:
 		using namespace seqan;
 		using namespace flexbar;
 		
-		
-		// appendValue(alignments.ascores, 0);
-		
 		// int band1 = overhang;
 		// int band2 = readLen - minOvl;
 		
+		// appendValue(alignments.ascores, 0);
 		// AlignConfig<true, true, true, true> ac;
+		
 		// alignments.ascores[idxAl] = globalAlignment(alignments.aset[idxAl], m_scoreMatrix, ac, band1, band2);
 		
-		// if(m_trimEnd == RIGHT || m_trimEnd == RTAIL){
-		// 	AlignConfig<true, false, true, true> ac;
-		// 	alignments.ascores[idxAl] = globalAlignment(alignments.aset[idxAl], m_scoreMatrix, ac);
-		// }
-		// else if(m_trimEnd == LEFT || m_trimEnd == LTAIL){
-		// 	AlignConfig<true, true, false, true> ac;
-		// 	alignments.ascores[idxAl] = globalAlignment(alignments.aset[idxAl], m_scoreMatrix, ac);
-		// }
-		// else{
-		// 	AlignConfig<true, true, true, true> ac;
-		// 	alignments.ascores[idxAl] = globalAlignment(alignments.aset[idxAl], m_scoreMatrix, ac);
-		// }
 		
 		if(cycle == COMPUTE){
 			
 			if(m_trimEnd == RIGHT || m_trimEnd == RTAIL){
 				
 				AlignConfig<true, false, true, true> ac;
-				alignments.ascores = globalAlignment(alignments.aset, m_score, ac);
+				alignments.ascores = globalAlignment(alignments.aset, m_scoreMatrix, ac);
 			}
 			else if(m_trimEnd == LEFT || m_trimEnd == LTAIL){
 				
 				AlignConfig<true, true, false, true> ac;
-				alignments.ascores = globalAlignment(alignments.aset, m_score, ac);
+				alignments.ascores = globalAlignment(alignments.aset, m_scoreMatrix, ac);
 			}
 			else{
 				AlignConfig<true, true, true, true> ac;
-				alignments.ascores = globalAlignment(alignments.aset, m_score, ac);
+				alignments.ascores = globalAlignment(alignments.aset, m_scoreMatrix, ac);
 			}
 		}
 		
