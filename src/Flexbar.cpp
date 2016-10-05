@@ -4,7 +4,7 @@
    
    Version 3.0.0
    
-   uses SeqAn library release 2.1.1
+   uses SeqAn library release 2.2.0
    and TBB library 4.0 or later
    
    
@@ -27,8 +27,8 @@ int main(int argc, const char* argv[]){
 	using namespace std;
 	using namespace seqan;
 	
-	const string version = "3.0 dev";
-	const string date    = "September 2016";
+	const string version = "3.0 beta";
+	const string date    = "October 2016";
 	
 	ArgumentParser parser("flexbar");
 	
