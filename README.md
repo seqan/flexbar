@@ -2,7 +2,7 @@
 
 The program Flexbar preprocesses high-throughput sequencing data efficiently. It demultiplexes barcoded runs and removes adapter sequences. Moreover, trimming and filtering features are provided. Flexbar increases read mapping rates and improves genome as well as transcriptome assemblies. It supports next-generation sequencing data in fasta and fastq format, e.g. from Roche 454 and the Illumina platform.
 
-This is the Flexbar repository by Johannes Roehr. Flexbar is in the process of being adapted to SeqAn and incorporates features from the seqan flexcat repository. Refer to the [manual](https://github.com/seqan/flexbar/wiki) or contact [jtroehr](https://github.com/jtroehr) for support with this application.
+Refer to the [manual](https://github.com/seqan/flexbar/wiki) or contact [jtroehr](https://github.com/jtroehr) for support with this application.
 
 
 ### Reference
@@ -19,24 +19,27 @@ Flexbar source code as well as binaries for Linux and Mac OS X can be downloaded
 
 ### Building from source
 
-Make sure that `cmake` is available, as well as development and runtime files of the TBB library 4.0 or later (Intel Threading Building Blocks). Using a package manager is a simple way to install them. Furthermore, the SeqAn library is required:
+Make sure that `cmake` is available, as well as development and runtime files of the TBB library 4.0 or later (Intel Threading Building Blocks). Using a package manager is a simple way to install them. Furthermore, the SeqAn library and a compiler that supports C++14 is required:
 
-* Get SeqAn library version 2.1.1 [here](https://github.com/seqan/seqan/releases)
-* Download Flexbar 2.7 source code [release](https://github.com/seqan/flexbar/releases)
+* Get SeqAn library version 2.2.0 [here](https://github.com/seqan/seqan/releases/download/seqan-v2.2.0/seqan-library-2.2.0.tar.xz)
+* Download Flexbar 3.0 source code [release](https://github.com/seqan/flexbar/releases)
 
-Decompress both and move SeqAn include folder to Flexbar:
+Decompress both files:
 
-        mv seqan-library/include flexbar
+		tar xzf flexbar-3.0.0.tar.gz
+		tar xJf seqan-library-2.2.0.tar.xz
+
+Move SeqAn include folder to Flexbar:
+
+        mv seqan-library-2.2.0/include flexbar-3.0.0
 
 Use these commands for building:
 
-        cd flexbar
+        cd flexbar-3.0.0
         cmake .
         make
 
-The latest sources require SeqAn 2.2.0 instead.
-
-Releases prior to 2.7 use the SeqAn 1.4.2 library.
+Flexbar version 2.7 requires SeqAn 2.1.1 instead. Releases prior to 2.7 use the SeqAn 1.4.2 library.
 
 
 ### Binaries
