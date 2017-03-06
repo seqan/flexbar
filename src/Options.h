@@ -305,8 +305,8 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setDefaultValue(parser, "barcode-gap",        "-9");
 	
 	setDefaultValue(parser, "adapter-trim-end",    "RIGHT");
-	setDefaultValue(parser, "adapter-min-overlap", "1");
-	setDefaultValue(parser, "adapter-error-rate",  "0.3");
+	setDefaultValue(parser, "adapter-min-overlap", "3");
+	setDefaultValue(parser, "adapter-error-rate",  "0.1");
 	// setDefaultValue(parser, "adapter-overhang",    "0");
 	setDefaultValue(parser, "adapter-match",       "1");
 	setDefaultValue(parser, "adapter-mismatch",    "-1");
