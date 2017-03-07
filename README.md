@@ -14,7 +14,7 @@ See article on [PubMed](http://www.ncbi.nlm.nih.gov/pubmed/24832523).
 
 ### Download
 
-Flexbar source code as well as binaries for Linux and Mac OS X can be downloaded on the [release](https://github.com/seqan/flexbar/releases) page. Please follow instructions for building or setup of binaries below. Additionally, Flexbar is available via package manager on Debian systems. Versions before 2.4 can be found on the [old](https://sourceforge.net/projects/flexbar) page.
+Flexbar source code as well as binaries for Linux and Mac OS can be downloaded on the [release](https://github.com/seqan/flexbar/releases) page. Please follow instructions for building or setup of binaries below. Additionally, Flexbar is available via package manager on Debian systems. Versions before 2.4 can be found on the [old](https://sourceforge.net/projects/flexbar) page.
 
 
 ### Building from source
@@ -51,7 +51,7 @@ Adjust lib search path to include the absolute path of the Flexbar directory con
 
         export LD_LIBRARY_PATH=/path/FlexbarDir:$LD_LIBRARY_PATH
 
-#### Mac OS X
+#### Mac OS
 It applies the same as for Linux. Make the file libtbb.dylib available by setting the lib search path:
 
         export DYLD_LIBRARY_PATH=/path/FlexbarDir:$DYLD_LIBRARY_PATH
