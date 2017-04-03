@@ -8,13 +8,12 @@ template <typename TSeqStr, typename TString>
 class SeqRead {
 	
 	public:
-	TSeqStr &seq;
-	TString &id, &qual;
+	TSeqStr seq;
+	TString id, qual;
 	
 	SeqRead(TSeqStr& sequence, TString& seqID) :
 		seq(sequence),
-		id(seqID),
-		qual(seqID){
+		id(seqID){
 	}
 	
 	SeqRead(TSeqStr& sequence, TString& seqID, TString& quality) :
@@ -83,7 +82,6 @@ namespace flexbar{
 	typedef seqan::Align<FSeqStr, seqan::ArrayGaps> TAlign;
 	typedef seqan::StringSet<TAlign>                TAlignSet;
 	typedef seqan::String<int>                      TAlignScores;
-	// typedef std::pair<TAlignSet, TAlignScores>      TAlignments;
 	
 	struct Alignments {
 		TAlignSet aset;
@@ -91,25 +89,25 @@ namespace flexbar{
 	};
 	
 	typedef std::vector<Alignments>    TAlignBundle;
-	typedef std::vector<TPairedRead* > TPairedReads;
+	typedef std::vector<TPairedRead* > TPairedReadBundle;
 	
 	// typedef seqan::StringSet<TAlign, seqan::Dependent<seqan::Tight> > TAlignSet;
 	
 	
-	struct SeqReadData {
-		TSeqStrs seqs;
-		TStrings ids, quals;
-		TBools uncalled;
-		
-		SeqReadData(){}
-	};
+	// struct SeqReadData {
+	// 	TSeqStrs seqs;
+	// 	TStrings ids, quals;
+	// 	TBools uncalled;
+	//
+	// 	SeqReadData(){}
+	// };
 	
-	struct PairedReadBundle {
-		SeqReadData srd, srd2, srdBR;
-		TPairedReads pReads;
-		
-		PairedReadBundle(){}
-	};
+	// struct PairedReadBundle {
+	// 	SeqReadData srd, srd2, srdBR;
+	// 	TPairedReads pReads;
+	//
+	// 	PairedReadBundle(){}
+	// };
 	
 	
 	struct TBar {

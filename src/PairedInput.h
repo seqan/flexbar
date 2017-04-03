@@ -56,12 +56,15 @@ public:
 		using namespace std;
 		using namespace flexbar;
 		
-		PairedReadBundle *b = new PairedReadBundle();
+		TSeqStrs seqs,     seqs2,     seqsBR;
+		TStrings ids,      ids2,      idsBR;
+		TStrings quals,    quals2,    qualsBR;
+		TBools   uncalled, uncalled2, uncalledBR;
 		
-		unsigned int nReads = m_f1->loadSeqReads(b->srd.uncalled, b->srd.ids, b->srd.seqs, b->srd.quals, m_bundleSize);
+		unsigned int nReads = m_f1->loadSeqReads(uncalled, ids, seqs, quals, m_bundleSize);
 		
 		if(m_isPaired){
-			unsigned int nReads2 = m_f2->loadSeqReads(b->srd2.uncalled, b->srd2.ids, b->srd2.seqs, b->srd2.quals, m_bundleSize);
+			unsigned int nReads2 = m_f2->loadSeqReads(uncalled2, ids2, seqs2, quals2, m_bundleSize);
 			
 			if(nReads != nReads2){
 				cerr << "\nERROR: Read without counterpart in paired input mode.\n" << endl;
@@ -70,7 +73,7 @@ public:
 		}
 		
 		if(m_useBarRead){
-			unsigned int nBarReads = m_b->loadSeqReads(b->srdBR.uncalled, b->srdBR.ids, b->srdBR.seqs, b->srdBR.quals, m_bundleSize);
+			unsigned int nBarReads = m_b->loadSeqReads(uncalledBR, idsBR, seqsBR, qualsBR, m_bundleSize);
 			
 			if(nReads > nBarReads){
 				cerr << "\nERROR: Read without barcode read in input.\n" << endl;
@@ -82,20 +85,20 @@ public:
 			}
 		}
 		
-		if(nReads == 0){
-			delete b;
-			return NULL;
-		}
+		if(nReads == 0) return NULL;
 		
-		for(unsigned int i = 0; i < length(b->srd.ids); ++i){
+		
+		TPairedReadBundle *prBundle = new TPairedReadBundle();
+		
+		for(unsigned int i = 0; i < length(ids); ++i){
 			
-			if(b->srd.uncalled[i] || (m_isPaired && b->srd2.uncalled[i])){
+			if(uncalled[i] || (m_isPaired && uncalled2[i])){
 				
-				if(b->srd.uncalled[i])                ++m_uncalled;
-				if(m_isPaired && b->srd2.uncalled[i]) ++m_uncalled;
-				if(m_isPaired)                        ++m_uncalledPairs;
+				if(uncalled[i])                ++m_uncalled;
+				if(m_isPaired && uncalled2[i]) ++m_uncalled;
+				if(m_isPaired)                 ++m_uncalledPairs;
 			}
-			// else if(m_useBarRead && b->srdBR.uncalled[i]){
+			// else if(m_useBarRead && uncalledBR[i]){
 			//
 			// 	// to be handled
 			// }
@@ -106,35 +109,29 @@ public:
 					converter << ++m_tagCounter;
 					TString tagCount = converter.str();
 					
-					                 b->srd.ids[i]   = tagCount;
-					if(m_isPaired)   b->srd2.ids[i]  = tagCount;
-					if(m_useBarRead) b->srdBR.ids[i] = tagCount;
+					                 ids[i]   = tagCount;
+					if(m_isPaired)   ids2[i]  = tagCount;
+					if(m_useBarRead) idsBR[i] = tagCount;
 				}
 				
 				TSeqRead *read1 = NULL, *read2 = NULL, *barRead = NULL;
 				
 				if(m_format == FASTA){
-					                 read1   = new TSeqRead(b->srd.seqs[i],   b->srd.ids[i]);
-					if(m_isPaired)   read2   = new TSeqRead(b->srd2.seqs[i],  b->srd2.ids[i]);
-					if(m_useBarRead) barRead = new TSeqRead(b->srdBR.seqs[i], b->srdBR.ids[i]);
+					                 read1   = new TSeqRead(seqs[i],   ids[i]);
+					if(m_isPaired)   read2   = new TSeqRead(seqs2[i],  ids2[i]);
+					if(m_useBarRead) barRead = new TSeqRead(seqsBR[i], idsBR[i]);
 				}
 				else{
-					                 read1   = new TSeqRead(b->srd.seqs[i],   b->srd.ids[i],   b->srd.quals[i]);
-					if(m_isPaired)   read2   = new TSeqRead(b->srd2.seqs[i],  b->srd2.ids[i],  b->srd2.quals[i]);
-					if(m_useBarRead) barRead = new TSeqRead(b->srdBR.seqs[i], b->srdBR.ids[i], b->srdBR.quals[i]);
+					                 read1   = new TSeqRead(seqs[i],   ids[i],   quals[i]);
+					if(m_isPaired)   read2   = new TSeqRead(seqs2[i],  ids2[i],  quals2[i]);
+					if(m_useBarRead) barRead = new TSeqRead(seqsBR[i], idsBR[i], qualsBR[i]);
 				}
 				
-				b->pReads.push_back(new TPairedRead(read1, read2, barRead));
+				prBundle->push_back(new TPairedRead(read1, read2, barRead));
 			}
 		}
 		
-		if(b->pReads.size() == 0){
-			delete b;
-			b = NULL;
-			return loadPairedReadBundle();
-		}
-		
-		return b;
+		return prBundle;
 	}
 	
 	
@@ -143,9 +140,21 @@ public:
 		
 		using namespace flexbar;
 		
-		PairedReadBundle *prBundle = NULL;
+		TPairedReadBundle *prBundle = NULL;
 		
-		prBundle = static_cast< PairedReadBundle* >(loadPairedReadBundle());
+		prBundle = static_cast< TPairedReadBundle* >(loadPairedReadBundle());
+		
+		if(prBundle != NULL){
+			
+			while(prBundle->size() == 0){
+				delete prBundle;
+				prBundle = NULL;
+				
+				prBundle = static_cast< TPairedReadBundle* >(loadPairedReadBundle());
+				
+				if(prBundle == NULL) return prBundle;
+			}
+		}
 		
 		return prBundle;
 	}
