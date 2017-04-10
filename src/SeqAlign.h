@@ -69,6 +69,14 @@ public:
 			// return 0;
 		}
 		
+		// if(readLength < 1) return 0;
+		
+		if(readLength < 1){
+			seqRead.seq = "N";
+			if(m_format == FASTQ)
+				seqRead.qual = "I";
+		}
+		
 		if(cycle == PRELOAD){
 			
 			if(idxAl == 0) reserve(alignments.aset, m_bundleSize * m_queries->size());

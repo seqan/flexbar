@@ -282,7 +282,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	// setMinValue(parser, "pre-trim-left",    "1");
 	// setMinValue(parser, "pre-trim-right",   "1");
 	// setMinValue(parser, "post-trim-length", "1");
-	// setMinValue(parser, "min-read-length",  "1");
+	// setMinValue(parser, "min-read-length",  "2");
 	// setMinValue(parser, "qtrim-threshold",  "0");
 	
 	
@@ -571,6 +571,11 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	
 	getOptionValue(o.min_readLen, parser, "min-read-length");
 	*out << "min-read-length:       " << o.min_readLen << endl;
+	
+	if(o.min_readLen < 2){
+		cerr << "\n" << "Minimum read length should be 2 or higher.\n" << endl;
+		exit(1);
+	}
 	
 	
 	// quality-based trimming
