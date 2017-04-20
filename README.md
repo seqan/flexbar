@@ -1,10 +1,10 @@
 ## Flexbar — flexible barcode and adapter removal
 
-![Flexbar logo](https://github.com/seqan/flexbar/wiki/images/flexbar-logo.png)
-
 The program Flexbar preprocesses high-throughput sequencing data efficiently. It demultiplexes barcoded runs and removes adapter sequences. Moreover, trimming and filtering features are provided. Flexbar increases read mapping rates and improves genome as well as transcriptome assemblies. It supports next-generation sequencing data in fasta and fastq format, e.g. from Roche 454 and the Illumina platform.
 
 Refer to the [manual](https://github.com/seqan/flexbar/wiki) or contact [jtroehr](https://github.com/jtroehr) for support with this application.
+
+![Flexbar logo](https://github.com/seqan/flexbar/wiki/images/flexbar-logo.png)
 
 
 ### Reference
