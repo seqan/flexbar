@@ -2,7 +2,7 @@
    
    Flexbar - flexible barcode and adapter removal
    
-   Version 3.0.0
+   Version 3.0.1
    
    uses SeqAn library release 2.2.0
    and TBB library 4.0 or later
@@ -27,8 +27,8 @@ int main(int argc, const char* argv[]){
 	using namespace std;
 	using namespace seqan;
 	
-	const string version = "3.0";
-	const string date    = "March 2017";
+	const string version = "3.0.1";
+	const string date    = "April 2017";
 	
 	ArgumentParser parser("flexbar");
 	
