@@ -1,14 +1,8 @@
 cmake_minimum_required( VERSION 2.8.2 )
 
 include(CheckCXXCompilerFlag)
-# CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)
-CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
 
-# if(COMPILER_SUPPORTS_CXX11)
-# 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-# else()
-# 	message(STATUS "The compiler ${CMAKE_CXX_COMPILER} has no C++11 support. Use a different compiler.")
-# endif()
+CHECK_CXX_COMPILER_FLAG("-std=c++14" COMPILER_SUPPORTS_CXX14)
 
 if(COMPILER_SUPPORTS_CXX14)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
@@ -59,6 +53,10 @@ else()
 	message( STATUS "Build will not support bzip2." )
 endif()
 
+# find_package( TBB REQUIRED )
+# if( NOT TBB_FOUND )
+# 	message( FATAL_ERROR "TBB library not found." )
+# endif()
 
 set( SEQAN_CTD_EXECUTABLES ${SEQAN_CTD_EXECUTABLES} flexbar CACHE INTERNAL "" )
 
@@ -70,8 +68,3 @@ set( SEQAN_CTD_EXECUTABLES ${SEQAN_CTD_EXECUTABLES} flexbar CACHE INTERNAL "" )
 # include_directories( ${SEQAN_INCLUDE_DIRS} )
 # target_link_libraries( flexbar ${SEQAN_LIBRARIES} )
 # set( SEQAN_HAS_ZLIB FALSE )
-
-# find_package( TBB REQUIRED )
-# if( NOT TBB_FOUND )
-# 	message( FATAL_ERROR "TBB library not found." )
-# endif()
