@@ -85,8 +85,11 @@ public:
 			
 			if(pRead->barID == 0 || (m_twoBarcodes && pRead->barID2 == 0)){
 				
-				if(cycle[0] != PRELOAD) m_unassigned++;
-				if(! m_writeUnassigned) skipAdapRem = true;
+				if(cycle[0] != PRELOAD){
+					m_unassigned++;
+					
+					if(! m_writeUnassigned) skipAdapRem = true;
+				}
 			}
 		}
 		
