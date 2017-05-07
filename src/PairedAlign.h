@@ -70,10 +70,9 @@ public:
 		
 		using namespace flexbar;
 		
-		bool skipAdapRem = false;
-		
 		// barcode detection
 		if(m_barType != BOFF){
+			
 			switch(m_barType){
 				case BARCODE_READ:         pRead->barID  = m_b1->alignSeqRead(pRead->b,  false, alBundle[0], cycle[0], idxAl[0]); break;
 				case WITHIN_READ_REMOVAL2: pRead->barID2 = m_b2->alignSeqRead(pRead->r2, true,  alBundle[2], cycle[2], idxAl[2]);
@@ -85,16 +84,13 @@ public:
 			
 			if(pRead->barID == 0 || (m_twoBarcodes && pRead->barID2 == 0)){
 				
-				if(cycle[0] != PRELOAD){
-					m_unassigned++;
-					
-					if(! m_writeUnassigned) skipAdapRem = true;
-				}
+				if(cycle[0] != PRELOAD) m_unassigned++;
 			}
 		}
 		
 		// adapter removal
-		if(m_adapRem != AOFF && ! skipAdapRem){
+		if(m_adapRem != AOFF){
+			
 			if(m_adapRem != ATWO)
 			m_a1->alignSeqRead(pRead->r1, true, alBundle[3], cycle[3], idxAl[3]);
 			
