@@ -69,13 +69,14 @@ public:
 			// return 0;
 		}
 		
-		// if(readLength < 1) return 0;
+		if(readLength < 1) return 0;
 		
-		if(readLength < 1){
-			seqRead.seq = "N";
-			if(m_format == FASTQ)
-				seqRead.qual = "I";
-		}
+		// if(readLength < 1){
+		// 	seqRead.seq = "N";
+		// 	if(m_format == FASTQ)
+		// 		seqRead.qual = "I";
+		// }
+		
 		
 		if(cycle == PRELOAD){
 			
