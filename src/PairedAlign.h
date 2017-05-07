@@ -124,46 +124,23 @@ public:
 			alBundle.push_back(r2AlignmentsA);
 			
 			std::vector<unsigned int> idxAl;
-			
-			idxAl.push_back(0);
-			idxAl.push_back(0);
-			idxAl.push_back(0);
-			idxAl.push_back(0);
-			idxAl.push_back(0);
-			
 			std::vector<ComputeCycle> cycle;
 			
-			cycle.push_back(PRELOAD);
-			cycle.push_back(PRELOAD);
-			cycle.push_back(PRELOAD);
-			cycle.push_back(PRELOAD);
-			cycle.push_back(PRELOAD);
-			
-			for(unsigned int i = 0; i < prBundle->size(); ++i)
-				alignPairedRead(prBundle->at(i), alBundle, cycle, idxAl);
-			
-			idxAl[0] = 0;
-			idxAl[1] = 0;
-			idxAl[2] = 0;
-			idxAl[3] = 0;
-			idxAl[4] = 0;
-			
-			cycle[0] = COMPUTE;
-			cycle[1] = COMPUTE;
-			cycle[2] = COMPUTE;
-			cycle[3] = COMPUTE;
-			cycle[4] = COMPUTE;
+			for(unsigned int i = 0; i < 5; ++i){
+				idxAl.push_back(0);
+				cycle.push_back(PRELOAD);
+			}
 			
 			for(unsigned int i = 0; i < prBundle->size(); ++i){
-				
-				if(i > 0){
-					cycle[0] = RESULTS;
-					cycle[1] = RESULTS;
-					cycle[2] = RESULTS;
-					cycle[3] = RESULTS;
-					cycle[4] = RESULTS;
-				}
-				
+				alignPairedRead(prBundle->at(i), alBundle, cycle, idxAl);
+			}
+			
+			for(unsigned int i = 0; i < 5; ++i){
+				idxAl[i] = 0;
+				cycle[i] = COMPUTE;
+			}
+			
+			for(unsigned int i = 0; i < prBundle->size(); ++i){
 				alignPairedRead(prBundle->at(i), alBundle, cycle, idxAl);
 			}
 			

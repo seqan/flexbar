@@ -50,7 +50,7 @@ public:
 	};
 	
 	
-	void alignGlobal(TAlignResults &a, flexbar::Alignments &alignments, const flexbar::ComputeCycle &cycle, const unsigned int idxAl){
+	void alignGlobal(TAlignResults &a, flexbar::Alignments &alignments, flexbar::ComputeCycle &cycle, const unsigned int idxAl){
 		
 		using namespace std;
 		using namespace seqan;
@@ -66,6 +66,8 @@ public:
 		
 		
 		if(cycle == COMPUTE){
+			
+			cycle = RESULTS;
 			
 			if(m_trimEnd == RIGHT || m_trimEnd == RTAIL){
 				

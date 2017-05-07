@@ -117,8 +117,6 @@ public:
 		// align each query sequence and store best one
 		for(unsigned int i = 0; i < m_queries->size(); ++i){
 			
-			if(i > 0) cycle = RESULTS;
-			
 			TAlignResults a;
 			
 			// global sequence alignment
