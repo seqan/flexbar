@@ -66,11 +66,10 @@ public:
 	};
 	
 	
-	void alignPairedRead(flexbar::TPairedRead* pRead, flexbar::TAlignBundle &alBundle, std::vector<flexbar::ComputeCycle> &cycle, std::vector<unsigned int> &idxAl){
+	void alignPairedReadBarcode(flexbar::TPairedRead* pRead, flexbar::TAlignBundle &alBundle, std::vector<flexbar::ComputeCycle> &cycle, std::vector<unsigned int> &idxAl){
 		
 		using namespace flexbar;
 		
-		// barcode detection
 		if(m_barType != BOFF){
 			
 			switch(m_barType){
@@ -87,16 +86,21 @@ public:
 				if(cycle[0] != PRELOAD) m_unassigned++;
 			}
 		}
+	}
+	
+	
+	void alignPairedReadAdapter(flexbar::TPairedRead* pRead, flexbar::TAlignBundle &alBundle, std::vector<flexbar::ComputeCycle> &cycle, std::vector<unsigned int> &idxAl){
 		
-		// adapter removal
+		using namespace flexbar;
+		
 		if(m_adapRem != AOFF){
 			
 			if(m_adapRem != ATWO)
-			m_a1->alignSeqRead(pRead->r1, true, alBundle[3], cycle[3], idxAl[3]);
+				m_a1->alignSeqRead(pRead->r1, true, alBundle[0], cycle[0], idxAl[0]);
 			
 			if(pRead->r2 != NULL && m_adapRem != AONE){
-				if(m_adapRem != NORMAL2) m_a1->alignSeqRead(pRead->r2, true, alBundle[4], cycle[4], idxAl[4]);
-				else                     m_a2->alignSeqRead(pRead->r2, true, alBundle[4], cycle[4], idxAl[4]);
+				if(m_adapRem != NORMAL2) m_a1->alignSeqRead(pRead->r2, true, alBundle[1], cycle[1], idxAl[1]);
+				else                     m_a2->alignSeqRead(pRead->r2, true, alBundle[1], cycle[1], idxAl[1]);
 			}
 		}
 	}
@@ -111,37 +115,69 @@ public:
 			
 			TPairedReadBundle *prBundle = static_cast<TPairedReadBundle* >(item);
 			
-			TAlignBundle alBundle;
-			alBundle.reserve(5);
+			// barcode detection
 			
-			Alignments r1AlignmentsB, r2AlignmentsB, bAlignmentsB;
-			Alignments r1AlignmentsA, r2AlignmentsA;
-			
-			alBundle.push_back(bAlignmentsB);
-			alBundle.push_back(r1AlignmentsB);
-			alBundle.push_back(r2AlignmentsB);
-			alBundle.push_back(r1AlignmentsA);
-			alBundle.push_back(r2AlignmentsA);
-			
-			std::vector<unsigned int> idxAl;
-			std::vector<ComputeCycle> cycle;
-			
-			for(unsigned int i = 0; i < 5; ++i){
-				idxAl.push_back(0);
-				cycle.push_back(PRELOAD);
+			if(m_barType != BOFF){
+				
+				TAlignBundle alBundle;
+				Alignments r1AlignmentsB, r2AlignmentsB, bAlignmentsB;
+				
+				alBundle.push_back(bAlignmentsB);
+				alBundle.push_back(r1AlignmentsB);
+				alBundle.push_back(r2AlignmentsB);
+				
+				std::vector<unsigned int> idxAl;
+				std::vector<ComputeCycle> cycle;
+				
+				for(unsigned int i = 0; i < 3; ++i){
+					idxAl.push_back(0);
+					cycle.push_back(PRELOAD);
+				}
+				
+				for(unsigned int i = 0; i < prBundle->size(); ++i){
+					alignPairedReadBarcode(prBundle->at(i), alBundle, cycle, idxAl);
+				}
+				
+				for(unsigned int i = 0; i < 3; ++i){
+					idxAl[i] = 0;
+					cycle[i] = COMPUTE;
+				}
+				
+				for(unsigned int i = 0; i < prBundle->size(); ++i){
+					alignPairedReadBarcode(prBundle->at(i), alBundle, cycle, idxAl);
+				}
 			}
 			
-			for(unsigned int i = 0; i < prBundle->size(); ++i){
-				alignPairedRead(prBundle->at(i), alBundle, cycle, idxAl);
-			}
+			// adapter removal
 			
-			for(unsigned int i = 0; i < 5; ++i){
-				idxAl[i] = 0;
-				cycle[i] = COMPUTE;
-			}
-			
-			for(unsigned int i = 0; i < prBundle->size(); ++i){
-				alignPairedRead(prBundle->at(i), alBundle, cycle, idxAl);
+			if(m_adapRem != AOFF){
+				
+				TAlignBundle alBundle;
+				Alignments r1AlignmentsA, r2AlignmentsA;
+				
+				alBundle.push_back(r1AlignmentsA);
+				alBundle.push_back(r2AlignmentsA);
+				
+				std::vector<unsigned int> idxAl;
+				std::vector<ComputeCycle> cycle;
+				
+				for(unsigned int i = 0; i < 2; ++i){
+					idxAl.push_back(0);
+					cycle.push_back(PRELOAD);
+				}
+				
+				for(unsigned int i = 0; i < prBundle->size(); ++i){
+					alignPairedReadAdapter(prBundle->at(i), alBundle, cycle, idxAl);
+				}
+				
+				for(unsigned int i = 0; i < 2; ++i){
+					idxAl[i] = 0;
+					cycle[i] = COMPUTE;
+				}
+				
+				for(unsigned int i = 0; i < prBundle->size(); ++i){
+					alignPairedReadAdapter(prBundle->at(i), alBundle, cycle, idxAl);
+				}
 			}
 			
 			return prBundle;
