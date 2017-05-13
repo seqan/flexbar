@@ -28,18 +28,18 @@ Make sure that `cmake` is available, as well as development and runtime files of
 
 Decompress both files:
 
-		tar xzf flexbar-3.0.3.tar.gz
-		tar xJf seqan-library-2.2.0.tar.xz
+	tar xzf flexbar-3.0.3.tar.gz
+	tar xJf seqan-library-2.2.0.tar.xz
 
 Move SeqAn include folder to Flexbar:
 
-        mv seqan-library-2.2.0/include flexbar-3.0.3
+	mv seqan-library-2.2.0/include flexbar-3.0.3
 
 Use these commands for building:
 
-        cd flexbar-3.0.3
-        cmake .
-        make
+	cd flexbar-3.0.3
+	cmake .
+	make
 
 Flexbar version 2.7 requires SeqAn 2.1.1 instead. Releases prior to 2.7 use the SeqAn 1.4.2 library.
 
@@ -51,19 +51,19 @@ For execution of provided Flexbar binaries, the corresponding TBB library has to
 #### Linux
 Adjust lib search path to include the absolute path of the Flexbar directory containing the lib file libtbb.so.2 for the current terminal session, or permanently in shell startup scripts:
 
-        export LD_LIBRARY_PATH=/path/FlexbarDir:$LD_LIBRARY_PATH
+	export LD_LIBRARY_PATH=/path/FlexbarDir:$LD_LIBRARY_PATH
 
 #### Mac OS
 It applies the same as for Linux. Make the file libtbb.dylib available by setting the lib search path:
 
-        export DYLD_LIBRARY_PATH=/path/FlexbarDir:$DYLD_LIBRARY_PATH
+	export DYLD_LIBRARY_PATH=/path/FlexbarDir:$DYLD_LIBRARY_PATH
 
 
 ### Program usage
 
 Flexbar needs at least one file with sequencing reads in fasta or fastq format as input. Additionally, the target name and further options can be specified. For read separation based on barcodes and for adapter removal, a file in fasta format with barcode or adapter sequences should be provided.
 
-        flexbar -r reads [-b barcodes] [-a adapters] [options]
+	flexbar -r reads [-b barcodes] [-a adapters] [options]
 
 Refer to the help screen `flexbar -h` or [manual](https://github.com/seqan/flexbar/wiki) for more information. Although default parameters of Flexbar are optimized to deliver good results in many scenarios, the adjustment of parameters might improve results, e.g. `--adapter-min-overlap`. To run tests, make sure `flexbar` is reachable via the path variable and run `flexbar_test.sh` within the test folder.
 
@@ -71,11 +71,11 @@ Refer to the help screen `flexbar -h` or [manual](https://github.com/seqan/flexb
 
 In this example, reads that are barcoded on left side are demultiplexed by specifying a file with barcodes in fasta format. After separation of reads, given adapters are removed from the right side if they do not align before read start. The left side of reads is kept if long enough. Remaining reads are written to the file `target.fastq` in same format as the input.
 
-		flexbar -r reads.fq -t target -b brc.fa -be LTAIL -a adp.fa
+	flexbar -r reads.fq -t target -b brc.fa -be LTAIL -a adp.fa
 
 The second example shows how to trim compressed reads based on their quality scores in illumina version 1.8 format. Afterwards, provided adapters are removed in right trim-end mode, only if the overlap of adapter and read has at least length five with at most 40% errors.
 
-		flexbar -r reads.fq.gz -q TAIL -qf i1.8 -a adp.fa -ao 5 -at 0.4
+	flexbar -r reads.fq.gz -q TAIL -qf i1.8 -a adp.fa -ao 5 -at 0.4
 
 For further examples visit the [manual](https://github.com/seqan/flexbar/wiki) page.
 
