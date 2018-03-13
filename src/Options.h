@@ -17,6 +17,7 @@ struct Options{
 	std::string readsFile, readsFile2, barReadsFile;
 	std::string barcodeFile, adapterFile, barcode2File, adapter2File;
 	std::string adapterSeq, targetName, logAlignStr, outCompression;
+	std::string trimLeftNucs, trimRightNucs;
 	
 	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, randTag, logStdout;
 	bool switch2Fasta, writeUnassigned, writeSingleReads, writeSingleReadsP, writeLengthDist;
@@ -53,6 +54,8 @@ struct Options{
 		barcode2File   = "";
 		adapter2File   = "";
 		outCompression = "";
+		trimLeftNucs   = "";
+		trimRightNucs  = "";
 		
 		isPaired          = false;
 		useAdapterFile    = false;
@@ -80,6 +83,8 @@ struct Options{
 		a_tail_len    = 0;
 		b_tail_len    = 0;
 		b_min_overlap = 0;
+		
+		a_errorRate = 0.1;
 		
 		format    = flexbar::FASTA;
 		qual      = flexbar::SANGER;
@@ -191,6 +196,8 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("u", "max-uncalled", "Allowed uncalled bases N for each read.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("x", "pre-trim-left", "Trim given number of bases on 5' read end before detection.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("y", "pre-trim-right", "Trim specified number of bases on 3' end prior to detection.", ARG::INTEGER));
+	addOption(parser, ArgParseOption("X", "post-trim-left-hps", "Trim certain homopolymers on the left read end after removal.", ARG::STRING));
+	addOption(parser, ArgParseOption("Y", "post-trim-right-hps", "Trim certain homopolymers on the right read end after removal.", ARG::STRING));
 	addOption(parser, ArgParseOption("k", "post-trim-length", "Trim to specified read length from 3' end after removal.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("m", "min-read-length", "Minimum read length to remain after removal.", ARG::INTEGER));
 	
@@ -229,7 +236,6 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "barcode-mismatch");
 	setAdvanced(parser, "barcode-gap");
 	
-	setAdvanced(parser, "adapters2");
 	setAdvanced(parser, "adapter-revcomp");
 	setAdvanced(parser, "adapter-tail-length");
 	// setAdvanced(parser, "adapter-overhang");
@@ -239,6 +245,8 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "adapter-mismatch");
 	setAdvanced(parser, "adapter-gap");
 	
+	setAdvanced(parser, "post-trim-left-hps");
+	setAdvanced(parser, "post-trim-right-hps");
 	setAdvanced(parser, "post-trim-length");
 	setAdvanced(parser, "qtrim-win-size");
 	setAdvanced(parser, "qtrim-post-removal");
@@ -564,6 +572,16 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		*out << "pre-trim-right:        " << o.cutLen_end << endl;
 	}
 	
+	if(isSet(parser, "post-trim-left-hps")){
+		getOptionValue(o.trimLeftNucs, parser, "post-trim-left-hps");
+		*out << "post-trim-left-hps:    " << o.trimLeftNucs << endl;
+	}
+	
+	if(isSet(parser, "post-trim-right-hps")){
+		getOptionValue(o.trimRightNucs, parser, "post-trim-right-hps");
+		*out << "post-trim-right-hps:   " << o.trimRightNucs << endl;
+	}
+	
 	if(isSet(parser, "post-trim-length")){
 		getOptionValue(o.cutLen_read, parser, "post-trim-length");
 		*out << "post-trim-length:      " << o.cutLen_read << endl;
@@ -747,10 +765,10 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		string a_trim_end;
 		getOptionValue(a_trim_end, parser, "adapter-trim-end");
 		
-		if     (a_trim_end == "LEFT")        o.end = LEFT;
-		else if(a_trim_end == "RIGHT")       o.end = RIGHT;
-		else if(a_trim_end == "ANY")         o.end = ANY;
-		else if(a_trim_end == "LTAIL")   o.end = LTAIL;
+		if     (a_trim_end == "LEFT")   o.end = LEFT;
+		else if(a_trim_end == "RIGHT")  o.end = RIGHT;
+		else if(a_trim_end == "ANY")    o.end = ANY;
+		else if(a_trim_end == "LTAIL")  o.end = LTAIL;
 		else if(a_trim_end == "RTAIL")  o.end = RTAIL;
 		else {
 			cerr << "Specified adapter trim-end is unknown!\n" << endl;
@@ -796,7 +814,6 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		
 		// getOptionValue(o.a_overhang, parser, "adapter-overhang");
 		// *out << "adapter-overhang:      " << o.a_overhang << endl;
-		
 		
 		getOptionValue(o.match,    parser, "adapter-match");
 		getOptionValue(o.mismatch, parser, "adapter-mismatch");
