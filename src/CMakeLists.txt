@@ -59,12 +59,3 @@ endif()
 # endif()
 
 set( SEQAN_CTD_EXECUTABLES ${SEQAN_CTD_EXECUTABLES} flexbar CACHE INTERNAL "" )
-
-# set( CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "/Users/jtr/Downloads/seqan-trunk/util/cmake" )
-# set( SEQAN_FIND_DEPENDENCIES ZLIB BZip2 )
-# find_package( SeqAn REQUIRED )
-
-# add_definitions( ${SEQAN_DEFINITIONS} )
-# include_directories( ${SEQAN_INCLUDE_DIRS} )
-# target_link_libraries( flexbar ${SEQAN_LIBRARIES} )
-# set( SEQAN_HAS_ZLIB FALSE )
