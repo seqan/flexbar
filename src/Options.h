@@ -24,7 +24,7 @@ struct Options{
 	bool useStdin, useStdout, relaxRegion, revCompAdapter, qtrimPostRm, bNoMBV;
 	
 	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len;
-	int qtrimThresh, qtrimWinSize, a_overhang;
+	int qtrimThresh, qtrimWinSize, a_overhang, hpsMinLength;
 	int maxUncalled, min_readLen, a_min_overlap, b_min_overlap, nThreads, bundleSize;
 	int match, mismatch, gapCost, b_match, b_mismatch, b_gapCost;
 	
@@ -198,6 +198,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("y", "pre-trim-right", "Trim specified number of bases on 3' end prior to detection.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("X", "post-trim-left-hps", "Trim certain homopolymers on the left read end after removal.", ARG::STRING));
 	addOption(parser, ArgParseOption("Y", "post-trim-right-hps", "Trim certain homopolymers on the right read end after removal.", ARG::STRING));
+	addOption(parser, ArgParseOption("Z", "post-trim-hps-length", "Minimum length of homopolymers at read ends.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("k", "post-trim-length", "Trim to specified read length from 3' end after removal.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("m", "min-read-length", "Minimum read length to remain after removal.", ARG::INTEGER));
 	
@@ -247,6 +248,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	setAdvanced(parser, "post-trim-left-hps");
 	setAdvanced(parser, "post-trim-right-hps");
+	setAdvanced(parser, "post-trim-hps-length");
 	setAdvanced(parser, "post-trim-length");
 	setAdvanced(parser, "qtrim-win-size");
 	setAdvanced(parser, "qtrim-post-removal");
@@ -300,11 +302,13 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setValidValues(parser, "zip-output", "GZ BZ2");
 	setValidValues(parser, "adapter-read-set", "1 2");
 	
-	setDefaultValue(parser, "target",          "flexbarOut");
-	setDefaultValue(parser, "threads",         "1");
-	setDefaultValue(parser, "bundle",          "256");
-	setDefaultValue(parser, "max-uncalled",    "0");
-	setDefaultValue(parser, "min-read-length", "18");
+	setDefaultValue(parser, "target",  "flexbarOut");
+	setDefaultValue(parser, "threads", "1");
+	setDefaultValue(parser, "bundle",  "256");
+	
+	setDefaultValue(parser, "max-uncalled",         "0");
+	setDefaultValue(parser, "min-read-length",      "18");
+	setDefaultValue(parser, "post-trim-hps-length", "3");
 	
 	setDefaultValue(parser, "barcode-trim-end",   "LTAIL");
 	setDefaultValue(parser, "barcode-error-rate", "0.1");
@@ -581,6 +585,9 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		getOptionValue(o.trimRightNucs, parser, "post-trim-right-hps");
 		*out << "post-trim-right-hps:   " << o.trimRightNucs << endl;
 	}
+	
+	getOptionValue(o.hpsMinLength, parser, "post-trim-hps-length");
+	*out << "post-trim-hps-length:  " << o.hpsMinLength << endl;
 	
 	if(isSet(parser, "post-trim-length")){
 		getOptionValue(o.cutLen_read, parser, "post-trim-length");

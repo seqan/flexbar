@@ -23,6 +23,7 @@ private:
 	const std::string m_target;
 	const std::string m_trimLeftNucs, m_trimRightNucs;
 	
+	const int m_hpsMinLength;
 	const float m_errorRate;
 	
 	const flexbar::FileFormat     m_format;
@@ -51,6 +52,7 @@ public:
 		m_minLength(o.min_readLen),
 		m_trimLeftNucs(o.trimLeftNucs),
 		m_trimRightNucs(o.trimRightNucs),
+		m_hpsMinLength(o.hpsMinLength),
 		m_errorRate(o.a_errorRate),
 		m_qtrim(o.qTrim),
 		m_qtrimThresh(o.qtrimThresh),
@@ -254,7 +256,7 @@ public:
 				}
 			}
 			
-			if(cutPos > 0){
+			if(cutPos > 0 && cutPos >= m_hpsMinLength){
 				erase(seqRead->seq, 0, cutPos);
 		
 				if(m_format == FASTQ){
@@ -287,7 +289,7 @@ public:
 				}
 			}
 			
-			if(cutPos < length(seqRead->seq)){
+			if(cutPos < length(seqRead->seq) && cutPos <= length(seqRead->seq) - m_hpsMinLength){
 				erase(seqRead->seq, cutPos, length(seqRead->seq));
 		
 				if(m_format == FASTQ){
