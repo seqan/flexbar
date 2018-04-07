@@ -311,7 +311,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setDefaultValue(parser, "post-trim-hps-length", "3");
 	
 	setDefaultValue(parser, "barcode-trim-end",   "LTAIL");
-	setDefaultValue(parser, "barcode-error-rate", "0.1");
+	setDefaultValue(parser, "barcode-error-rate", "0.0");
 	setDefaultValue(parser, "barcode-match",      "1");
 	setDefaultValue(parser, "barcode-mismatch",   "-1");
 	setDefaultValue(parser, "barcode-gap",        "-9");
