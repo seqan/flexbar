@@ -234,8 +234,8 @@ public:
 			// valid alignment, not neccesarily removal
 			
 			if(m_randTag && am.randTag != ""){
-				append(seqRead.id, "_");
-				append(seqRead.id, am.randTag);
+				append(seqRead.umi, "_");
+				append(seqRead.umi, am.randTag);
 			}
 			
 			// alignment stats

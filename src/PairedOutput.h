@@ -16,7 +16,7 @@ private:
 	int m_mapsize;
 	const int m_minLength, m_qtrimThresh, m_qtrimWinSize;
 	const bool m_isPaired, m_writeUnassigned, m_writeSingleReads, m_writeSingleReadsP;
-	const bool m_twoBarcodes, m_qtrimPostRm;
+	const bool m_twoBarcodes, m_qtrimPostRm, m_randTag;
 	
 	tbb::atomic<unsigned long> m_nSingleReads, m_nLowPhred;
 	
@@ -59,6 +59,7 @@ public:
 		m_qtrimWinSize(o.qtrimWinSize),
 		m_qtrimPostRm(o.qtrimPostRm),
 		m_isPaired(o.isPaired),
+		m_randTag(o.randTag),
 		m_writeUnassigned(o.writeUnassigned),
 		m_writeSingleReads(o.writeSingleReads),
 		m_writeSingleReadsP(o.writeSingleReadsP),
@@ -321,6 +322,8 @@ public:
 						if(m_trimLeftNucs  != "") trimLeftNucs(pRead->r1);
 						if(m_trimRightNucs != "") trimRightNucs(pRead->r1);
 						
+						if(m_randTag) append(pRead->r1->id, pRead->r1->umi);
+						
 						if(length(pRead->r1->seq) >= m_minLength){
 							
 							m_outMap[pRead->barID].f1->writeRead(pRead->r1);
@@ -359,6 +362,14 @@ public:
 						if(m_trimRightNucs != ""){
 							trimRightNucs(pRead->r1);
 							trimRightNucs(pRead->r2);
+						}
+						
+						if(m_randTag){
+							append(pRead->r1->id, pRead->r1->umi);
+							append(pRead->r1->id, pRead->r2->umi);
+							
+							append(pRead->r2->id, pRead->r1->umi);
+							append(pRead->r2->id, pRead->r2->umi);
 						}
 						
 						if(length(pRead->r1->seq) >= m_minLength) l1ok = true;

@@ -9,17 +9,19 @@ class SeqRead {
 	
 	public:
 	TSeqStr seq;
-	TString id, qual;
+	TString id, qual, umi;
 	
 	SeqRead(TSeqStr& sequence, TString& seqID) :
 		seq(sequence),
-		id(seqID){
+		id(seqID),
+		umi(""){
 	}
 	
 	SeqRead(TSeqStr& sequence, TString& seqID, TString& quality) :
 		seq(sequence),
 		id(seqID),
-		qual(quality){
+		qual(quality),
+		umi(""){
 	}
 };
 
