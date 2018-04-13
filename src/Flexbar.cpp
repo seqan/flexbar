@@ -27,8 +27,8 @@ int main(int argc, const char* argv[]){
 	using namespace std;
 	using namespace seqan;
 	
-	const string version = "3.1 beta";
-	const string date    = "March 2018";
+	const string version = "3.1";
+	const string date    = "April 2018";
 	
 	ArgumentParser parser("flexbar");
 	
