@@ -21,7 +21,7 @@ struct Options{
 	
 	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, randTag, logStdout;
 	bool switch2Fasta, writeUnassigned, writeSingleReads, writeSingleReadsP, writeLengthDist;
-	bool useStdin, useStdout, relaxRegion, revCompAdapter, qtrimPostRm, bNoMBV;
+	bool useStdin, useStdout, relaxRegion, revCompAdapter, qtrimPostRm;
 	
 	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len;
 	int qtrimThresh, qtrimWinSize, a_overhang, hpsMinLength;
@@ -73,7 +73,6 @@ struct Options{
 		relaxRegion       = false;
 		revCompAdapter    = false;
 		qtrimPostRm       = false;
-		bNoMBV            = false;
 		
 		cutLen_begin  = 0;
 		cutLen_end    = 0;
@@ -168,13 +167,9 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("bt", "barcode-error-rate", "Error rate threshold for mismatches and gaps.", ARG::DOUBLE));
 	addOption(parser, ArgParseOption("bk", "barcode-keep", "Keep barcodes within reads instead of removal."));
 	addOption(parser, ArgParseOption("bu", "barcode-unassigned", "Include unassigned reads in output generation."));
-	// addOption(parser, ArgParseOption("ba", "barcode-no-mbv", "Turn off bit-vector alignment with edit distance."));
 	addOption(parser, ArgParseOption("bm", "barcode-match", "Alignment match score.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("bi", "barcode-mismatch", "Alignment mismatch score.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("bg", "barcode-gap", "Alignment gap score.", ARG::INTEGER));
-	// addOption(parser, ArgParseOption("bm", "barcode-match", "Alignment match score in case of no-mbv.", ARG::INTEGER));
-	// addOption(parser, ArgParseOption("bi", "barcode-mismatch", "Standard alignment mismatch score.", ARG::INTEGER));
-	// addOption(parser, ArgParseOption("bg", "barcode-gap", "Standard alignment gap score.", ARG::INTEGER));
 	
 	addSection(parser, "Adapter removal");
 	addOption(parser, ArgParseOption("a",  "adapters", "Fasta file with adapters for removal that may contain N.", ARG::INPUT_FILE));
@@ -223,7 +218,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("o", "stdout-log", "Write statistics to console instead of target log file."));
 	addOption(parser, ArgParseOption("g", "removal-tags", "Tag reads that are subject to adapter or barcode removal."));
 	addOption(parser, ArgParseOption("e", "number-tags", "Replace read tags by ascending number to save space."));
-	addOption(parser, ArgParseOption("d", "random-tags", "Capture read sequence at barcode or adapter N positions."));
+	addOption(parser, ArgParseOption("i", "umi-tags", "Capture UMIs in reads at barcode or adapter N positions."));
 	
 	
 	hideOption(parser, "version");
@@ -232,7 +227,6 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "barcode-tail-length");
 	setAdvanced(parser, "barcode-keep");
 	setAdvanced(parser, "barcode-unassigned");
-	// setAdvanced(parser, "barcode-no-mbv");
 	setAdvanced(parser, "barcode-match");
 	setAdvanced(parser, "barcode-mismatch");
 	setAdvanced(parser, "barcode-gap");
@@ -259,7 +253,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "length-dist");
 	setAdvanced(parser, "single-reads-paired");
 	setAdvanced(parser, "number-tags");
-	setAdvanced(parser, "random-tags");
+	setAdvanced(parser, "umi-tags");
 	
 	
 	setCategory(parser, "Trimming");
@@ -698,7 +692,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	if(isSet(parser, "length-dist"))  o.writeLengthDist = true;
 	if(isSet(parser, "number-tags"))  o.useNumberTag    = true;
 	if(isSet(parser, "removal-tags")) o.useRemovalTag   = true;
-	if(isSet(parser, "random-tags"))  o.randTag         = true;
+	if(isSet(parser, "umi-tags"))     o.randTag         = true;
 	
 	*out << endl;
 	
@@ -741,26 +735,23 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		}
 		
 		if(isSet(parser, "barcode-unassigned")) o.writeUnassigned = true;
-		// if(isSet(parser, "barcode-no-mbv"))     o.bNoMBV          = true;
 		
 		getOptionValue(o.b_match,    parser, "barcode-match");
 		getOptionValue(o.b_mismatch, parser, "barcode-mismatch");
 		getOptionValue(o.b_gapCost,  parser, "barcode-gap");
 		
-		// if(o.bNoMBV){
-			
-			*out << "barcode-match:        ";
-			if(o.b_match >= 0) *out << " ";
-			*out << o.b_match << endl;
-			
-			*out << "barcode-mismatch:     ";
-			if(o.b_mismatch >= 0) *out << " ";
-			*out << o.b_mismatch << endl;
-			
-			*out << "barcode-gap:          ";
-			if(o.b_gapCost >= 0) *out << " ";
-			*out << o.b_gapCost << endl;
-		// }
+		*out << "barcode-match:        ";
+		if(o.b_match >= 0) *out << " ";
+		*out << o.b_match << endl;
+		
+		*out << "barcode-mismatch:     ";
+		if(o.b_mismatch >= 0) *out << " ";
+		*out << o.b_mismatch << endl;
+		
+		*out << "barcode-gap:          ";
+		if(o.b_gapCost >= 0) *out << " ";
+		*out << o.b_gapCost << endl;
+		
 		*out << endl;
 	}
 	
