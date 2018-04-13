@@ -28,7 +28,7 @@ Flexbar source code as well as binaries for Linux and Mac OS can be downloaded o
 Make sure that `cmake` is available, as well as development and runtime files of the TBB library 4.0 or later (Intel Threading Building Blocks). For example on Debian systems, install the packages `libtbb-dev` and `libtbb2`. Furthermore, the SeqAn library and a compiler that supports C++14 is required:
 
 * Get SeqAn library version 2.2.0 [here](https://github.com/seqan/seqan/releases/download/seqan-v2.2.0/seqan-library-2.2.0.tar.xz)
-* Download Flexbar 3.1.0 source code [release](https://github.com/seqan/flexbar/releases)
+* Download Flexbar 3.1 source code [release](https://github.com/seqan/flexbar/releases)
 
 Decompress both files:
 
