@@ -117,7 +117,7 @@ const std::string getFlexbarBanner(const seqan::CharString version){
 
 
 const std::string getFlexbarCitation(){
-	return "Matthias Dodt, Johannes T. Roehr, Rina Ahmed, Christoph Dieterich:\nFlexbar - flexible barcode and adapter processing for next-generation\nsequencing platforms. Biology 2012, 1(3):895-905.\n";
+	return "Johannes T. Roehr, Christoph Dieterich, Knut Reinert:\nFlexbar 3.0 - SIMD and multicore parallelization. Bioinformatics 2017.\n\nMatthias Dodt, Johannes T. Roehr, Rina Ahmed, Christoph Dieterich:\nFlexbar - flexible barcode and adapter processing for next-generation\nsequencing platforms. Biology 2012.\n";
 }
 
 
@@ -148,7 +148,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	addOption(parser, ArgParseOption("hm", "man-help", "Print advanced options as man document."));
 	addOption(parser, ArgParseOption("v", "versions", "Print Flexbar and SeqAn version numbers."));
-	addOption(parser, ArgParseOption("c", "cite", "Show program reference for citation."));
+	addOption(parser, ArgParseOption("c", "cite", "Show program references for citation."));
 	
 	addSection(parser, "Basic options");
 	addOption(parser, ArgParseOption("n", "threads", "Number of threads to employ.", ARG::INTEGER));
