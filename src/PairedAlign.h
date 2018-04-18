@@ -13,6 +13,7 @@ class PairedAlign : public tbb::filter {
 private:
 	
 	const bool m_writeUnassigned, m_twoBarcodes;
+	const unsigned int m_arTimes;
 	
 	const flexbar::LogAlign       m_log;
 	const flexbar::RunType        m_runType;
@@ -37,6 +38,7 @@ public:
 		m_runType(o.runType),
 		m_barType(o.barDetect),
 		m_adapRem(o.adapRm),
+		m_arTimes(o.a_cycles),
 		m_writeUnassigned(o.writeUnassigned),
 		m_twoBarcodes(o.barDetect == flexbar::WITHIN_READ_REMOVAL2 || o.barDetect == flexbar::WITHIN_READ2),
 		out(o.out),
@@ -152,31 +154,34 @@ public:
 			
 			if(m_adapRem != AOFF){
 				
-				TAlignBundle alBundle;
-				Alignments r1AlignmentsA, r2AlignmentsA;
-				
-				alBundle.push_back(r1AlignmentsA);
-				alBundle.push_back(r2AlignmentsA);
-				
-				std::vector<unsigned int> idxAl;
-				std::vector<ComputeCycle> cycle;
-				
-				for(unsigned int i = 0; i < 2; ++i){
-					idxAl.push_back(0);
-					cycle.push_back(PRELOAD);
-				}
-				
-				for(unsigned int i = 0; i < prBundle->size(); ++i){
-					alignPairedReadAdapter(prBundle->at(i), alBundle, cycle, idxAl);
-				}
-				
-				for(unsigned int i = 0; i < 2; ++i){
-					idxAl[i] = 0;
-					cycle[i] = COMPUTE;
-				}
-				
-				for(unsigned int i = 0; i < prBundle->size(); ++i){
-					alignPairedReadAdapter(prBundle->at(i), alBundle, cycle, idxAl);
+				for(unsigned int c = 0; c < m_arTimes; ++c){
+					
+					TAlignBundle alBundle;
+					Alignments r1AlignmentsA, r2AlignmentsA;
+					
+					alBundle.push_back(r1AlignmentsA);
+					alBundle.push_back(r2AlignmentsA);
+					
+					std::vector<unsigned int> idxAl;
+					std::vector<ComputeCycle> cycle;
+					
+					for(unsigned int i = 0; i < 2; ++i){
+						idxAl.push_back(0);
+						cycle.push_back(PRELOAD);
+					}
+					
+					for(unsigned int i = 0; i < prBundle->size(); ++i){
+						alignPairedReadAdapter(prBundle->at(i), alBundle, cycle, idxAl);
+					}
+					
+					for(unsigned int i = 0; i < 2; ++i){
+						idxAl[i] = 0;
+						cycle[i] = COMPUTE;
+					}
+					
+					for(unsigned int i = 0; i < prBundle->size(); ++i){
+						alignPairedReadAdapter(prBundle->at(i), alBundle, cycle, idxAl);
+					}
 				}
 			}
 			

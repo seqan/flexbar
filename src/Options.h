@@ -24,7 +24,7 @@ struct Options{
 	bool useStdin, useStdout, relaxRegion, revCompAdapter, qtrimPostRm;
 	
 	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len;
-	int qtrimThresh, qtrimWinSize, a_overhang, hpsMinLength;
+	int qtrimThresh, qtrimWinSize, a_overhang, hpsMinLength, a_cycles;
 	int maxUncalled, min_readLen, a_min_overlap, b_min_overlap, nThreads, bundleSize;
 	int match, mismatch, gapCost, b_match, b_mismatch, b_gapCost;
 	
@@ -183,6 +183,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("ad", "adapter-relaxed", "Skip restriction to pass read ends in right and left modes."));
 	addOption(parser, ArgParseOption("ao", "adapter-min-overlap", "Minimum overlap of adapter and read for removal.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("at", "adapter-error-rate", "Error rate threshold for mismatches and gaps.", ARG::DOUBLE));
+	addOption(parser, ArgParseOption("ay", "adapter-cycles", "Number of adapter removal cycles.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("am", "adapter-match", "Alignment match score.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ai", "adapter-mismatch", "Alignment mismatch score.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ag", "adapter-gap", "Alignment gap score.", ARG::INTEGER));
@@ -236,6 +237,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	// setAdvanced(parser, "adapter-overhang");
 	setAdvanced(parser, "adapter-relaxed");
 	setAdvanced(parser, "adapter-read-set");
+	setAdvanced(parser, "adapter-cycles");
 	setAdvanced(parser, "adapter-match");
 	setAdvanced(parser, "adapter-mismatch");
 	setAdvanced(parser, "adapter-gap");
@@ -313,6 +315,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setDefaultValue(parser, "adapter-trim-end",    "RIGHT");
 	setDefaultValue(parser, "adapter-min-overlap", "3");
 	setDefaultValue(parser, "adapter-error-rate",  "0.1");
+	setDefaultValue(parser, "adapter-cycles",      "1");
 	// setDefaultValue(parser, "adapter-overhang",    "0");
 	setDefaultValue(parser, "adapter-match",       "1");
 	setDefaultValue(parser, "adapter-mismatch",    "-1");
@@ -807,6 +810,14 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		
 		if(o.a_errorRate < 0 || o.a_errorRate >= 1){
 			cerr << "\nAdapter error rate should be between 0 and 1.\n" << endl;
+			exit(1);
+		}
+		
+		getOptionValue(o.a_cycles, parser, "adapter-cycles");
+		if(o.a_cycles > 1) *out << "adapter-cycles:        " << o.a_cycles << endl;
+		
+		if(o.a_cycles < 1){
+			cerr << "\nNumber of adapter removal cycles should be 1 at least.\n" << endl;
 			exit(1);
 		}
 		
