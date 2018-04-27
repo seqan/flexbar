@@ -19,7 +19,7 @@ struct Options{
 	std::string adapterSeq, targetName, logAlignStr, outCompression;
 	std::string trimLeftNucs, trimRightNucs;
 	
-	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, randTag, logStdout;
+	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, umiTags, logStdout;
 	bool switch2Fasta, writeUnassigned, writeSingleReads, writeSingleReadsP, writeLengthDist;
 	bool useStdin, useStdout, relaxRegion, revCompAdapter, qtrimPostRm;
 	
@@ -67,7 +67,7 @@ struct Options{
 		writeLengthDist   = false;
 		switch2Fasta      = false;
 		logStdout         = false;
-		randTag           = false;
+		umiTags           = false;
 		useStdin          = false;
 		useStdout         = false;
 		relaxRegion       = false;
@@ -695,7 +695,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	if(isSet(parser, "length-dist"))  o.writeLengthDist = true;
 	if(isSet(parser, "number-tags"))  o.useNumberTag    = true;
 	if(isSet(parser, "removal-tags")) o.useRemovalTag   = true;
-	if(isSet(parser, "umi-tags"))     o.randTag         = true;
+	if(isSet(parser, "umi-tags"))     o.umiTags         = true;
 	
 	*out << endl;
 	

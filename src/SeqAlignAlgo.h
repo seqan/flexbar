@@ -21,14 +21,14 @@ private:
 	// TScoreSimple m_score;
 	TScoreMatrix m_scoreMatrix;
 	
-	const bool m_randTag;
+	const bool m_umiTags;
 	const flexbar::LogAlign m_log;
 	const flexbar::TrimEnd m_trimEnd;
 	
 public:
 	
 	SeqAlignAlgo(const Options &o, const int match, const int mismatch, const int gapCost, const flexbar::TrimEnd trimEnd):
-			m_randTag(o.randTag),
+			m_umiTags(o.umiTags),
 			m_log(o.logAlign),
 			m_trimEnd(trimEnd){
 		
@@ -113,7 +113,7 @@ public:
 			a.alString = s.str();
 		}
 		
-		if(m_randTag) a.randTag = "";
+		if(m_umiTags) a.umiTag = "";
 		
 		
 		TRowIterator it1 = begin(row1);
@@ -130,7 +130,7 @@ public:
 				     if(isGap(it1))                   ++a.gapsR;
 				else if(isGap(it2))                   ++a.gapsA;
 				else if(*it1 != *it2 && *it2 != 'N')  ++a.mismatches;
-				else if(m_randTag    && *it2 == 'N')  append(a.randTag, (TChar) *it1);
+				else if(m_umiTags    && *it2 == 'N')  append(a.umiTag, (TChar) *it1);
 			}
 			++alPos;
 			++it2;

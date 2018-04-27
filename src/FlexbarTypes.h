@@ -13,15 +13,13 @@ class SeqRead {
 	
 	SeqRead(TSeqStr& sequence, TString& seqID) :
 		seq(sequence),
-		id(seqID),
-		umi(""){
+		id(seqID){
 	}
 	
 	SeqRead(TSeqStr& sequence, TString& seqID, TString& quality) :
 		seq(sequence),
 		id(seqID),
-		qual(quality),
-		umi(""){
+		qual(quality){
 	}
 };
 
@@ -60,7 +58,7 @@ struct AlignResults{
 	int overlapLength, queryLength, tailLength;
 	
 	float allowedErrors;
-	TSeqStr randTag;
+	TSeqStr umiTag;
 	std::string alString;
 	
 	AlignResults(){}

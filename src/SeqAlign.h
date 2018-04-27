@@ -15,7 +15,7 @@ private:
 	const flexbar::LogAlign m_log;
 	const flexbar::FileFormat m_format;
 	
-	const bool m_isBarcoding, m_writeTag, m_randTag, m_strictRegion;
+	const bool m_isBarcoding, m_writeTag, m_umiTags, m_strictRegion;
 	const int m_minLength, m_minOverlap, m_tailLength;
 	const float m_errorRate;
 	const unsigned int m_bundleSize;
@@ -36,7 +36,7 @@ public:
 			m_tailLength(tailLength),
 			m_trimEnd(end),
 			m_isBarcoding(isBarcoding),
-			m_randTag(o.randTag),
+			m_umiTags(o.umiTags),
 			m_minLength(o.min_readLen),
 			m_log(o.logAlign),
 			m_format(o.format),
@@ -233,9 +233,9 @@ public:
 			
 			// valid alignment, not neccesarily removal
 			
-			if(m_randTag && am.randTag != ""){
+			if(m_umiTags && am.umiTag != ""){
 				append(seqRead.umi, "_");
-				append(seqRead.umi, am.randTag);
+				append(seqRead.umi, am.umiTag);
 			}
 			
 			// alignment stats

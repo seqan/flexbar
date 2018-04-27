@@ -12,7 +12,7 @@ class PairedAlign : public tbb::filter {
 
 private:
 	
-	const bool m_writeUnassigned, m_twoBarcodes;
+	const bool m_writeUnassigned, m_twoBarcodes, m_umiTags;
 	const unsigned int m_arTimes;
 	
 	const flexbar::LogAlign       m_log;
@@ -39,6 +39,7 @@ public:
 		m_barType(o.barDetect),
 		m_adapRem(o.adapRm),
 		m_arTimes(o.a_cycles),
+		m_umiTags(o.umiTags),
 		m_writeUnassigned(o.writeUnassigned),
 		m_twoBarcodes(o.barDetect == flexbar::WITHIN_READ_REMOVAL2 || o.barDetect == flexbar::WITHIN_READ2),
 		out(o.out),
@@ -117,6 +118,15 @@ public:
 			
 			TPairedReadBundle *prBundle = static_cast<TPairedReadBundle* >(item);
 			
+			if(m_umiTags){
+				for(unsigned int i = 0; i < prBundle->size(); ++i){
+					prBundle->at(i)->r1->umi = "";
+					
+					if(prBundle->at(i)->r2 != NULL)
+					prBundle->at(i)->r2->umi = "";
+				}
+			}
+			
 			// barcode detection
 			
 			if(m_barType != BOFF){
@@ -181,6 +191,20 @@ public:
 					
 					for(unsigned int i = 0; i < prBundle->size(); ++i){
 						alignPairedReadAdapter(prBundle->at(i), alBundle, cycle, idxAl);
+					}
+				}
+			}
+			
+			if(m_umiTags){
+				for(unsigned int i = 0; i < prBundle->size(); ++i){
+					
+					append(prBundle->at(i)->r1->id, prBundle->at(i)->r1->umi);
+					
+					if(prBundle->at(i)->r2 != NULL){
+						append(prBundle->at(i)->r1->id, prBundle->at(i)->r2->umi);
+						
+						append(prBundle->at(i)->r2->id, prBundle->at(i)->r1->umi);
+						append(prBundle->at(i)->r2->id, prBundle->at(i)->r2->umi);
 					}
 				}
 			}
