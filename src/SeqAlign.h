@@ -211,7 +211,7 @@ public:
 				
 				++m_modified;
 				
-				seqRead.adapterRemoved = true;
+				if(! m_isBarcoding) seqRead.adapterRemoved = true;
 				
 				// count number of removals for each query
 				m_queries->at(qIndex).rmOverlap++;
