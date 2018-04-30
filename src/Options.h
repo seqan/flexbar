@@ -17,18 +17,18 @@ struct Options{
 	std::string readsFile, readsFile2, barReadsFile;
 	std::string barcodeFile, adapterFile, barcode2File, adapter2File;
 	std::string adapterSeq, targetName, logAlignStr, outCompression;
-	std::string trimLeftNucs, trimRightNucs;
+	std::string htrimLeft, htrimRight;
 	
 	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, umiTags, logStdout;
 	bool switch2Fasta, writeUnassigned, writeSingleReads, writeSingleReadsP, writeLengthDist;
-	bool useStdin, useStdout, relaxRegion, revCompAdapter, qtrimPostRm;
+	bool useStdin, useStdout, relaxRegion, revCompAdapter, qtrimPostRm, htrimAdapterRm;
 	
 	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len;
-	int qtrimThresh, qtrimWinSize, a_overhang, hpsMinLength, a_cycles;
+	int qtrimThresh, qtrimWinSize, a_overhang, htrimMinLength, htrimMaxLength, a_cycles;
 	int maxUncalled, min_readLen, a_min_overlap, b_min_overlap, nThreads, bundleSize;
 	int match, mismatch, gapCost, b_match, b_mismatch, b_gapCost;
 	
-	float a_errorRate, b_errorRate;
+	float a_errorRate, b_errorRate, h_errorRate;
 	
 	flexbar::TrimEnd         end, b_end;
 	flexbar::FileFormat      format;
@@ -54,8 +54,8 @@ struct Options{
 		barcode2File   = "";
 		adapter2File   = "";
 		outCompression = "";
-		trimLeftNucs   = "";
-		trimRightNucs  = "";
+		htrimLeft      = "";
+		htrimRight     = "";
 		
 		isPaired          = false;
 		useAdapterFile    = false;
@@ -73,17 +73,17 @@ struct Options{
 		relaxRegion       = false;
 		revCompAdapter    = false;
 		qtrimPostRm       = false;
+		htrimAdapterRm    = false;
 		
-		cutLen_begin  = 0;
-		cutLen_end    = 0;
-		cutLen_read   = 0;
-		qtrimThresh   = 0;
-		qtrimWinSize  = 0;
-		a_tail_len    = 0;
-		b_tail_len    = 0;
-		b_min_overlap = 0;
-		
-		a_errorRate = 0.1;
+		cutLen_begin   = 0;
+		cutLen_end     = 0;
+		cutLen_read    = 0;
+		qtrimThresh    = 0;
+		qtrimWinSize   = 0;
+		a_tail_len     = 0;
+		b_tail_len     = 0;
+		b_min_overlap  = 0;
+		htrimMaxLength = 0;
 		
 		format    = flexbar::FASTA;
 		qual      = flexbar::SANGER;
@@ -184,6 +184,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("ao", "adapter-min-overlap", "Minimum overlap of adapter and read for removal.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("at", "adapter-error-rate", "Error rate threshold for mismatches and gaps.", ARG::DOUBLE));
 	addOption(parser, ArgParseOption("ay", "adapter-cycles", "Number of adapter removal cycles.", ARG::INTEGER));
+	// addOption(parser, ArgParseOption("ap", "adapter-paired-overlap-off", "Turn off overlap detection for paired reads."));
 	addOption(parser, ArgParseOption("am", "adapter-match", "Alignment match score.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ai", "adapter-mismatch", "Alignment mismatch score.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ag", "adapter-gap", "Alignment gap score.", ARG::INTEGER));
@@ -192,9 +193,6 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("u", "max-uncalled", "Allowed uncalled bases N for each read.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("x", "pre-trim-left", "Trim given number of bases on 5' read end before detection.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("y", "pre-trim-right", "Trim specified number of bases on 3' end prior to detection.", ARG::INTEGER));
-	addOption(parser, ArgParseOption("X", "post-trim-left-hps", "Trim certain homopolymers on the left read end after removal.", ARG::STRING));
-	addOption(parser, ArgParseOption("Y", "post-trim-right-hps", "Trim certain homopolymers on the right read end after removal.", ARG::STRING));
-	addOption(parser, ArgParseOption("Z", "post-trim-hps-length", "Minimum length of homopolymers at read ends.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("k", "post-trim-length", "Trim to specified read length from 3' end after removal.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("m", "min-read-length", "Minimum read length to remain after removal.", ARG::INTEGER));
 	
@@ -202,9 +200,16 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("q",  "qtrim", "Quality-based trimming mode.", ARG::STRING));
 	addOption(parser, ArgParseOption("qf", "qtrim-format", "Quality format.", ARG::STRING));
 	addOption(parser, ArgParseOption("qt", "qtrim-threshold", "Minimum quality as threshold for trimming.", ARG::INTEGER));
-	// addOption(parser, ArgParseOption("qm", "qtrim-win-mean", "Different threshold for min mean quality of window.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("qw", "qtrim-win-size", "Region size for sliding window approach.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("qa", "qtrim-post-removal", "Perform quality-based trimming after removal steps."));
+	
+	addSection(parser, "Trimming of homopolymers");
+	addOption(parser, ArgParseOption("X", "htrim-left", "Trim certain homopolymers on left read end after removal.", ARG::STRING));
+	addOption(parser, ArgParseOption("Y", "htrim-right", "Trim certain homopolymers on right read end after removal.", ARG::STRING));
+	addOption(parser, ArgParseOption("M", "htrim-min-length", "Minimum length of homopolymers at read ends.", ARG::INTEGER));
+	addOption(parser, ArgParseOption("L", "htrim-max-length", "Maximum length of homopolymers at read ends.", ARG::INTEGER));
+	addOption(parser, ArgParseOption("E", "htrim-error-rate", "Error rate threshold for mismatches.", ARG::DOUBLE));
+	addOption(parser, ArgParseOption("A", "htrim-adapter", "Trim homopolymers only in case of adapter removal."));
 	
 	addSection(parser, "Output selection");
 	addOption(parser, ArgParseOption("f", "fasta-output", "Prefer non-quality format fasta for output."));
@@ -242,12 +247,12 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "adapter-mismatch");
 	setAdvanced(parser, "adapter-gap");
 	
-	setAdvanced(parser, "post-trim-left-hps");
-	setAdvanced(parser, "post-trim-right-hps");
-	setAdvanced(parser, "post-trim-hps-length");
 	setAdvanced(parser, "post-trim-length");
 	setAdvanced(parser, "qtrim-win-size");
 	setAdvanced(parser, "qtrim-post-removal");
+	setAdvanced(parser, "htrim-left");
+	setAdvanced(parser, "htrim-max-length");
+	setAdvanced(parser, "htrim-adapter");
 	
 	setAdvanced(parser, "man-help");
 	setAdvanced(parser, "bundle");
@@ -304,7 +309,6 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	setDefaultValue(parser, "max-uncalled",         "0");
 	setDefaultValue(parser, "min-read-length",      "18");
-	setDefaultValue(parser, "post-trim-hps-length", "3");
 	
 	setDefaultValue(parser, "barcode-trim-end",   "LTAIL");
 	setDefaultValue(parser, "barcode-error-rate", "0.0");
@@ -324,6 +328,8 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setDefaultValue(parser, "qtrim-threshold", "20");
 	setDefaultValue(parser, "qtrim-win-size",  "5");
 	
+	setDefaultValue(parser, "htrim-min-length", "3");
+	setDefaultValue(parser, "htrim-error-rate", "0.1");
 	
 	addTextSection(parser, "TRIM-END MODES");
 	addText(parser._toolDoc, "\\fBANY:\\fP   longer side of read remains after removal of overlap", false);
@@ -573,19 +579,6 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		*out << "pre-trim-right:        " << o.cutLen_end << endl;
 	}
 	
-	if(isSet(parser, "post-trim-left-hps")){
-		getOptionValue(o.trimLeftNucs, parser, "post-trim-left-hps");
-		*out << "post-trim-left-hps:    " << o.trimLeftNucs << endl;
-	}
-	
-	if(isSet(parser, "post-trim-right-hps")){
-		getOptionValue(o.trimRightNucs, parser, "post-trim-right-hps");
-		*out << "post-trim-right-hps:   " << o.trimRightNucs << endl;
-	}
-	
-	getOptionValue(o.hpsMinLength, parser, "post-trim-hps-length");
-	*out << "post-trim-hps-length:  " << o.hpsMinLength << endl;
-	
 	if(isSet(parser, "post-trim-length")){
 		getOptionValue(o.cutLen_read, parser, "post-trim-length");
 		*out << "post-trim-length:      " << o.cutLen_read << endl;
@@ -660,6 +653,37 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		if(isSet(parser, "qtrim-post-removal")) o.qtrimPostRm = true;
 	}
 	
+	
+	// trimming of homopolymers
+	
+	if(isSet(parser, "htrim-left") || isSet(parser, "htrim-right")){
+		
+		if(isSet(parser, "htrim-left")){
+			getOptionValue(o.htrimLeft, parser, "htrim-left");
+			*out << "htrim-left:            " << o.htrimLeft << endl;
+		}
+		
+		if(isSet(parser, "htrim-right")){
+			getOptionValue(o.htrimRight, parser, "htrim-right");
+			*out << "htrim-right:           " << o.htrimRight << endl;
+		}
+		
+		if(isSet(parser, "htrim-max-length")){
+			getOptionValue(o.htrimMaxLength, parser, "htrim-max-length");
+			*out << "htrim-max-length:      " << o.htrimMaxLength << endl;
+		}
+		
+		getOptionValue(o.htrimMinLength, parser, "htrim-min-length");
+		*out << "htrim-min-length:      " << o.htrimMinLength << endl;
+		
+		getOptionValue(o.h_errorRate, parser, "htrim-error-rate");
+		*out << "htrim-error-rate:      " << o.h_errorRate << endl;
+		
+		if(isSet(parser, "htrim-adapter")){
+			*out << "htrim-adapter:         yes" << endl;
+			o.htrimAdapterRm = true;
+		}
+	}
 	
 	// output, logging and tagging options
 	
