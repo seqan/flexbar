@@ -257,7 +257,9 @@ public:
 						notNuc++;
 					}
 					else if(notNuc <= m_htrimErrorRate * (i+1)){
-						if(i+1 <= m_htrimMaxLength) cutPos = i+1;
+						if(m_htrimMaxLength == 0 || i+1 <= m_htrimMaxLength){
+							cutPos = i+1;
+						}
 					}
 				}
 				
@@ -294,7 +296,9 @@ public:
 						notNuc++;
 					}
 					else if(notNuc <= m_htrimErrorRate * (seqLen - i)){
-						if(i >= seqLen - m_htrimMaxLength) cutPos = i;
+						if(m_htrimMaxLength == 0 || i >= seqLen - m_htrimMaxLength){
+							cutPos = i;
+						}
 					}
 				}
 				
