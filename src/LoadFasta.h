@@ -73,12 +73,13 @@ public:
 					TSeqStr seq = seqs[i];
 					TString  id =  ids[i];
 					
-					append(id, " revcomp");
+					append(id, "_rc");
 					seqan::reverseComplement(seq);
 					
 					TBar barRC;
-					barRC.id  = id;
-					barRC.seq = seq;
+					barRC.id        = id;
+					barRC.seq       = seq;
+					barRC.rcAdapter = true;
 					bars.push_back(barRC);
 				}
 			}

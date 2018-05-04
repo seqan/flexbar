@@ -121,9 +121,12 @@ namespace flexbar{
 		
 		tbb::atomic<unsigned long> rmOverlap, rmFull;
 		
+		bool rcAdapter;
+		
 		TBar() :
 			rmOverlap(0),
-			rmFull(0){
+			rmFull(0),
+			rcAdapter(false){
 	    }
 	};
 	

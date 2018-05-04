@@ -21,7 +21,7 @@ struct Options{
 	
 	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, umiTags, logStdout;
 	bool switch2Fasta, writeUnassigned, writeSingleReads, writeSingleReadsP, writeLengthDist;
-	bool useStdin, useStdout, relaxRegion, revCompAdapter, qtrimPostRm, htrimAdapterRm;
+	bool useStdin, useStdout, relaxRegion, revCompAdapter, useRcTrimEnd, qtrimPostRm, htrimAdapterRm;
 	
 	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len;
 	int qtrimThresh, qtrimWinSize, a_overhang, htrimMinLength, htrimMaxLength, a_cycles;
@@ -30,7 +30,7 @@ struct Options{
 	
 	float a_errorRate, b_errorRate, h_errorRate;
 	
-	flexbar::TrimEnd         end, b_end;
+	flexbar::TrimEnd         end, b_end, arc_end;
 	flexbar::FileFormat      format;
 	flexbar::QualityType     qual;
 	flexbar::QualTrimType    qTrim;
@@ -72,6 +72,7 @@ struct Options{
 		useStdout         = false;
 		relaxRegion       = false;
 		revCompAdapter    = false;
+		useRcTrimEnd      = false;
 		qtrimPostRm       = false;
 		htrimAdapterRm    = false;
 		
@@ -161,10 +162,10 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("b",  "barcodes", "Fasta file with barcodes for demultiplexing, may contain N.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("b2", "barcodes2", "Additional barcodes file for second read set in paired mode.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("br", "barcode-reads", "Fasta/q file containing separate barcode reads for detection.", ARG::INPUT_FILE));
-	addOption(parser, ArgParseOption("be", "barcode-trim-end", "Type of detection, see section trim-end modes.", ARG::STRING));
-	addOption(parser, ArgParseOption("bn", "barcode-tail-length", "Region size in tail trim-end modes. Default: barcode length.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("bo", "barcode-min-overlap", "Minimum overlap of barcode and read. Default: barcode length.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("bt", "barcode-error-rate", "Error rate threshold for mismatches and gaps.", ARG::DOUBLE));
+	addOption(parser, ArgParseOption("be", "barcode-trim-end", "Type of detection, see section trim-end modes.", ARG::STRING));
+	addOption(parser, ArgParseOption("bn", "barcode-tail-length", "Region size in tail trim-end modes. Default: barcode length.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("bk", "barcode-keep", "Keep barcodes within reads instead of removal."));
 	addOption(parser, ArgParseOption("bu", "barcode-unassigned", "Include unassigned reads in output generation."));
 	addOption(parser, ArgParseOption("bm", "barcode-match", "Alignment match score.", ARG::INTEGER));
@@ -175,14 +176,15 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("a",  "adapters", "Fasta file with adapters for removal that may contain N.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("a2", "adapters2", "File with extra adapters for second read set in paired mode.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("as", "adapter-seq", "Single adapter sequence as alternative to adapters option.", ARG::STRING));
-	addOption(parser, ArgParseOption("ar", "adapter-read-set", "Consider only single read set for adapters.", ARG::STRING));
-	addOption(parser, ArgParseOption("ac", "adapter-revcomp", "Consider also reverse complement of each adapter in search."));
+	addOption(parser, ArgParseOption("ao", "adapter-min-overlap", "Minimum overlap of adapter and read for removal.", ARG::INTEGER));
+	addOption(parser, ArgParseOption("at", "adapter-error-rate", "Error rate threshold for mismatches and gaps.", ARG::DOUBLE));
 	addOption(parser, ArgParseOption("ae", "adapter-trim-end", "Type of removal, see section trim-end modes.", ARG::STRING));
 	addOption(parser, ArgParseOption("an", "adapter-tail-length", "Region size for tail trim-end modes. Default: adapter length.", ARG::INTEGER));
 	// addOption(parser, ArgParseOption("ah", "adapter-overhang", "Overhang at read ends in right and left modes.", ARG::INTEGER));
-	addOption(parser, ArgParseOption("ad", "adapter-relaxed", "Skip restriction to pass read ends in right and left modes."));
-	addOption(parser, ArgParseOption("ao", "adapter-min-overlap", "Minimum overlap of adapter and read for removal.", ARG::INTEGER));
-	addOption(parser, ArgParseOption("at", "adapter-error-rate", "Error rate threshold for mismatches and gaps.", ARG::DOUBLE));
+	addOption(parser, ArgParseOption("ax", "adapter-relaxed", "Skip restriction to pass read ends in right and left modes."));
+	addOption(parser, ArgParseOption("ac", "adapter-revcomp", "Consider also reverse complement of each adapter in search."));
+	addOption(parser, ArgParseOption("ad", "adapter-revcomp-end", "Use different trim-end for reverse complement of adapters.", ARG::STRING));
+	addOption(parser, ArgParseOption("ar", "adapter-read-set", "Consider only single read set for adapters.", ARG::STRING));
 	addOption(parser, ArgParseOption("ay", "adapter-cycles", "Number of adapter removal cycles.", ARG::INTEGER));
 	// addOption(parser, ArgParseOption("ap", "adapter-paired-overlap-off", "Turn off overlap detection for paired reads."));
 	addOption(parser, ArgParseOption("am", "adapter-match", "Alignment match score.", ARG::INTEGER));
@@ -238,6 +240,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "barcode-gap");
 	
 	setAdvanced(parser, "adapter-revcomp");
+	setAdvanced(parser, "adapter-revcomp-end");
 	setAdvanced(parser, "adapter-tail-length");
 	// setAdvanced(parser, "adapter-overhang");
 	setAdvanced(parser, "adapter-relaxed");
@@ -680,7 +683,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		*out << "htrim-error-rate:      " << o.h_errorRate << endl;
 		
 		if(isSet(parser, "htrim-adapter")){
-			*out << "htrim-adapter:         yes" << endl;
+			*out << "htrim-adapter:         on" << endl;
 			o.htrimAdapterRm = true;
 		}
 	}
@@ -808,12 +811,33 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		}
 		
 		if(isSet(parser, "adapter-revcomp")){
-			*out << "adapter-revcomp:       yes" << endl;
+			*out << "adapter-revcomp:       on" << endl;
 			o.revCompAdapter = true;
+			
+			if(isSet(parser, "adapter-revcomp-end")){
+				
+				string arc_trim_end;
+				getOptionValue(arc_trim_end, parser, "adapter-revcomp-end");
+				
+				if     (arc_trim_end == "LEFT")   o.arc_end = LEFT;
+				else if(arc_trim_end == "RIGHT")  o.arc_end = RIGHT;
+				else if(arc_trim_end == "ANY")    o.arc_end = ANY;
+				else if(arc_trim_end == "LTAIL")  o.arc_end = LTAIL;
+				else if(arc_trim_end == "RTAIL")  o.arc_end = RTAIL;
+				else {
+					cerr << "Specified reverse complement adapter trim-end is unknown!\n" << endl;
+					exit(1);
+				}
+				
+				if(o.arc_end != o.end){
+					*out << "adapter-revcomp-end:   " << arc_trim_end << endl;
+					o.useRcTrimEnd = true;
+				}
+			}
 		}
 		
 		if(isSet(parser, "adapter-relaxed")){
-			*out << "adapter-relaxed:       yes" << endl;
+			*out << "adapter-relaxed:       on" << endl;
 			o.relaxRegion = true;
 		}
 		
