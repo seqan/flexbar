@@ -595,6 +595,11 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		exit(1);
 	}
 	
+	if(o.cutLen_read != 0 && o.cutLen_read < o.min_readLen){
+		o.cutLen_read = 0;
+		cerr << "\nOption post-trim-length omitted, as it is shorter than min read length.\n" << endl;
+	}
+	
 	
 	// quality-based trimming
 	
@@ -887,14 +892,6 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		*out << "adapter-gap:          ";
 		if(o.gapCost >= 0) *out << " ";
 		*out << o.gapCost << "\n" << endl;
-	}
-	
-	
-	// option compatibility tests
-	
-	if(o.cutLen_read != 0 && o.cutLen_read < o.min_readLen){
-		o.cutLen_read = 0;
-		cerr << "\nOption post-trim-length omitted, as it is shorter than min read length.\n" << endl;
 	}
 	
 }
