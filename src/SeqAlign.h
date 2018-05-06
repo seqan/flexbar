@@ -11,7 +11,6 @@ private:
 	
 	typedef AlignResults<TSeqStr> TAlignResults;
 	
-	const flexbar::TrimEnd m_trimEnd;
 	const flexbar::LogAlign m_log;
 	const flexbar::FileFormat m_format;
 	
@@ -29,12 +28,11 @@ private:
 	
 public:
 	
-	SeqAlign(tbb::concurrent_vector<flexbar::TBar> *queries, const Options &o, int minOverlap, float errorRate, const int tailLength, const int match, const int mismatch, const int gapCost, const flexbar::TrimEnd end, const bool isBarcoding):
+	SeqAlign(tbb::concurrent_vector<flexbar::TBar> *queries, const Options &o, int minOverlap, float errorRate, const int tailLength, const int match, const int mismatch, const int gapCost, const bool isBarcoding):
 			
 			m_minOverlap(minOverlap),
 			m_errorRate(errorRate),
 			m_tailLength(tailLength),
-			m_trimEnd(end),
 			m_isBarcoding(isBarcoding),
 			m_umiTags(o.umiTags),
 			m_minLength(o.min_readLen),
@@ -46,14 +44,14 @@ public:
 			m_out(o.out),
 			m_nPreShortReads(0),
 			m_modified(0),
-			algo(TAlgorithm(o, match, mismatch, gapCost, end)){
+			algo(TAlgorithm(o, match, mismatch, gapCost)){
 		
 		m_queries    = queries;
 		m_rmOverlaps = tbb::concurrent_vector<unsigned long>(flexbar::MAX_READLENGTH + 1, 0);
 	};
 	
 	
-	int alignSeqRead(flexbar::TSeqRead* sr, const bool performRemoval, flexbar::Alignments &alignments, flexbar::ComputeCycle &cycle, unsigned int &idxAl){
+	int alignSeqRead(flexbar::TSeqRead* sr, const bool performRemoval, flexbar::Alignments &alignments, flexbar::ComputeCycle &cycle, unsigned int &idxAl, const flexbar::AlignmentMode &alMode, const flexbar::TrimEnd trimEnd){
 		
 		using namespace std;
 		using namespace flexbar;
@@ -78,16 +76,19 @@ public:
 			
 			for(unsigned int i = 0; i < m_queries->size(); ++i){
 				
+				if     (alMode == ALIGNRCOFF && m_queries->at(i).rcAdapter)   continue;
+				else if(alMode == ALIGNRC    && ! m_queries->at(i).rcAdapter) continue;
+				
 				TSeqStr &qseq = m_queries->at(i).seq;
 				TSeqStr *rseq = &seqRead.seq;
 				TSeqStr tmp;
 				
-				if(m_trimEnd == LTAIL || m_trimEnd == RTAIL){
+				if(trimEnd == LTAIL || trimEnd == RTAIL){
 					int tailLength  = (m_tailLength > 0) ? m_tailLength : length(qseq);
 					
 					if(tailLength < readLength){
-						if(m_trimEnd == LTAIL) tmp = prefix(seqRead.seq, tailLength);
-						else                   tmp = suffix(seqRead.seq, readLength - tailLength);
+						if(trimEnd == LTAIL) tmp = prefix(seqRead.seq, tailLength);
+						else                 tmp = suffix(seqRead.seq, readLength - tailLength);
 						rseq = &tmp;
 					}
 				}
@@ -112,10 +113,13 @@ public:
 		// align each query sequence and store best one
 		for(unsigned int i = 0; i < m_queries->size(); ++i){
 			
+			if     (alMode == ALIGNRCOFF && m_queries->at(i).rcAdapter)   continue;
+			else if(alMode == ALIGNRC    && ! m_queries->at(i).rcAdapter) continue;
+			
 			TAlignResults a;
 			
 			// global sequence alignment
-			algo.alignGlobal(a, alignments, cycle, idxAl++);
+			algo.alignGlobal(a, alignments, cycle, idxAl++, trimEnd);
 			
 			a.queryLength = length(m_queries->at(i).seq);
 			a.tailLength  = (m_tailLength > 0) ? m_tailLength : a.queryLength;
@@ -128,8 +132,8 @@ public:
 			
 			bool validAl = true;
 			
-			if(((m_trimEnd == RTAIL  || m_trimEnd == RIGHT) && a.startPosA < a.startPosS && m_strictRegion) ||
-			   ((m_trimEnd == LTAIL  || m_trimEnd == LEFT)  && a.endPosA   > a.endPosS   && m_strictRegion) ||
+			if(((trimEnd == RTAIL  || trimEnd == RIGHT) && a.startPosA < a.startPosS && m_strictRegion) ||
+			   ((trimEnd == LTAIL  || trimEnd == LEFT)  && a.endPosA   > a.endPosS   && m_strictRegion) ||
 			     a.overlapLength < 1){
 				
 				validAl = false;
@@ -149,24 +153,24 @@ public:
 		// valid alignment
 		if(qIndex >= 0){
 			
-			TrimEnd trimEnd = m_trimEnd;
+			TrimEnd trEnd = trimEnd;
 			
 			// trim read based on alignment
 			if(performRemoval){
 				
-				if(trimEnd == ANY){
+				if(trEnd == ANY){
 					
 					if(am.startPosA <= am.startPosS && am.endPosS <= am.endPosA){
 						seqRead.seq = "";
 						if(m_format == FASTQ) seqRead.qual = "";
 					}
 					else if(am.startPosA - am.startPosS >= am.endPosS - am.endPosA){
-						trimEnd = RIGHT;
+						trEnd = RIGHT;
 					}
-					else trimEnd = LEFT;
+					else trEnd = LEFT;
 				}
 				
-				switch(trimEnd){
+				switch(trEnd){
 					
 					int rCutPos;
 					
@@ -246,9 +250,9 @@ public:
 				if(performRemoval){
 					s << "Sequence removal:";
 					
-					     if(trimEnd == LEFT  || trimEnd == LTAIL) s << " left side\n";
-					else if(trimEnd == RIGHT || trimEnd == RTAIL) s << " right side\n";
-					else                                          s << " any side\n";
+					     if(trEnd == LEFT  || trEnd == LTAIL) s << " left side\n";
+					else if(trEnd == RIGHT || trEnd == RTAIL) s << " right side\n";
+					else                                      s << " any side\n";
 				}
 				else s << "Sequence detection, no removal:\n";
 				

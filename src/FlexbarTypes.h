@@ -131,11 +131,17 @@ namespace flexbar{
 	};
 	
 	
-   	enum ComputeCycle {
-   		PRELOAD,
-   		COMPUTE,
-   		RESULTS
-   	};
+	enum AlignmentMode {
+		ALIGNALL,
+		ALIGNRCOFF,
+		ALIGNRC
+	};
+	
+	enum ComputeCycle {
+		PRELOAD,
+		COMPUTE,
+		RESULTS
+	};
 	
 	enum LogAlign {
 		NONE,

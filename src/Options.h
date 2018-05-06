@@ -30,7 +30,7 @@ struct Options{
 	
 	float a_errorRate, b_errorRate, h_errorRate;
 	
-	flexbar::TrimEnd         end, b_end, arc_end;
+	flexbar::TrimEnd         a_end, b_end, arc_end;
 	flexbar::FileFormat      format;
 	flexbar::QualityType     qual;
 	flexbar::QualTrimType    qTrim;
@@ -798,11 +798,11 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		string a_trim_end;
 		getOptionValue(a_trim_end, parser, "adapter-trim-end");
 		
-		if     (a_trim_end == "LEFT")   o.end = LEFT;
-		else if(a_trim_end == "RIGHT")  o.end = RIGHT;
-		else if(a_trim_end == "ANY")    o.end = ANY;
-		else if(a_trim_end == "LTAIL")  o.end = LTAIL;
-		else if(a_trim_end == "RTAIL")  o.end = RTAIL;
+		if     (a_trim_end == "LEFT")   o.a_end = LEFT;
+		else if(a_trim_end == "RIGHT")  o.a_end = RIGHT;
+		else if(a_trim_end == "ANY")    o.a_end = ANY;
+		else if(a_trim_end == "LTAIL")  o.a_end = LTAIL;
+		else if(a_trim_end == "RTAIL")  o.a_end = RTAIL;
 		else {
 			cerr << "Specified adapter trim-end is unknown!\n" << endl;
 			exit(1);
@@ -834,7 +834,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 					exit(1);
 				}
 				
-				if(o.arc_end != o.end){
+				if(o.arc_end != o.a_end){
 					*out << "adapter-revcomp-end:   " << arc_trim_end << endl;
 					o.useRcTrimEnd = true;
 				}

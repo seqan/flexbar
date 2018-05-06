@@ -12,13 +12,14 @@ class PairedAlign : public tbb::filter {
 
 private:
 	
-	const bool m_writeUnassigned, m_twoBarcodes, m_umiTags;
+	const bool m_writeUnassigned, m_twoBarcodes, m_umiTags, m_useRcTrimEnd;
 	const unsigned int m_arTimes;
 	
 	const flexbar::LogAlign       m_log;
 	const flexbar::RunType        m_runType;
 	const flexbar::BarcodeDetect  m_barType;
 	const flexbar::AdapterRemoval m_adapRem;
+	const flexbar::TrimEnd        m_aTrimEnd, m_arcTrimEnd, m_bTrimEnd;
 	
 	tbb::atomic<unsigned long> m_unassigned;
 	tbb::concurrent_vector<flexbar::TBar> *m_adapters, *m_adapters2;
@@ -38,8 +39,12 @@ public:
 		m_runType(o.runType),
 		m_barType(o.barDetect),
 		m_adapRem(o.adapRm),
+		m_aTrimEnd(o.a_end),
+		m_arcTrimEnd(o.arc_end),
+		m_bTrimEnd(o.b_end),
 		m_arTimes(o.a_cycles),
 		m_umiTags(o.umiTags),
+		m_useRcTrimEnd(o.useRcTrimEnd),
 		m_writeUnassigned(o.writeUnassigned),
 		m_twoBarcodes(o.barDetect == flexbar::WITHIN_READ_REMOVAL2 || o.barDetect == flexbar::WITHIN_READ2),
 		out(o.out),
@@ -50,11 +55,11 @@ public:
 		m_barcodes2 = &o.barcodes2;
 		m_adapters2 = &o.adapters2;
 		
-		m_b1 = new TSeqAlign(m_barcodes, o, o.b_min_overlap, o.b_errorRate, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, o.b_end, true);
-		m_a1 = new TSeqAlign(m_adapters, o, o.a_min_overlap, o.a_errorRate, o.a_tail_len, o.match, o.mismatch, o.gapCost, o.end, false);
+		m_b1 = new TSeqAlign(m_barcodes, o, o.b_min_overlap, o.b_errorRate, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, true);
+		m_a1 = new TSeqAlign(m_adapters, o, o.a_min_overlap, o.a_errorRate, o.a_tail_len, o.match, o.mismatch, o.gapCost, false);
 		
-		m_b2 = new TSeqAlign(m_barcodes2, o, o.b_min_overlap, o.b_errorRate, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, o.b_end, true);
-		m_a2 = new TSeqAlign(m_adapters2, o, o.a_min_overlap, o.a_errorRate, o.a_tail_len, o.match, o.mismatch, o.gapCost, o.end, false);
+		m_b2 = new TSeqAlign(m_barcodes2, o, o.b_min_overlap, o.b_errorRate, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, true);
+		m_a2 = new TSeqAlign(m_adapters2, o, o.a_min_overlap, o.a_errorRate, o.a_tail_len, o.match, o.mismatch, o.gapCost, false);
 		
 		if(m_log == flexbar::TAB)
 		*out << "ReadTag\tQueryTag\tQueryStart\tQueryEnd\tOverlapLength\tMismatches\tIndels\tAllowedErrors" << std::endl;
@@ -69,18 +74,18 @@ public:
 	};
 	
 	
-	void alignPairedReadBarcode(flexbar::TPairedRead* pRead, flexbar::TAlignBundle &alBundle, std::vector<flexbar::ComputeCycle> &cycle, std::vector<unsigned int> &idxAl){
+	void alignPairedReadToBarcodes(flexbar::TPairedRead* pRead, flexbar::TAlignBundle &alBundle, std::vector<flexbar::ComputeCycle> &cycle, std::vector<unsigned int> &idxAl, const flexbar::AlignmentMode &alMode){
 		
 		using namespace flexbar;
 		
 		if(m_barType != BOFF){
 			
 			switch(m_barType){
-				case BARCODE_READ:         pRead->barID  = m_b1->alignSeqRead(pRead->b,  false, alBundle[0], cycle[0], idxAl[0]); break;
-				case WITHIN_READ_REMOVAL2: pRead->barID2 = m_b2->alignSeqRead(pRead->r2, true,  alBundle[2], cycle[2], idxAl[2]);
-				case WITHIN_READ_REMOVAL:  pRead->barID  = m_b1->alignSeqRead(pRead->r1, true,  alBundle[1], cycle[1], idxAl[1]); break;
-				case WITHIN_READ2:         pRead->barID2 = m_b2->alignSeqRead(pRead->r2, false, alBundle[2], cycle[2], idxAl[2]);
-				case WITHIN_READ:          pRead->barID  = m_b1->alignSeqRead(pRead->r1, false, alBundle[1], cycle[1], idxAl[1]); break;
+				case BARCODE_READ:         pRead->barID  = m_b1->alignSeqRead(pRead->b,  false, alBundle[0], cycle[0], idxAl[0], alMode, m_bTrimEnd); break;
+				case WITHIN_READ_REMOVAL2: pRead->barID2 = m_b2->alignSeqRead(pRead->r2, true,  alBundle[2], cycle[2], idxAl[2], alMode, m_bTrimEnd);
+				case WITHIN_READ_REMOVAL:  pRead->barID  = m_b1->alignSeqRead(pRead->r1, true,  alBundle[1], cycle[1], idxAl[1], alMode, m_bTrimEnd); break;
+				case WITHIN_READ2:         pRead->barID2 = m_b2->alignSeqRead(pRead->r2, false, alBundle[2], cycle[2], idxAl[2], alMode, m_bTrimEnd);
+				case WITHIN_READ:          pRead->barID  = m_b1->alignSeqRead(pRead->r1, false, alBundle[1], cycle[1], idxAl[1], alMode, m_bTrimEnd); break;
 				case BOFF: break;
 			}
 			
@@ -92,18 +97,18 @@ public:
 	}
 	
 	
-	void alignPairedReadAdapter(flexbar::TPairedRead* pRead, flexbar::TAlignBundle &alBundle, std::vector<flexbar::ComputeCycle> &cycle, std::vector<unsigned int> &idxAl){
+	void alignPairedReadToAdapters(flexbar::TPairedRead* pRead, flexbar::TAlignBundle &alBundle, std::vector<flexbar::ComputeCycle> &cycle, std::vector<unsigned int> &idxAl, const flexbar::AlignmentMode &alMode, const flexbar::TrimEnd trimEnd){
 		
 		using namespace flexbar;
 		
 		if(m_adapRem != AOFF){
 			
 			if(m_adapRem != ATWO)
-				m_a1->alignSeqRead(pRead->r1, true, alBundle[0], cycle[0], idxAl[0]);
+				m_a1->alignSeqRead(pRead->r1, true, alBundle[0], cycle[0], idxAl[0], alMode, trimEnd);
 			
 			if(pRead->r2 != NULL && m_adapRem != AONE){
-				if(m_adapRem != NORMAL2) m_a1->alignSeqRead(pRead->r2, true, alBundle[1], cycle[1], idxAl[1]);
-				else                     m_a2->alignSeqRead(pRead->r2, true, alBundle[1], cycle[1], idxAl[1]);
+				if(m_adapRem != NORMAL2) m_a1->alignSeqRead(pRead->r2, true, alBundle[1], cycle[1], idxAl[1], alMode, trimEnd);
+				else                     m_a2->alignSeqRead(pRead->r2, true, alBundle[1], cycle[1], idxAl[1], alMode, trimEnd);
 			}
 		}
 	}
@@ -127,6 +132,8 @@ public:
 				}
 			}
 			
+			AlignmentMode alMode = ALIGNALL;
+			
 			// barcode detection
 			
 			if(m_barType != BOFF){
@@ -147,7 +154,7 @@ public:
 				}
 				
 				for(unsigned int i = 0; i < prBundle->size(); ++i){
-					alignPairedReadBarcode(prBundle->at(i), alBundle, cycle, idxAl);
+					alignPairedReadToBarcodes(prBundle->at(i), alBundle, cycle, idxAl, alMode);
 				}
 				
 				for(unsigned int i = 0; i < 3; ++i){
@@ -156,7 +163,7 @@ public:
 				}
 				
 				for(unsigned int i = 0; i < prBundle->size(); ++i){
-					alignPairedReadBarcode(prBundle->at(i), alBundle, cycle, idxAl);
+					alignPairedReadToBarcodes(prBundle->at(i), alBundle, cycle, idxAl, alMode);
 				}
 			}
 			
@@ -166,31 +173,48 @@ public:
 				
 				for(unsigned int c = 0; c < m_arTimes; ++c){
 					
-					TAlignBundle alBundle;
-					Alignments r1AlignmentsA, r2AlignmentsA;
+					flexbar::TrimEnd trimEnd = m_aTrimEnd;
 					
-					alBundle.push_back(r1AlignmentsA);
-					alBundle.push_back(r2AlignmentsA);
+					unsigned int rc = 1;
 					
-					std::vector<unsigned int> idxAl;
-					std::vector<ComputeCycle> cycle;
-					
-					for(unsigned int i = 0; i < 2; ++i){
-						idxAl.push_back(0);
-						cycle.push_back(PRELOAD);
+					if(m_useRcTrimEnd){
+						alMode = ALIGNRCOFF;
+						rc = 2;
 					}
 					
-					for(unsigned int i = 0; i < prBundle->size(); ++i){
-						alignPairedReadAdapter(prBundle->at(i), alBundle, cycle, idxAl);
-					}
-					
-					for(unsigned int i = 0; i < 2; ++i){
-						idxAl[i] = 0;
-						cycle[i] = COMPUTE;
-					}
-					
-					for(unsigned int i = 0; i < prBundle->size(); ++i){
-						alignPairedReadAdapter(prBundle->at(i), alBundle, cycle, idxAl);
+					for(unsigned int r = 0; r < rc; ++r){
+						
+						if(m_useRcTrimEnd && r == 1){
+							alMode  = ALIGNRC;
+							trimEnd = m_arcTrimEnd;
+						}
+						
+						TAlignBundle alBundle;
+						Alignments r1AlignmentsA, r2AlignmentsA;
+						
+						alBundle.push_back(r1AlignmentsA);
+						alBundle.push_back(r2AlignmentsA);
+						
+						std::vector<unsigned int> idxAl;
+						std::vector<ComputeCycle> cycle;
+						
+						for(unsigned int i = 0; i < 2; ++i){
+							idxAl.push_back(0);
+							cycle.push_back(PRELOAD);
+						}
+						
+						for(unsigned int i = 0; i < prBundle->size(); ++i){
+							alignPairedReadToAdapters(prBundle->at(i), alBundle, cycle, idxAl, alMode, trimEnd);
+						}
+						
+						for(unsigned int i = 0; i < 2; ++i){
+							idxAl[i] = 0;
+							cycle[i] = COMPUTE;
+						}
+						
+						for(unsigned int i = 0; i < prBundle->size(); ++i){
+							alignPairedReadToAdapters(prBundle->at(i), alBundle, cycle, idxAl, alMode, trimEnd);
+						}
 					}
 				}
 			}

@@ -23,14 +23,12 @@ private:
 	
 	const bool m_umiTags;
 	const flexbar::LogAlign m_log;
-	const flexbar::TrimEnd m_trimEnd;
 	
 public:
 	
-	SeqAlignAlgo(const Options &o, const int match, const int mismatch, const int gapCost, const flexbar::TrimEnd trimEnd):
+	SeqAlignAlgo(const Options &o, const int match, const int mismatch, const int gapCost):
 			m_umiTags(o.umiTags),
-			m_log(o.logAlign),
-			m_trimEnd(trimEnd){
+			m_log(o.logAlign){
 		
 		using namespace seqan;
 		
@@ -50,7 +48,7 @@ public:
 	};
 	
 	
-	void alignGlobal(TAlignResults &a, flexbar::Alignments &alignments, flexbar::ComputeCycle &cycle, const unsigned int idxAl){
+	void alignGlobal(TAlignResults &a, flexbar::Alignments &alignments, flexbar::ComputeCycle &cycle, const unsigned int idxAl, const flexbar::TrimEnd trimEnd){
 		
 		using namespace std;
 		using namespace seqan;
@@ -69,12 +67,12 @@ public:
 			
 			cycle = RESULTS;
 			
-			if(m_trimEnd == RIGHT || m_trimEnd == RTAIL){
+			if(trimEnd == RIGHT || trimEnd == RTAIL){
 				
 				AlignConfig<true, false, true, true> ac;
 				alignments.ascores = globalAlignment(alignments.aset, m_scoreMatrix, ac);
 			}
-			else if(m_trimEnd == LEFT || m_trimEnd == LTAIL){
+			else if(trimEnd == LEFT || trimEnd == LTAIL){
 				
 				AlignConfig<true, true, false, true> ac;
 				alignments.ascores = globalAlignment(alignments.aset, m_scoreMatrix, ac);
