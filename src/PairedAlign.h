@@ -13,7 +13,7 @@ class PairedAlign : public tbb::filter {
 private:
 	
 	const bool m_writeUnassigned, m_twoBarcodes, m_umiTags, m_useRcTrimEnd;
-	const bool m_htrim, m_htrimAdapterRm;
+	const bool m_htrim, m_htrimAdapterRm, m_htrimMaxFirstOnly;
 	
 	const std::string m_htrimLeft, m_htrimRight;
 	
@@ -59,6 +59,7 @@ public:
 		m_htrimRight(o.htrimRight),
 		m_htrimMinLength(o.htrimMinLength),
 		m_htrimMaxLength(o.htrimMaxLength),
+		m_htrimMaxFirstOnly(o.htrimMaxFirstOnly),
 		m_htrimErrorRate(o.h_errorRate),
 		m_htrimAdapterRm(o.htrimAdapterRm),
 		m_htrim(o.htrimLeft != "" || o.htrimRight != ""),
@@ -139,6 +140,9 @@ public:
 			if     (seqRead->removedAdapter   && (m_aTrimEnd   == RIGHT || m_aTrimEnd   == RTAIL)) return;
 			else if(seqRead->removedAdapterRC && (m_arcTrimEnd == RIGHT || m_arcTrimEnd == RTAIL)) return;
 		}
+		else if(m_htrimAdapterRm && ! m_useRcTrimEnd){
+			if(m_aTrimEnd == RIGHT || m_aTrimEnd == RTAIL) return;
+		}
 		
 		if(! m_htrimAdapterRm || seqRead->removedAdapter || seqRead->removedAdapterRC){
 			
@@ -155,9 +159,10 @@ public:
 						notNuc++;
 					}
 					else if(notNuc <= m_htrimErrorRate * (i+1)){
-						if(m_htrimMaxLength == 0 || i+1 <= m_htrimMaxLength){
-							cutPos = i+1;
-						}
+						
+						if(m_htrimMaxLength != 0 && i+1 > m_htrimMaxLength && (! m_htrimMaxFirstOnly || s == 0)) break;
+						
+						cutPos = i+1;
 					}
 				}
 				
@@ -182,6 +187,9 @@ public:
 			if     (seqRead->removedAdapter   && (m_aTrimEnd   == LEFT || m_aTrimEnd   == LTAIL)) return;
 			else if(seqRead->removedAdapterRC && (m_arcTrimEnd == LEFT || m_arcTrimEnd == LTAIL)) return;
 		}
+		else if(m_htrimAdapterRm && ! m_useRcTrimEnd){
+			if(m_aTrimEnd == LEFT || m_aTrimEnd == LTAIL) return;
+		}
 		
 		if(! m_htrimAdapterRm || seqRead->removedAdapter || seqRead->removedAdapterRC){
 			
@@ -199,9 +207,10 @@ public:
 						notNuc++;
 					}
 					else if(notNuc <= m_htrimErrorRate * (seqLen - i)){
-						if(m_htrimMaxLength == 0 || i >= seqLen - m_htrimMaxLength){
-							cutPos = i;
-						}
+						
+						if(m_htrimMaxLength != 0 && i < seqLen - m_htrimMaxLength && (! m_htrimMaxFirstOnly || s == 0)) break;
+						
+						cutPos = i;
 					}
 				}
 				

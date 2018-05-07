@@ -21,7 +21,8 @@ struct Options{
 	
 	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, umiTags, logStdout;
 	bool switch2Fasta, writeUnassigned, writeSingleReads, writeSingleReadsP, writeLengthDist;
-	bool useStdin, useStdout, relaxRegion, revCompAdapter, useRcTrimEnd, qtrimPostRm, htrimAdapterRm;
+	bool useStdin, useStdout, relaxRegion, revCompAdapter, useRcTrimEnd, qtrimPostRm;
+	bool htrimAdapterRm, htrimMaxFirstOnly;
 	
 	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len;
 	int qtrimThresh, qtrimWinSize, a_overhang, htrimMinLength, htrimMaxLength, a_cycles;
@@ -75,6 +76,7 @@ struct Options{
 		useRcTrimEnd      = false;
 		qtrimPostRm       = false;
 		htrimAdapterRm    = false;
+		htrimMaxFirstOnly = false;
 		
 		cutLen_begin   = 0;
 		cutLen_end     = 0;
@@ -210,8 +212,9 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("Y", "htrim-right", "Trim certain homopolymers on right read end after removal.", ARG::STRING));
 	addOption(parser, ArgParseOption("M", "htrim-min-length", "Minimum length of homopolymers at read ends.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("L", "htrim-max-length", "Maximum length of homopolymers at read ends.", ARG::INTEGER));
-	addOption(parser, ArgParseOption("E", "htrim-error-rate", "Error rate threshold for mismatches.", ARG::DOUBLE));
-	addOption(parser, ArgParseOption("A", "htrim-adapter", "Trim homopolymers only in case of adapter removal."));
+	addOption(parser, ArgParseOption("F", "htrim-max-first", "Max length of homopolymers only for first type."));
+	addOption(parser, ArgParseOption("T", "htrim-error-rate", "Error rate threshold for mismatches.", ARG::DOUBLE));
+	addOption(parser, ArgParseOption("A", "htrim-adapter", "Trim only in case of adapter removal on same side."));
 	
 	addSection(parser, "Output selection");
 	addOption(parser, ArgParseOption("f", "fasta-output", "Prefer non-quality format fasta for output."));
@@ -255,6 +258,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "qtrim-post-removal");
 	setAdvanced(parser, "htrim-left");
 	setAdvanced(parser, "htrim-max-length");
+	setAdvanced(parser, "htrim-max-first");
 	setAdvanced(parser, "htrim-adapter");
 	
 	setAdvanced(parser, "man-help");
@@ -679,6 +683,11 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		if(isSet(parser, "htrim-max-length")){
 			getOptionValue(o.htrimMaxLength, parser, "htrim-max-length");
 			*out << "htrim-max-length:      " << o.htrimMaxLength << endl;
+			
+			if(isSet(parser, "htrim-max-first")){
+				*out << "htrim-max-first:       on" << endl;
+				o.htrimMaxFirstOnly = true;
+			}
 		}
 		
 		getOptionValue(o.htrimMinLength, parser, "htrim-min-length");
