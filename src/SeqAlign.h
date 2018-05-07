@@ -76,7 +76,7 @@ public:
 			
 			for(unsigned int i = 0; i < m_queries->size(); ++i){
 				
-				if     (alMode == ALIGNRCOFF && m_queries->at(i).rcAdapter)   continue;
+				if     (alMode == ALIGNRCOFF &&   m_queries->at(i).rcAdapter) continue;
 				else if(alMode == ALIGNRC    && ! m_queries->at(i).rcAdapter) continue;
 				
 				TSeqStr &qseq = m_queries->at(i).seq;
@@ -113,7 +113,7 @@ public:
 		// align each query sequence and store best one
 		for(unsigned int i = 0; i < m_queries->size(); ++i){
 			
-			if     (alMode == ALIGNRCOFF && m_queries->at(i).rcAdapter)   continue;
+			if     (alMode == ALIGNRCOFF &&   m_queries->at(i).rcAdapter) continue;
 			else if(alMode == ALIGNRC    && ! m_queries->at(i).rcAdapter) continue;
 			
 			TAlignResults a;
@@ -215,7 +215,10 @@ public:
 				
 				++m_modified;
 				
-				if(! m_isBarcoding) seqRead.adapterRemoved = true;
+				if(! m_isBarcoding){
+					if(! m_queries->at(qIndex).rcAdapter) seqRead.removedAdapter   = true;
+					else                                  seqRead.removedAdapterRC = true;
+				}
 				
 				// count number of removals for each query
 				m_queries->at(qIndex).rmOverlap++;

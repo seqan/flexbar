@@ -11,19 +11,21 @@ class SeqRead {
 	TSeqStr seq;
 	TString id, qual, umi;
 	
-	bool adapterRemoved;
+	bool removedAdapter, removedAdapterRC;
 	
 	SeqRead(TSeqStr& sequence, TString& seqID) :
 		seq(sequence),
 		id(seqID),
-		adapterRemoved(false){
+		removedAdapter(false),
+		removedAdapterRC(false){
 	}
 	
 	SeqRead(TSeqStr& sequence, TString& seqID, TString& quality) :
 		seq(sequence),
 		id(seqID),
 		qual(quality),
-		adapterRemoved(false){
+		removedAdapter(false),
+		removedAdapterRC(false){
 	}
 };
 

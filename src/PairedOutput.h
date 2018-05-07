@@ -242,7 +242,7 @@ public:
 		using namespace std;
 		using namespace flexbar;
 		
-		if(! m_htrimAdapterRm || seqRead->adapterRemoved){
+		if(! m_htrimAdapterRm || seqRead->removedAdapter || seqRead->removedAdapterRC){
 			
 			for(unsigned int s = 0; s < m_htrimLeft.length(); ++s){
 				
@@ -280,7 +280,7 @@ public:
 		using namespace std;
 		using namespace flexbar;
 		
-		if(! m_htrimAdapterRm || seqRead->adapterRemoved){
+		if(! m_htrimAdapterRm || seqRead->removedAdapter || seqRead->removedAdapterRC){
 			
 			for(unsigned int s = 0; s < m_htrimRight.length(); ++s){
 				
