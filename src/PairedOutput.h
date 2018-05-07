@@ -16,15 +16,11 @@ private:
 	int m_mapsize;
 	const int m_minLength, m_qtrimThresh, m_qtrimWinSize;
 	const bool m_isPaired, m_writeUnassigned, m_writeSingleReads, m_writeSingleReadsP;
-	const bool m_twoBarcodes, m_qtrimPostRm, m_htrim, m_htrimAdapterRm;
+	const bool m_twoBarcodes, m_qtrimPostRm;
 	
 	tbb::atomic<unsigned long> m_nSingleReads, m_nLowPhred;
 	
 	const std::string m_target;
-	const std::string m_htrimLeft, m_htrimRight;
-	
-	const int m_htrimMinLength, m_htrimMaxLength;
-	const float m_htrimErrorRate;
 	
 	const flexbar::FileFormat     m_format;
 	const flexbar::RunType        m_runType;
@@ -50,13 +46,6 @@ public:
 		m_runType(o.runType),
 		m_barDetect(o.barDetect),
 		m_minLength(o.min_readLen),
-		m_htrimLeft(o.htrimLeft),
-		m_htrimRight(o.htrimRight),
-		m_htrimMinLength(o.htrimMinLength),
-		m_htrimMaxLength(o.htrimMaxLength),
-		m_htrimErrorRate(o.h_errorRate),
-		m_htrimAdapterRm(o.htrimAdapterRm),
-		m_htrim(o.htrimLeft != "" || o.htrimRight != ""),
 		m_qtrim(o.qTrim),
 		m_qtrimThresh(o.qtrimThresh),
 		m_qtrimWinSize(o.qtrimWinSize),
@@ -237,83 +226,6 @@ public:
 	};
 	
 	
-	void trimLeftHPS(flexbar::TSeqRead* seqRead){
-		
-		using namespace std;
-		using namespace flexbar;
-		
-		if(! m_htrimAdapterRm || seqRead->removedAdapter || seqRead->removedAdapterRC){
-			
-			for(unsigned int s = 0; s < m_htrimLeft.length(); ++s){
-				
-				char nuc = m_htrimLeft[s];
-				
-				unsigned int cutPos = 0;
-				unsigned int notNuc = 0;
-				
-				for(unsigned int i = 0; i < length(seqRead->seq); ++i){
-					
-					if(seqRead->seq[i] != nuc){
-						notNuc++;
-					}
-					else if(notNuc <= m_htrimErrorRate * (i+1)){
-						if(m_htrimMaxLength == 0 || i+1 <= m_htrimMaxLength){
-							cutPos = i+1;
-						}
-					}
-				}
-				
-				if(cutPos > 0 && cutPos >= m_htrimMinLength){
-					erase(seqRead->seq, 0, cutPos);
-					
-					if(m_format == FASTQ){
-						erase(seqRead->qual, 0, cutPos);
-					}
-				}
-			}
-		}
-	}
-	
-	
-	void trimRightHPS(flexbar::TSeqRead* seqRead){
-		
-		using namespace std;
-		using namespace flexbar;
-		
-		if(! m_htrimAdapterRm || seqRead->removedAdapter || seqRead->removedAdapterRC){
-			
-			for(unsigned int s = 0; s < m_htrimRight.length(); ++s){
-				
-				char nuc = m_htrimRight[s];
-				
-				unsigned int seqLen = length(seqRead->seq);
-				unsigned int cutPos = seqLen;
-				unsigned int notNuc = 0;
-				
-				for(int i = seqLen - 1; i >= 0; --i){
-					
-					if(seqRead->seq[i] != nuc){
-						notNuc++;
-					}
-					else if(notNuc <= m_htrimErrorRate * (seqLen - i)){
-						if(m_htrimMaxLength == 0 || i >= seqLen - m_htrimMaxLength){
-							cutPos = i;
-						}
-					}
-				}
-				
-				if(cutPos < seqLen && cutPos <= seqLen - m_htrimMinLength){
-					erase(seqRead->seq, cutPos, length(seqRead->seq));
-					
-					if(m_format == FASTQ){
-						erase(seqRead->qual, cutPos, length(seqRead->qual));
-					}
-				}
-			}
-		}
-	}
-	
-	
 	void writePairedRead(flexbar::TPairedRead* pRead){
 		
 		using namespace flexbar;
@@ -327,11 +239,6 @@ public:
 				
 				if(pRead->r1 != NULL){
 					if(m_runType == SINGLE || m_writeUnassigned || pRead->barID > 0){
-						
-						if(m_htrim){
-							if(m_htrimLeft  != "") trimLeftHPS(pRead->r1);
-							if(m_htrimRight != "") trimRightHPS(pRead->r1);
-						}
 						
 						if(m_qtrim != QOFF && m_qtrimPostRm){
 							if(qualTrim(pRead->r1, m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
@@ -362,17 +269,6 @@ public:
 					}
 					
 					if(m_runType == PAIRED || m_writeUnassigned || outIdx > 0){
-						
-						if(m_htrim){
-							if(m_htrimLeft != ""){
-								trimLeftHPS(pRead->r1);
-								trimLeftHPS(pRead->r2);
-							}
-							if(m_htrimRight != ""){
-								trimRightHPS(pRead->r1);
-								trimRightHPS(pRead->r2);
-							}
-						}
 						
 						if(m_qtrim != QOFF && m_qtrimPostRm){
 							if(qualTrim(pRead->r1, m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;

@@ -13,8 +13,16 @@ class PairedAlign : public tbb::filter {
 private:
 	
 	const bool m_writeUnassigned, m_twoBarcodes, m_umiTags, m_useRcTrimEnd;
+	const bool m_htrim, m_htrimAdapterRm;
+	
+	const std::string m_htrimLeft, m_htrimRight;
+	
+	const int m_htrimMinLength, m_htrimMaxLength;
+	const float m_htrimErrorRate;
+	
 	const unsigned int m_arTimes;
 	
+	const flexbar::FileFormat     m_format;
 	const flexbar::LogAlign       m_log;
 	const flexbar::RunType        m_runType;
 	const flexbar::BarcodeDetect  m_barType;
@@ -35,6 +43,7 @@ public:
 	PairedAlign(Options &o) :
 		
 		filter(parallel),
+		m_format(o.format),
 		m_log(o.logAlign),
 		m_runType(o.runType),
 		m_barType(o.barDetect),
@@ -46,6 +55,13 @@ public:
 		m_umiTags(o.umiTags),
 		m_useRcTrimEnd(o.useRcTrimEnd),
 		m_writeUnassigned(o.writeUnassigned),
+		m_htrimLeft(o.htrimLeft),
+		m_htrimRight(o.htrimRight),
+		m_htrimMinLength(o.htrimMinLength),
+		m_htrimMaxLength(o.htrimMaxLength),
+		m_htrimErrorRate(o.h_errorRate),
+		m_htrimAdapterRm(o.htrimAdapterRm),
+		m_htrim(o.htrimLeft != "" || o.htrimRight != ""),
 		m_twoBarcodes(o.barDetect == flexbar::WITHIN_READ_REMOVAL2 || o.barDetect == flexbar::WITHIN_READ2),
 		out(o.out),
 		m_unassigned(0){
@@ -109,6 +125,83 @@ public:
 			if(pRead->r2 != NULL && m_adapRem != AONE){
 				if(m_adapRem != NORMAL2) m_a1->alignSeqRead(pRead->r2, true, alBundle[1], cycle[1], idxAl[1], alMode, trimEnd);
 				else                     m_a2->alignSeqRead(pRead->r2, true, alBundle[1], cycle[1], idxAl[1], alMode, trimEnd);
+			}
+		}
+	}
+	
+	
+	void trimLeftHPS(flexbar::TSeqRead* seqRead){
+		
+		using namespace std;
+		using namespace flexbar;
+		
+		if(! m_htrimAdapterRm || seqRead->removedAdapter || seqRead->removedAdapterRC){
+			
+			for(unsigned int s = 0; s < m_htrimLeft.length(); ++s){
+				
+				char nuc = m_htrimLeft[s];
+				
+				unsigned int cutPos = 0;
+				unsigned int notNuc = 0;
+				
+				for(unsigned int i = 0; i < length(seqRead->seq); ++i){
+					
+					if(seqRead->seq[i] != nuc){
+						notNuc++;
+					}
+					else if(notNuc <= m_htrimErrorRate * (i+1)){
+						if(m_htrimMaxLength == 0 || i+1 <= m_htrimMaxLength){
+							cutPos = i+1;
+						}
+					}
+				}
+				
+				if(cutPos > 0 && cutPos >= m_htrimMinLength){
+					erase(seqRead->seq, 0, cutPos);
+					
+					if(m_format == FASTQ){
+						erase(seqRead->qual, 0, cutPos);
+					}
+				}
+			}
+		}
+	}
+	
+	
+	void trimRightHPS(flexbar::TSeqRead* seqRead){
+		
+		using namespace std;
+		using namespace flexbar;
+		
+		if(! m_htrimAdapterRm || seqRead->removedAdapter || seqRead->removedAdapterRC){
+			
+			for(unsigned int s = 0; s < m_htrimRight.length(); ++s){
+				
+				char nuc = m_htrimRight[s];
+				
+				unsigned int seqLen = length(seqRead->seq);
+				unsigned int cutPos = seqLen;
+				unsigned int notNuc = 0;
+				
+				for(int i = seqLen - 1; i >= 0; --i){
+					
+					if(seqRead->seq[i] != nuc){
+						notNuc++;
+					}
+					else if(notNuc <= m_htrimErrorRate * (seqLen - i)){
+						if(m_htrimMaxLength == 0 || i >= seqLen - m_htrimMaxLength){
+							cutPos = i;
+						}
+					}
+				}
+				
+				if(cutPos < seqLen && cutPos <= seqLen - m_htrimMinLength){
+					erase(seqRead->seq, cutPos, length(seqRead->seq));
+					
+					if(m_format == FASTQ){
+						erase(seqRead->qual, cutPos, length(seqRead->qual));
+					}
+				}
 			}
 		}
 	}
@@ -229,6 +322,27 @@ public:
 						
 						append(prBundle->at(i)->r2->id, prBundle->at(i)->r1->umi);
 						append(prBundle->at(i)->r2->id, prBundle->at(i)->r2->umi);
+					}
+				}
+			}
+			
+			if(m_htrim){
+				if(m_htrimLeft != ""){
+					
+					for(unsigned int i = 0; i < prBundle->size(); ++i){
+						trimLeftHPS(prBundle->at(i)->r1);
+						
+						if(prBundle->at(i)->r2 != NULL)
+						trimLeftHPS(prBundle->at(i)->r2);
+					}
+				}
+				if(m_htrimRight != ""){
+					
+					for(unsigned int i = 0; i < prBundle->size(); ++i){
+						trimRightHPS(prBundle->at(i)->r1);
+						
+						if(prBundle->at(i)->r2 != NULL)
+						trimRightHPS(prBundle->at(i)->r2);
 					}
 				}
 			}
