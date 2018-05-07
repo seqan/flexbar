@@ -135,6 +135,11 @@ public:
 		using namespace std;
 		using namespace flexbar;
 		
+		if(m_htrimAdapterRm && m_useRcTrimEnd){
+			if     (seqRead->removedAdapter   && (m_aTrimEnd   == RIGHT || m_aTrimEnd   == RTAIL)) return;
+			else if(seqRead->removedAdapterRC && (m_arcTrimEnd == RIGHT || m_arcTrimEnd == RTAIL)) return;
+		}
+		
 		if(! m_htrimAdapterRm || seqRead->removedAdapter || seqRead->removedAdapterRC){
 			
 			for(unsigned int s = 0; s < m_htrimLeft.length(); ++s){
@@ -172,6 +177,11 @@ public:
 		
 		using namespace std;
 		using namespace flexbar;
+		
+		if(m_htrimAdapterRm && m_useRcTrimEnd){
+			if     (seqRead->removedAdapter   && (m_aTrimEnd   == LEFT || m_aTrimEnd   == LTAIL)) return;
+			else if(seqRead->removedAdapterRC && (m_arcTrimEnd == LEFT || m_arcTrimEnd == LTAIL)) return;
+		}
 		
 		if(! m_htrimAdapterRm || seqRead->removedAdapter || seqRead->removedAdapterRC){
 			
