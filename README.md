@@ -77,9 +77,9 @@ In this example, reads that are barcoded on left side are demultiplexed by speci
 
 	flexbar -r reads.fq -t target -b brc.fa -be LTAIL -a adp.fa
 
-The second example shows how to trim compressed reads based on their quality scores in illumina version 1.8 format. Afterwards, provided adapters are removed in right trim-end mode, only if the overlap of adapter and read has at least length five with at most 40% errors.
+The second example shows how to trim compressed reads based on their quality scores in illumina version 1.8 format. Afterwards, provided adapters are removed in right trim-end mode, only if the overlap of adapter and read has at least length 5 with at most 20% errors.
 
-	flexbar -r reads.fq.gz -q TAIL -qf i1.8 -a adp.fa -ao 5 -at 0.4
+	flexbar -r reads.fq.gz -q TAIL -qf i1.8 -a adp.fa -ao 5 -at 0.2
 
 For further examples visit the [manual](https://github.com/seqan/flexbar/wiki) page.
 

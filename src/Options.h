@@ -160,6 +160,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("t", "target", "Prefix for output file names or paths.", ARG::STRING));
 	addOption(parser, ArgParseOption("r", "reads", "Fasta/q file or stdin (-) with reads that may contain barcodes.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("p", "reads2", "Second input file of paired reads, gz and bz2 files supported.", ARG::INPUT_FILE));
+	// addOption(parser, ArgParseOption("i", "interleaved", "Use interleaved format for stdin reading of paired reads."));
 	
 	addSection(parser, "Barcode detection");
 	addOption(parser, ArgParseOption("b",  "barcodes", "Fasta file with barcodes for demultiplexing, may contain N.", ARG::INPUT_FILE));
@@ -230,7 +231,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("o", "stdout-log", "Write statistics to console instead of target log file."));
 	addOption(parser, ArgParseOption("g", "removal-tags", "Tag reads that are subject to adapter or barcode removal."));
 	addOption(parser, ArgParseOption("e", "number-tags", "Replace read tags by ascending number to save space."));
-	addOption(parser, ArgParseOption("i", "umi-tags", "Capture UMIs in reads at barcode or adapter N positions."));
+	addOption(parser, ArgParseOption("d", "umi-tags", "Capture UMIs in reads at barcode or adapter N positions."));
 	
 	
 	hideOption(parser, "version");
@@ -349,7 +350,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	addTextSection(parser, "EXAMPLES");
 	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq \\fB-t\\fP target \\fB-b\\fP brc.fa \\fB-be\\fP LTAIL \\fB-a\\fP adp.fa", false);
-	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq.gz \\fB-q\\fP TAIL \\fB-qf\\fP i1.8 \\fB-a\\fP adp.fa \\fB-ao\\fP 5 \\fB-at\\fP 0.4");
+	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq.gz \\fB-q\\fP TAIL \\fB-qf\\fP i1.8 \\fB-a\\fP adp.fa \\fB-ao\\fP 5 \\fB-at\\fP 0.2");
 }
 
 
