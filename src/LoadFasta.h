@@ -12,16 +12,16 @@ private:
 	std::ostream *out;
 	tbb::concurrent_vector<flexbar::TBar> bars;
 	
-	bool m_revComp, m_isAdapter;
+	const bool m_isAdapter;
+	const flexbar::RevCompMode m_rcMode;
 	
 public:
 	
 	LoadFasta(const Options &o, const bool isAdapter) :
 		
 		out(o.out),
+		m_rcMode(o.rcMode),
 		m_isAdapter(isAdapter){
-			
-			m_revComp = o.revCompAdapter && isAdapter;
 	};
 	
 	
@@ -64,14 +64,16 @@ public:
 				}
 				else idMap[ids[i]] = 1;
 				
-				TBar bar;
-				bar.id  =  ids[i];
-				bar.seq = seqs[i];
-				bars.push_back(bar);
+				if(! m_isAdapter || m_rcMode == RCOFF || m_rcMode == RCALSO){
+					TBar bar;
+					bar.id  =  ids[i];
+					bar.seq = seqs[i];
+					bars.push_back(bar);
+				}
 				
-				if(m_revComp){
-					TSeqStr seq = seqs[i];
+				if(m_isAdapter && (m_rcMode == RCALSO || m_rcMode == RCONLY)){
 					TString  id =  ids[i];
+					TSeqStr seq = seqs[i];
 					
 					append(id, "_rc");
 					seqan::reverseComplement(seq);

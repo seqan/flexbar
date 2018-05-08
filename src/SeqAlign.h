@@ -216,8 +216,8 @@ public:
 				++m_modified;
 				
 				if(! m_isBarcoding){
-					if(! m_queries->at(qIndex).rcAdapter) seqRead.removedAdapter   = true;
-					else                                  seqRead.removedAdapterRC = true;
+					if(! m_queries->at(qIndex).rcAdapter) seqRead.rmAdapter   = true;
+					else                                  seqRead.rmAdapterRC = true;
 				}
 				
 				// count number of removals for each query

@@ -21,7 +21,7 @@ struct Options{
 	
 	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, umiTags, logStdout;
 	bool switch2Fasta, writeUnassigned, writeSingleReads, writeSingleReadsP, writeLengthDist;
-	bool useStdin, useStdout, relaxRegion, revCompAdapter, useRcTrimEnd, qtrimPostRm;
+	bool useStdin, useStdout, relaxRegion, useRcTrimEnd, qtrimPostRm;
 	bool htrimAdapterRm, htrimMaxFirstOnly;
 	
 	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len;
@@ -40,6 +40,7 @@ struct Options{
 	flexbar::RunType         runType;
 	flexbar::BarcodeDetect   barDetect;
 	flexbar::AdapterRemoval  adapRm;
+	flexbar::RevCompMode     rcMode;
 	
 	tbb::concurrent_vector<flexbar::TBar> barcodes, adapters, barcodes2, adapters2;
 	
@@ -72,7 +73,6 @@ struct Options{
 		useStdin          = false;
 		useStdout         = false;
 		relaxRegion       = false;
-		revCompAdapter    = false;
 		useRcTrimEnd      = false;
 		qtrimPostRm       = false;
 		htrimAdapterRm    = false;
@@ -95,6 +95,7 @@ struct Options{
 		cmprsType = flexbar::UNCOMPRESSED;
 		barDetect = flexbar::BOFF;
 		adapRm    = flexbar::AOFF;
+		rcMode    = flexbar::RCOFF;
     }
 };
 
@@ -184,7 +185,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("an", "adapter-tail-length", "Region size for tail trim-end modes. Default: adapter length.", ARG::INTEGER));
 	// addOption(parser, ArgParseOption("ah", "adapter-overhang", "Overhang at read ends in right and left modes.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ax", "adapter-relaxed", "Skip restriction to pass read ends in right and left modes."));
-	addOption(parser, ArgParseOption("ac", "adapter-revcomp", "Consider also reverse complement of each adapter in search."));
+	addOption(parser, ArgParseOption("ac", "adapter-revcomp", "Include reverse complements of adapters.", ARG::STRING));
 	addOption(parser, ArgParseOption("ad", "adapter-revcomp-end", "Use different trim-end for reverse complement of adapters.", ARG::STRING));
 	addOption(parser, ArgParseOption("ar", "adapter-read-set", "Consider only single read set for adapters.", ARG::STRING));
 	addOption(parser, ArgParseOption("ay", "adapter-cycles", "Number of adapter removal cycles.", ARG::INTEGER));
@@ -309,6 +310,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setValidValues(parser, "align-log", "ALL MOD TAB");
 	setValidValues(parser, "zip-output", "GZ BZ2");
 	setValidValues(parser, "adapter-read-set", "1 2");
+	setValidValues(parser, "adapter-revcomp", "ALSO ONLY");
 	
 	setDefaultValue(parser, "target",  "flexbarOut");
 	setDefaultValue(parser, "threads", "1");
@@ -825,19 +827,24 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		}
 		
 		if(isSet(parser, "adapter-revcomp")){
-			*out << "adapter-revcomp:       on" << endl;
-			o.revCompAdapter = true;
 			
-			if(isSet(parser, "adapter-revcomp-end")){
+			string rcModeStr;
+			getOptionValue(rcModeStr, parser, "adapter-revcomp");
+			*out << "adapter-revcomp:       " << rcModeStr << endl;
+			
+			if     (rcModeStr == "ALSO") o.rcMode = RCALSO;
+			else if(rcModeStr == "ONLY") o.rcMode = RCONLY;
+			
+			if(isSet(parser, "adapter-revcomp-end") && o.rcMode == RCALSO){
 				
 				string arc_trim_end;
 				getOptionValue(arc_trim_end, parser, "adapter-revcomp-end");
 				
-				if     (arc_trim_end == "LEFT")   o.arc_end = LEFT;
-				else if(arc_trim_end == "RIGHT")  o.arc_end = RIGHT;
-				else if(arc_trim_end == "ANY")    o.arc_end = ANY;
-				else if(arc_trim_end == "LTAIL")  o.arc_end = LTAIL;
-				else if(arc_trim_end == "RTAIL")  o.arc_end = RTAIL;
+				if     (arc_trim_end == "LEFT")  o.arc_end = LEFT;
+				else if(arc_trim_end == "RIGHT") o.arc_end = RIGHT;
+				else if(arc_trim_end == "ANY")   o.arc_end = ANY;
+				else if(arc_trim_end == "LTAIL") o.arc_end = LTAIL;
+				else if(arc_trim_end == "RTAIL") o.arc_end = RTAIL;
 				else {
 					cerr << "Specified reverse complement adapter trim-end is unknown!\n" << endl;
 					exit(1);

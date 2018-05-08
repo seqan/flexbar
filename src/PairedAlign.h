@@ -137,14 +137,14 @@ public:
 		using namespace flexbar;
 		
 		if(m_htrimAdapterRm && m_useRcTrimEnd){
-			if     (seqRead->removedAdapter   && (m_aTrimEnd   == RIGHT || m_aTrimEnd   == RTAIL)) return;
-			else if(seqRead->removedAdapterRC && (m_arcTrimEnd == RIGHT || m_arcTrimEnd == RTAIL)) return;
+			if     (seqRead->rmAdapter   && (m_aTrimEnd   == RIGHT || m_aTrimEnd   == RTAIL)) return;
+			else if(seqRead->rmAdapterRC && (m_arcTrimEnd == RIGHT || m_arcTrimEnd == RTAIL)) return;
 		}
 		else if(m_htrimAdapterRm && ! m_useRcTrimEnd){
 			if(m_aTrimEnd == RIGHT || m_aTrimEnd == RTAIL) return;
 		}
 		
-		if(! m_htrimAdapterRm || seqRead->removedAdapter || seqRead->removedAdapterRC){
+		if(! m_htrimAdapterRm || seqRead->rmAdapter || seqRead->rmAdapterRC){
 			
 			for(unsigned int s = 0; s < m_htrimLeft.length(); ++s){
 				
@@ -184,14 +184,14 @@ public:
 		using namespace flexbar;
 		
 		if(m_htrimAdapterRm && m_useRcTrimEnd){
-			if     (seqRead->removedAdapter   && (m_aTrimEnd   == LEFT || m_aTrimEnd   == LTAIL)) return;
-			else if(seqRead->removedAdapterRC && (m_arcTrimEnd == LEFT || m_arcTrimEnd == LTAIL)) return;
+			if     (seqRead->rmAdapter   && (m_aTrimEnd   == LEFT || m_aTrimEnd   == LTAIL)) return;
+			else if(seqRead->rmAdapterRC && (m_arcTrimEnd == LEFT || m_arcTrimEnd == LTAIL)) return;
 		}
 		else if(m_htrimAdapterRm && ! m_useRcTrimEnd){
 			if(m_aTrimEnd == LEFT || m_aTrimEnd == LTAIL) return;
 		}
 		
-		if(! m_htrimAdapterRm || seqRead->removedAdapter || seqRead->removedAdapterRC){
+		if(! m_htrimAdapterRm || seqRead->rmAdapter || seqRead->rmAdapterRC){
 			
 			for(unsigned int s = 0; s < m_htrimRight.length(); ++s){
 				

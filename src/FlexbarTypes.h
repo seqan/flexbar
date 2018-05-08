@@ -11,21 +11,21 @@ class SeqRead {
 	TSeqStr seq;
 	TString id, qual, umi;
 	
-	bool removedAdapter, removedAdapterRC;
+	bool rmAdapter, rmAdapterRC;
 	
 	SeqRead(TSeqStr& sequence, TString& seqID) :
 		seq(sequence),
 		id(seqID),
-		removedAdapter(false),
-		removedAdapterRC(false){
+		rmAdapter(false),
+		rmAdapterRC(false){
 	}
 	
 	SeqRead(TSeqStr& sequence, TString& seqID, TString& quality) :
 		seq(sequence),
 		id(seqID),
 		qual(quality),
-		removedAdapter(false),
-		removedAdapterRC(false){
+		rmAdapter(false),
+		rmAdapterRC(false){
 	}
 };
 
@@ -120,10 +120,9 @@ namespace flexbar{
 		
 		FString id;
 		FSeqStr seq;
+		bool rcAdapter;
 		
 		tbb::atomic<unsigned long> rmOverlap, rmFull;
-		
-		bool rcAdapter;
 		
 		TBar() :
 			rmOverlap(0),
@@ -132,6 +131,12 @@ namespace flexbar{
 	    }
 	};
 	
+	
+	enum RevCompMode {
+		RCOFF,
+		RCALSO,
+		RCONLY
+	};
 	
 	enum AlignmentMode {
 		ALIGNALL,
