@@ -240,20 +240,20 @@ public:
 	
 	
 	unsigned long getNrProcessedReads() const{
-		if(m_isPaired) return m_f1->getNrProcessedReads() + m_f2->getNrProcessedReads();
-		else           return m_f1->getNrProcessedReads();
+		if(m_isPaired && ! m_interleaved) return m_f1->getNrProcessedReads() + m_f2->getNrProcessedReads();
+		else                              return m_f1->getNrProcessedReads();
 	}
 	
 	
 	unsigned long getNrProcessedChars() const{
-		if(m_isPaired) return m_f1->getNrProcessedChars() + m_f2->getNrProcessedChars();
-		else           return m_f1->getNrProcessedChars();
+		if(m_isPaired && ! m_interleaved) return m_f1->getNrProcessedChars() + m_f2->getNrProcessedChars();
+		else                              return m_f1->getNrProcessedChars();
 	}
 	
 	
 	unsigned long getNrLowPhredReads() const {
-		if(m_isPaired) return m_f1->getNrLowPhredReads() + m_f2->getNrLowPhredReads();
-		else           return m_f1->getNrLowPhredReads();
+		if(m_isPaired && ! m_interleaved) return m_f1->getNrLowPhredReads() + m_f2->getNrLowPhredReads();
+		else                              return m_f1->getNrLowPhredReads();
 	}
 	
 };
