@@ -62,7 +62,10 @@ public:
 		TStrings quals,    quals2,    qualsBR;
 		TBools   uncalled, uncalled2, uncalledBR;
 		
-		unsigned int nReads = m_f1->loadSeqReads(uncalled, ids, seqs, quals, m_bundleSize);
+		unsigned int bundleSize      = m_bundleSize;
+		if(m_interleaved) bundleSize = m_bundleSize * 2;
+		
+		unsigned int nReads = m_f1->loadSeqReads(uncalled, ids, seqs, quals, bundleSize);
 		
 		if(m_interleaved && nReads % 2 == 1){
 			cerr << "\nERROR: Interleaved reads input does not contain even number of reads.\n" << endl;
@@ -79,16 +82,10 @@ public:
 		}
 		
 		if(m_useBarRead){
+			unsigned int nBarReads = m_b->loadSeqReads(uncalledBR, idsBR, seqsBR, qualsBR, m_bundleSize);
 			
-			unsigned int bundleSize = m_bundleSize;
 			unsigned int multi      = 1;
-			
-			if(m_interleaved){
-				bundleSize = (unsigned int) (m_bundleSize / 2);
-				multi      = 2;
-			}
-			
-			unsigned int nBarReads = m_b->loadSeqReads(uncalledBR, idsBR, seqsBR, qualsBR, bundleSize);
+			if(m_interleaved) multi = 2;
 			
 			if(nReads > nBarReads * multi){
 				cerr << "\nERROR: Read without barcode read in input.\n" << endl;
