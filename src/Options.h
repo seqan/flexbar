@@ -487,8 +487,8 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	getOptionValue(o.bundleSize, parser, "bundle");
 	*out << "Bundled fragments:     " << o.bundleSize << endl << endl;
 	
-	if(o.bundleSize < 8){
-		cerr << "\n" << "Bundle size should be 8 at least.\n" << endl;
+	if(o.bundleSize < 16){
+		cerr << "\n" << "Bundle size should be 16 at least.\n" << endl;
 		exit(1);
 	}
 	else if(o.bundleSize % 2 == 1){

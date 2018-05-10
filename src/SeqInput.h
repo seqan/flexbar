@@ -117,6 +117,7 @@ public:
 							if(m_format == FASTQ)
 							erase(quals[i], 0, idx);
 						}
+						
 						if(m_preTrimEnd > 0 && length(seq) > 1){
 							
 							int idx = m_preTrimEnd;
@@ -127,6 +128,7 @@ public:
 							if(m_format == FASTQ)
 							quals[i] = prefix(quals[i], length(quals[i]) - idx);
 						}
+						
 						if(m_qtrim != QOFF && ! m_qtrimPostRm){
 							if(qualTrim(seq, quals[i], m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
 						}
