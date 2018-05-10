@@ -22,7 +22,7 @@ struct Options{
 	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, umiTags, logStdout;
 	bool switch2Fasta, writeUnassigned, writeSingleReads, writeSingleReadsP, writeLengthDist;
 	bool useStdin, useStdout, relaxRegion, useRcTrimEnd, qtrimPostRm;
-	bool htrimAdapterRm, htrimMaxFirstOnly;
+	bool interleavedInput, htrimAdapterRm, htrimMaxFirstOnly;
 	
 	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len;
 	int qtrimThresh, qtrimWinSize, a_overhang, htrimMinLength, htrimMaxLength, a_cycles;
@@ -70,6 +70,7 @@ struct Options{
 		switch2Fasta      = false;
 		logStdout         = false;
 		umiTags           = false;
+		interleavedInput  = false;
 		useStdin          = false;
 		useStdout         = false;
 		relaxRegion       = false;
@@ -160,7 +161,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("t", "target", "Prefix for output file names or paths.", ARG::STRING));
 	addOption(parser, ArgParseOption("r", "reads", "Fasta/q file or stdin (-) with reads that may contain barcodes.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("p", "reads2", "Second input file of paired reads, gz and bz2 files supported.", ARG::INPUT_FILE));
-	// addOption(parser, ArgParseOption("i", "interleaved", "Use interleaved format for stdin reading of paired reads."));
+	addOption(parser, ArgParseOption("i", "interleaved", "Use interleaved format for first file with paired reads."));
 	
 	addSection(parser, "Barcode detection");
 	addOption(parser, ArgParseOption("b",  "barcodes", "Fasta file with barcodes for demultiplexing, may contain N.", ARG::INPUT_FILE));
@@ -265,6 +266,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	setAdvanced(parser, "man-help");
 	setAdvanced(parser, "bundle");
+	setAdvanced(parser, "interleaved");
 	setAdvanced(parser, "stdout-reads");
 	setAdvanced(parser, "length-dist");
 	setAdvanced(parser, "single-reads-paired");
@@ -477,8 +479,22 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	getOptionValue(o.nThreads, parser, "threads");
 	*out << "Number of threads:     " << o.nThreads << endl;
 	
+	if(o.nThreads < 1){
+		cerr << "\n" << "Number of threads should be 1 at least.\n" << endl;
+		exit(1);
+	}
+	
 	getOptionValue(o.bundleSize, parser, "bundle");
 	*out << "Bundled fragments:     " << o.bundleSize << endl << endl;
+	
+	if(o.bundleSize < 8){
+		cerr << "\n" << "Bundle size should be 8 at least.\n" << endl;
+		exit(1);
+	}
+	else if(o.bundleSize % 2 == 1){
+		cerr << "\n" << "Bundle size should be a multiple of 2.\n" << endl;
+		exit(1);
+	}
 	
 	getOptionValue(o.targetName, parser, "target");
 	*out << "Target name:           " << o.targetName << endl;
@@ -500,7 +516,20 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	
 	o.runType = SINGLE;
 	
+	
+	if(isSet(parser, "interleaved")){
+		*out << "Interleaved reads:     on   (paired run)" << endl;
+		o.runType  = PAIRED;
+		o.isPaired = true;
+		o.interleavedInput = true;
+	}
+	
 	if(isSet(parser, "reads2")){
+		
+		if(o.interleavedInput){
+			cerr << "\n" << "Please specify either interleaved reads or second reads file.\n" << endl;
+			exit(1);
+		}
 		getOptionValue(o.readsFile2, parser, "reads2");
 		*out << "Reads file 2:          " << o.readsFile2 << "   (paired run)" << endl;
 		o.runType  = PAIRED;
@@ -510,7 +539,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		checkInputType(o.readsFile2, fformat, false);
 		
 		if(o.format != fformat){
-			cerr << "\n\n" << "First and second reads file do not have same format.\n" << endl;
+			cerr << "\n" << "First and second reads file do not have same format.\n" << endl;
 			exit(1);
 		}
 	}
@@ -528,7 +557,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 			checkInputType(o.barReadsFile, fformat, false);
 			
 			if(o.format != fformat){
-				cerr << "\n\n" << "Barcode reads file does not have same format as reads.\n" << endl;
+				cerr << "\n" << "Barcode reads file does not have same format as reads.\n" << endl;
 				exit(1);
 			}
 			
@@ -635,7 +664,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 			*out << "qtrim-format:          " << quality << endl;
 		}
 		else{
-			cerr << "\n\n" << "Specify qtrim-format for quality-based trimming.\n" << endl;
+			cerr << "\n" << "Specify qtrim-format for quality-based trimming.\n" << endl;
 			exit(1);
 		}
 		
@@ -757,7 +786,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		else if(b_trim_end == "LTAIL")  o.b_end = LTAIL;
 		else if(b_trim_end == "RTAIL")  o.b_end = RTAIL;
 		else{
-			cerr << "Specified barcode trim-end is unknown!\n" << endl;
+			cerr << "\nSpecified barcode trim-end is unknown.\n" << endl;
 			exit(1);
 		}
 		*out << "barcode-trim-end:      " << b_trim_end << endl;
@@ -816,7 +845,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		else if(a_trim_end == "LTAIL")  o.a_end = LTAIL;
 		else if(a_trim_end == "RTAIL")  o.a_end = RTAIL;
 		else {
-			cerr << "Specified adapter trim-end is unknown!\n" << endl;
+			cerr << "\nSpecified adapter trim-end is unknown.\n" << endl;
 			exit(1);
 		}
 		*out << "adapter-trim-end:      " << a_trim_end << endl;
@@ -847,7 +876,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 				else if(arc_trim_end == "LTAIL") o.arc_end = LTAIL;
 				else if(arc_trim_end == "RTAIL") o.arc_end = RTAIL;
 				else {
-					cerr << "Specified reverse complement adapter trim-end is unknown!\n" << endl;
+					cerr << "\nSpecified reverse complement adapter trim-end is unknown.\n" << endl;
 					exit(1);
 				}
 				
