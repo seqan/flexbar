@@ -98,13 +98,13 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 		}
 	}
 	else{
-		if(o.rcMode == RCOFF || o.rcMode == RCALSO){
+		if(o.rcMode == RCOFF || o.rcMode == RCON){
 			TBar bar;
 			bar.id  = "cmdline";
 			bar.seq = o.adapterSeq;
 			o.adapters.push_back(bar);
 		}
-		if(o.rcMode == RCALSO || o.rcMode == RCONLY){
+		if(o.rcMode == RCON || o.rcMode == RCONLY){
 			TSeqStr adapterSeqRC = o.adapterSeq;
 			seqan::reverseComplement(adapterSeqRC);
 			

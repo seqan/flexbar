@@ -64,14 +64,14 @@ public:
 				}
 				else idMap[ids[i]] = 1;
 				
-				if(! m_isAdapter || m_rcMode == RCOFF || m_rcMode == RCALSO){
+				if(! m_isAdapter || m_rcMode == RCOFF || m_rcMode == RCON){
 					TBar bar;
 					bar.id  =  ids[i];
 					bar.seq = seqs[i];
 					bars.push_back(bar);
 				}
 				
-				if(m_isAdapter && (m_rcMode == RCALSO || m_rcMode == RCONLY)){
+				if(m_isAdapter && (m_rcMode == RCON || m_rcMode == RCONLY)){
 					TString  id =  ids[i];
 					TSeqStr seq = seqs[i];
 					

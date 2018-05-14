@@ -134,7 +134,7 @@ namespace flexbar{
 	
 	enum RevCompMode {
 		RCOFF,
-		RCALSO,
+		RCON,
 		RCONLY
 	};
 	

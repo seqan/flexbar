@@ -313,7 +313,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setValidValues(parser, "zip-output", "GZ BZ2");
 	// setValidValues(parser, "adapter-pair-overlap", "ON ONLY");
 	setValidValues(parser, "adapter-read-set", "1 2");
-	setValidValues(parser, "adapter-revcomp", "ALSO ONLY");
+	setValidValues(parser, "adapter-revcomp", "ON ONLY");
 	
 	setDefaultValue(parser, "target",  "flexbarOut");
 	setDefaultValue(parser, "threads", "1");
@@ -858,10 +858,10 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 			getOptionValue(rcModeStr, parser, "adapter-revcomp");
 			*out << "adapter-revcomp:       " << rcModeStr << endl;
 			
-			if     (rcModeStr == "ALSO") o.rcMode = RCALSO;
+			if     (rcModeStr == "ON")   o.rcMode = RCON;
 			else if(rcModeStr == "ONLY") o.rcMode = RCONLY;
 			
-			if(isSet(parser, "adapter-revcomp-end") && o.rcMode == RCALSO){
+			if(isSet(parser, "adapter-revcomp-end") && o.rcMode == RCON){
 				
 				string arc_trim_end;
 				getOptionValue(arc_trim_end, parser, "adapter-revcomp-end");
