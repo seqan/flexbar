@@ -142,10 +142,9 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	// setCitation(parser, "\n\n" + getFlexbarCitation());
 	
-	// setAppName(parser, "");
+	// setAppName(parser, "Flexbar");
 	// setShortCopyright(parser, "");
 	// setLongCopyright(parser, "");
-	// ARG::OUTPUTPREFIX
 	
 	setShortDescription(parser, "flexible barcode and adapter removal");
 	
@@ -158,7 +157,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addSection(parser, "Basic options");
 	addOption(parser, ArgParseOption("n", "threads", "Number of threads to employ.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("N", "bundle", "Number of read pairs per thread.", ARG::INTEGER));
-	addOption(parser, ArgParseOption("t", "target", "Prefix for output file names or paths.", ARG::STRING));
+	addOption(parser, ArgParseOption("t", "target", "Prefix for output file names or paths.", ARG::OUTPUT_PREFIX));
 	addOption(parser, ArgParseOption("r", "reads", "Fasta/q file or stdin (-) with reads that may contain barcodes.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("p", "reads2", "Second input file of paired reads, gz and bz2 files supported.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("i", "interleaved", "Interleaved format for first input set with paired reads."));
@@ -181,6 +180,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("a",  "adapters", "Fasta file with adapters for removal that may contain N.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("a2", "adapters2", "File with extra adapters for second read set in paired mode.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("as", "adapter-seq", "Single adapter sequence as alternative to adapters option.", ARG::STRING));
+	// addOption(parser, ArgParseOption("ap", "adapter-pair-overlap", "Overlap detection for paired reads.", ARG::STRING));
 	addOption(parser, ArgParseOption("ao", "adapter-min-overlap", "Minimum overlap of adapter and read for removal.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("at", "adapter-error-rate", "Error rate threshold for mismatches and gaps.", ARG::DOUBLE));
 	addOption(parser, ArgParseOption("ae", "adapter-trim-end", "Type of removal, see section trim-end modes.", ARG::STRING));
@@ -191,7 +191,6 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("ad", "adapter-revcomp-end", "Use different trim-end for reverse complement of adapters.", ARG::STRING));
 	addOption(parser, ArgParseOption("ar", "adapter-read-set", "Consider only single read set for adapters.", ARG::STRING));
 	addOption(parser, ArgParseOption("ay", "adapter-cycles", "Number of adapter removal cycles.", ARG::INTEGER));
-	// addOption(parser, ArgParseOption("ap", "adapter-paired-overlap-off", "Turn off overlap detection for paired reads."));
 	addOption(parser, ArgParseOption("am", "adapter-match", "Alignment match score.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ai", "adapter-mismatch", "Alignment mismatch score.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ag", "adapter-gap", "Alignment gap score.", ARG::INTEGER));
@@ -312,6 +311,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setValidValues(parser, "qtrim-format", "sanger solexa i1.3 i1.5 i1.8");
 	setValidValues(parser, "align-log", "ALL MOD TAB");
 	setValidValues(parser, "zip-output", "GZ BZ2");
+	// setValidValues(parser, "adapter-pair-overlap", "ON ONLY");
 	setValidValues(parser, "adapter-read-set", "1 2");
 	setValidValues(parser, "adapter-revcomp", "ALSO ONLY");
 	
