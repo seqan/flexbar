@@ -143,7 +143,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	// setCitation(parser, "\n\n" + getFlexbarCitation());
 	
 	// setAppName(parser, "Flexbar");
-	// setShortCopyright(parser, "");
+	// setShortCopyright(parser, "BSD 3-Clause License");
 	// setLongCopyright(parser, "");
 	
 	setShortDescription(parser, "flexible barcode and adapter removal");
