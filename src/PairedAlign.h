@@ -4,6 +4,7 @@
 #define FLEXBAR_PAIREDALIGN_H
 
 #include "SeqAlign.h"
+#include "SeqAlignPair.h"
 #include "SeqAlignAlgo.h"
 
 
@@ -35,6 +36,9 @@ private:
 	
 	typedef SeqAlign<TSeqStr, TString, SeqAlignAlgo<TSeqStr> > TSeqAlign;
 	TSeqAlign *m_a1, *m_b1, *m_a2, *m_b2;
+	
+	typedef SeqAlignPair<TSeqStr, TString, SeqAlignAlgo<TSeqStr> > TSeqAlignPair;
+	TSeqAlignPair *m_p;
 	
 	std::ostream *out;
 	
