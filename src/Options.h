@@ -24,7 +24,7 @@ struct Options{
 	bool useStdin, useStdout, relaxRegion, useRcTrimEnd, qtrimPostRm;
 	bool interleavedInput, htrimAdapterRm, htrimMaxFirstOnly, pairOverlap;
 	
-	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len;
+	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len, p_min_overlap;
 	int qtrimThresh, qtrimWinSize, a_overhang, htrimMinLength, htrimMaxLength, a_cycles;
 	int maxUncalled, min_readLen, a_min_overlap, b_min_overlap, nThreads, bundleSize;
 	int match, mismatch, gapCost, b_match, b_mismatch, b_gapCost;
@@ -88,6 +88,7 @@ struct Options{
 		a_tail_len     = 0;
 		b_tail_len     = 0;
 		b_min_overlap  = 0;
+		p_min_overlap  = 0;
 		htrimMaxLength = 0;
 		
 		format    = flexbar::FASTA;
@@ -181,7 +182,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("a",  "adapters", "Fasta file with adapters for removal that may contain N.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("a2", "adapters2", "File with extra adapters for second read set in paired mode.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("as", "adapter-seq", "Single adapter sequence as alternative to adapters option.", ARG::STRING));
-	addOption(parser, ArgParseOption("ap", "adapter-pair-overlap", "Turn on removal with overlap detection for paired reads."));
+	addOption(parser, ArgParseOption("ap", "adapter-pair-overlap", "Use overlap detection for paired reads with given minimum.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ao", "adapter-min-overlap", "Minimum overlap of adapter and read for removal.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("at", "adapter-error-rate", "Error rate threshold for mismatches and gaps.", ARG::DOUBLE));
 	addOption(parser, ArgParseOption("ae", "adapter-trim-end", "Type of removal, see section trim-end modes.", ARG::STRING));
@@ -836,7 +837,13 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	// adapter options
 	
 	if(isSet(parser, "adapter-pair-overlap") && o.isPaired){
-		*out << "adapter-pair-overlap:  on" << endl;
+		getOptionValue(o.p_min_overlap, parser, "adapter-pair-overlap");
+		*out << "adapter-pair-overlap:  " << o.p_min_overlap << endl;
+		
+		if(o.p_min_overlap < 20){
+			cerr << "\nMinimum overlap of paired reads should be 20 at least.\n" << endl;
+			exit(1);
+		}
 		o.pairOverlap = true;
 	}
 	
@@ -917,16 +924,16 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 				exit(1);
 			}
 			
+			getOptionValue(o.a_min_overlap, parser, "adapter-min-overlap");
+			*out << "adapter-min-overlap:   " << o.a_min_overlap << endl;
+			
+			if(o.a_min_overlap < 1){
+				cerr << "\nAdapter min-overlap should be 1 at least.\n" << endl;
+				exit(1);
+			}
+			
 			// getOptionValue(o.a_overhang, parser, "adapter-overhang");
 			// *out << "adapter-overhang:      " << o.a_overhang << endl;
-		}
-		
-		getOptionValue(o.a_min_overlap, parser, "adapter-min-overlap");
-		*out << "adapter-min-overlap:   " << o.a_min_overlap << endl;
-		
-		if(o.a_min_overlap < 1){
-			cerr << "\nAdapter min-overlap should be 1 at least.\n" << endl;
-			exit(1);
 		}
 		
 		getOptionValue(o.a_errorRate, parser, "adapter-error-rate");

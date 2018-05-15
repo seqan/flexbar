@@ -83,7 +83,7 @@ public:
 		m_a1 = new TSeqAlign(m_adapters,  o, o.a_min_overlap, o.a_errorRate, o.a_tail_len, o.match, o.mismatch, o.gapCost, false);
 		m_a2 = new TSeqAlign(m_adapters2, o, o.a_min_overlap, o.a_errorRate, o.a_tail_len, o.match, o.mismatch, o.gapCost, false);
 		
-		m_p  = new TSeqAlignPair(o, o.a_min_overlap, o.a_errorRate, o.match, o.mismatch, o.gapCost);
+		m_p  = new TSeqAlignPair(o, o.p_min_overlap, o.a_errorRate, o.match, o.mismatch, o.gapCost);
 		
 		if(m_log == flexbar::TAB)
 		*out << "ReadTag\tQueryTag\tQueryStart\tQueryEnd\tOverlapLength\tMismatches\tIndels\tAllowedErrors" << std::endl;
@@ -285,20 +285,20 @@ public:
 			
 			if(m_pairOverlap){
 				
-				Alignments alignmentsA;
+				Alignments alignments;
 				
 				unsigned int idxAl = 0;
 				ComputeCycle cycle = PRELOAD;
 				
 				for(unsigned int i = 0; i < prBundle->size(); ++i){
-					m_p->alignSeqReadPair(prBundle->at(i)->r1, prBundle->at(i)->r2, alignmentsA, cycle, idxAl);
+					m_p->alignSeqReadPair(prBundle->at(i)->r1, prBundle->at(i)->r2, alignments, cycle, idxAl);
 				}
 				
 				idxAl = 0;
 				cycle = COMPUTE;
 				
 				for(unsigned int i = 0; i < prBundle->size(); ++i){
-					m_p->alignSeqReadPair(prBundle->at(i)->r1, prBundle->at(i)->r2, alignmentsA, cycle, idxAl);
+					m_p->alignSeqReadPair(prBundle->at(i)->r1, prBundle->at(i)->r2, alignments, cycle, idxAl);
 				}
 			}
 			
