@@ -22,7 +22,7 @@ struct Options{
 	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, umiTags, logStdout;
 	bool switch2Fasta, writeUnassigned, writeSingleReads, writeSingleReadsP, writeLengthDist;
 	bool useStdin, useStdout, relaxRegion, useRcTrimEnd, qtrimPostRm;
-	bool interleavedInput, htrimAdapterRm, htrimMaxFirstOnly;
+	bool interleavedInput, htrimAdapterRm, htrimMaxFirstOnly, pairOverlap;
 	
 	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len;
 	int qtrimThresh, qtrimWinSize, a_overhang, htrimMinLength, htrimMaxLength, a_cycles;
@@ -61,6 +61,7 @@ struct Options{
 		
 		isPaired          = false;
 		useAdapterFile    = false;
+		pairOverlap       = false;
 		useNumberTag      = false;
 		useRemovalTag     = false;
 		writeUnassigned   = false;
@@ -180,7 +181,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("a",  "adapters", "Fasta file with adapters for removal that may contain N.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("a2", "adapters2", "File with extra adapters for second read set in paired mode.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("as", "adapter-seq", "Single adapter sequence as alternative to adapters option.", ARG::STRING));
-	// addOption(parser, ArgParseOption("ap", "adapter-pair-overlap", "Overlap detection for paired reads.", ARG::STRING));
+	addOption(parser, ArgParseOption("ap", "adapter-pair-overlap", "Turn on removal with overlap detection for paired reads."));
 	addOption(parser, ArgParseOption("ao", "adapter-min-overlap", "Minimum overlap of adapter and read for removal.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("at", "adapter-error-rate", "Error rate threshold for mismatches and gaps.", ARG::DOUBLE));
 	addOption(parser, ArgParseOption("ae", "adapter-trim-end", "Type of removal, see section trim-end modes.", ARG::STRING));
@@ -273,7 +274,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "umi-tags");
 	
 	
-	setCategory(parser, "Trimming");
+	setCategory(parser, "Barcode and adapter removal");
 	// setRequired(parser, "reads");
 	// setMinValue(parser, "threads", "1");
 	
@@ -311,7 +312,6 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setValidValues(parser, "qtrim-format", "sanger solexa i1.3 i1.5 i1.8");
 	setValidValues(parser, "align-log", "ALL MOD TAB");
 	setValidValues(parser, "zip-output", "GZ BZ2");
-	// setValidValues(parser, "adapter-pair-overlap", "ON ONLY");
 	setValidValues(parser, "adapter-read-set", "1 2");
 	setValidValues(parser, "adapter-revcomp", "ON ONLY");
 	
@@ -835,71 +835,90 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	
 	// adapter options
 	
-	if(o.adapRm != AOFF){
+	if(isSet(parser, "adapter-pair-overlap") && o.isPaired){
+		*out << "adapter-pair-overlap:  on" << endl;
+		o.pairOverlap = true;
+	}
+	
+	if(o.adapRm != AOFF || o.pairOverlap){
 		
-		string a_trim_end;
-		getOptionValue(a_trim_end, parser, "adapter-trim-end");
-		
-		if     (a_trim_end == "LEFT")   o.a_end = LEFT;
-		else if(a_trim_end == "RIGHT")  o.a_end = RIGHT;
-		else if(a_trim_end == "ANY")    o.a_end = ANY;
-		else if(a_trim_end == "LTAIL")  o.a_end = LTAIL;
-		else if(a_trim_end == "RTAIL")  o.a_end = RTAIL;
-		else {
-			cerr << "\nSpecified adapter trim-end is unknown.\n" << endl;
-			exit(1);
-		}
-		*out << "adapter-trim-end:      " << a_trim_end << endl;
-		
-		
-		if(isSet(parser, "adapter-tail-length")){
-			getOptionValue(o.a_tail_len, parser, "adapter-tail-length");
-			*out << "adapter-tail-length:   " << o.a_tail_len << endl;
-		}
-		
-		if(isSet(parser, "adapter-revcomp")){
+		if(o.adapRm != AOFF){
 			
-			string rcModeStr;
-			getOptionValue(rcModeStr, parser, "adapter-revcomp");
-			*out << "adapter-revcomp:       " << rcModeStr << endl;
+			string a_trim_end;
+			getOptionValue(a_trim_end, parser, "adapter-trim-end");
 			
-			if     (rcModeStr == "ON")   o.rcMode = RCON;
-			else if(rcModeStr == "ONLY") o.rcMode = RCONLY;
+			if     (a_trim_end == "LEFT")   o.a_end = LEFT;
+			else if(a_trim_end == "RIGHT")  o.a_end = RIGHT;
+			else if(a_trim_end == "ANY")    o.a_end = ANY;
+			else if(a_trim_end == "LTAIL")  o.a_end = LTAIL;
+			else if(a_trim_end == "RTAIL")  o.a_end = RTAIL;
+			else {
+				cerr << "\nSpecified adapter trim-end is unknown.\n" << endl;
+				exit(1);
+			}
+			*out << "adapter-trim-end:      " << a_trim_end << endl;
 			
-			if(isSet(parser, "adapter-revcomp-end") && o.rcMode == RCON){
+			
+			if(isSet(parser, "adapter-tail-length")){
+				getOptionValue(o.a_tail_len, parser, "adapter-tail-length");
+				*out << "adapter-tail-length:   " << o.a_tail_len << endl;
+			}
+			
+			if(isSet(parser, "adapter-revcomp")){
 				
-				string arc_trim_end;
-				getOptionValue(arc_trim_end, parser, "adapter-revcomp-end");
+				string rcModeStr;
+				getOptionValue(rcModeStr, parser, "adapter-revcomp");
+				*out << "adapter-revcomp:       " << rcModeStr << endl;
 				
-				if     (arc_trim_end == "LEFT")  o.arc_end = LEFT;
-				else if(arc_trim_end == "RIGHT") o.arc_end = RIGHT;
-				else if(arc_trim_end == "ANY")   o.arc_end = ANY;
-				else if(arc_trim_end == "LTAIL") o.arc_end = LTAIL;
-				else if(arc_trim_end == "RTAIL") o.arc_end = RTAIL;
-				else {
-					cerr << "\nSpecified reverse complement adapter trim-end is unknown.\n" << endl;
-					exit(1);
-				}
+				if     (rcModeStr == "ON")   o.rcMode = RCON;
+				else if(rcModeStr == "ONLY") o.rcMode = RCONLY;
 				
-				if(o.arc_end != o.a_end){
-					*out << "adapter-revcomp-end:   " << arc_trim_end << endl;
-					o.useRcTrimEnd = true;
+				if(isSet(parser, "adapter-revcomp-end") && o.rcMode == RCON){
+					
+					string arc_trim_end;
+					getOptionValue(arc_trim_end, parser, "adapter-revcomp-end");
+					
+					if     (arc_trim_end == "LEFT")  o.arc_end = LEFT;
+					else if(arc_trim_end == "RIGHT") o.arc_end = RIGHT;
+					else if(arc_trim_end == "ANY")   o.arc_end = ANY;
+					else if(arc_trim_end == "LTAIL") o.arc_end = LTAIL;
+					else if(arc_trim_end == "RTAIL") o.arc_end = RTAIL;
+					else {
+						cerr << "\nSpecified reverse complement adapter trim-end is unknown.\n" << endl;
+						exit(1);
+					}
+					
+					if(o.arc_end != o.a_end){
+						*out << "adapter-revcomp-end:   " << arc_trim_end << endl;
+						o.useRcTrimEnd = true;
+					}
 				}
 			}
-		}
-		
-		if(isSet(parser, "adapter-relaxed")){
-			*out << "adapter-relaxed:       on" << endl;
-			o.relaxRegion = true;
-		}
-		
-		if(isSet(parser, "adapter-read-set") && o.isPaired && o.adapRm != NORMAL2){
-			string a_read_set;
-			getOptionValue(a_read_set, parser, "adapter-read-set");
-			*out << "adapter-read-set:      " << a_read_set << endl;
 			
-			     if(a_read_set == "1") o.adapRm = AONE;
-			else if(a_read_set == "2") o.adapRm = ATWO;
+			if(isSet(parser, "adapter-relaxed")){
+				*out << "adapter-relaxed:       on" << endl;
+				o.relaxRegion = true;
+			}
+			
+			if(isSet(parser, "adapter-read-set") && o.isPaired && o.adapRm != NORMAL2){
+				string a_read_set;
+				getOptionValue(a_read_set, parser, "adapter-read-set");
+				*out << "adapter-read-set:      " << a_read_set << endl;
+			
+				     if(a_read_set == "1") o.adapRm = AONE;
+				else if(a_read_set == "2") o.adapRm = ATWO;
+			}
+			
+			getOptionValue(o.a_cycles, parser, "adapter-cycles");
+			if(o.a_cycles > 1) *out << "adapter-cycles:        " << o.a_cycles << endl;
+			
+			if(o.a_cycles < 1){
+				cerr << "\nNumber of adapter removal cycles should be 1 at least.\n" << endl;
+				exit(1);
+			}
+			
+			// getOptionValue(o.a_overhang, parser, "adapter-overhang");
+			// *out << "adapter-overhang:      " << o.a_overhang << endl;
 		}
 		
 		getOptionValue(o.a_min_overlap, parser, "adapter-min-overlap");
@@ -917,17 +936,6 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 			cerr << "\nAdapter error rate should be between 0 and 1.\n" << endl;
 			exit(1);
 		}
-		
-		getOptionValue(o.a_cycles, parser, "adapter-cycles");
-		if(o.a_cycles > 1) *out << "adapter-cycles:        " << o.a_cycles << endl;
-		
-		if(o.a_cycles < 1){
-			cerr << "\nNumber of adapter removal cycles should be 1 at least.\n" << endl;
-			exit(1);
-		}
-		
-		// getOptionValue(o.a_overhang, parser, "adapter-overhang");
-		// *out << "adapter-overhang:      " << o.a_overhang << endl;
 		
 		getOptionValue(o.match,    parser, "adapter-match");
 		getOptionValue(o.mismatch, parser, "adapter-mismatch");
