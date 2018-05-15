@@ -796,6 +796,11 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		if(isSet(parser, "barcode-min-overlap")){
 			getOptionValue(o.b_min_overlap, parser, "barcode-min-overlap");
 			*out << "barcode-min-overlap:   " << o.b_min_overlap << endl;
+			
+			if(o.b_min_overlap < 1){
+				cerr << "\nBarcode min-overlap should be 1 at least.\n" << endl;
+				exit(1);
+			}
 		}
 		
 		getOptionValue(o.b_errorRate, parser, "barcode-error-rate");
@@ -899,6 +904,11 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		
 		getOptionValue(o.a_min_overlap, parser, "adapter-min-overlap");
 		*out << "adapter-min-overlap:   " << o.a_min_overlap << endl;
+		
+		if(o.a_min_overlap < 1){
+			cerr << "\nAdapter min-overlap should be 1 at least.\n" << endl;
+			exit(1);
+		}
 		
 		getOptionValue(o.a_errorRate, parser, "adapter-error-rate");
 		*out << "adapter-error-rate:    " << o.a_errorRate << endl;
