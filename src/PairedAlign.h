@@ -76,11 +76,13 @@ public:
 		m_barcodes2 = &o.barcodes2;
 		m_adapters2 = &o.adapters2;
 		
-		m_b1 = new TSeqAlign(m_barcodes, o, o.b_min_overlap, o.b_errorRate, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, true);
-		m_a1 = new TSeqAlign(m_adapters, o, o.a_min_overlap, o.a_errorRate, o.a_tail_len, o.match, o.mismatch, o.gapCost, false);
-		
+		m_b1 = new TSeqAlign(m_barcodes,  o, o.b_min_overlap, o.b_errorRate, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, true);
 		m_b2 = new TSeqAlign(m_barcodes2, o, o.b_min_overlap, o.b_errorRate, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, true);
+		
+		m_a1 = new TSeqAlign(m_adapters,  o, o.a_min_overlap, o.a_errorRate, o.a_tail_len, o.match, o.mismatch, o.gapCost, false);
 		m_a2 = new TSeqAlign(m_adapters2, o, o.a_min_overlap, o.a_errorRate, o.a_tail_len, o.match, o.mismatch, o.gapCost, false);
+		
+		m_p  = new TSeqAlignPair(o, o.a_min_overlap, o.a_errorRate, o.match, o.mismatch, o.gapCost);
 		
 		if(m_log == flexbar::TAB)
 		*out << "ReadTag\tQueryTag\tQueryStart\tQueryEnd\tOverlapLength\tMismatches\tIndels\tAllowedErrors" << std::endl;
@@ -89,9 +91,10 @@ public:
 	
 	virtual ~PairedAlign(){
 		delete m_b1;
-		delete m_a1;
 		delete m_b2;
+		delete m_a1;
 		delete m_a2;
+		delete m_p;
 	};
 	
 	
