@@ -24,7 +24,7 @@ private:
 	tbb::concurrent_vector<unsigned long> m_rmOverlaps;
 	
 	std::ostream *m_out;
-	TAlgorithm algo;
+	TAlgorithm m_algo;
 	
 public:
 	
@@ -44,7 +44,7 @@ public:
 			m_out(o.out),
 			m_nPreShortReads(0),
 			m_modified(0),
-			algo(TAlgorithm(o, match, mismatch, gapCost)){
+			m_algo(TAlgorithm(o, match, mismatch, gapCost, ! isBarcoding)){
 		
 		m_queries    = queries;
 		m_rmOverlaps = tbb::concurrent_vector<unsigned long>(flexbar::MAX_READLENGTH + 1, 0);
@@ -119,7 +119,7 @@ public:
 			TAlignResults a;
 			
 			// global sequence alignment
-			algo.alignGlobal(a, alignments, cycle, idxAl++, trimEnd);
+			m_algo.alignGlobal(a, alignments, cycle, idxAl++, trimEnd);
 			
 			a.queryLength = length(m_queries->at(i).seq);
 			a.tailLength  = (m_tailLength > 0) ? m_tailLength : a.queryLength;

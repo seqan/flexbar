@@ -26,7 +26,7 @@ private:
 	
 public:
 	
-	SeqAlignAlgo(const Options &o, const int match, const int mismatch, const int gapCost):
+	SeqAlignAlgo(const Options &o, const int match, const int mismatch, const int gapCost, const bool isAdapterRemoval):
 			m_umiTags(o.umiTags),
 			m_log(o.logAlign){
 		
@@ -38,7 +38,7 @@ public:
 		for(unsigned i = 0; i < ValueSize<TChar>::VALUE; ++i){
 			for(unsigned j = 0; j < ValueSize<TChar>::VALUE; ++j){
 				
-				if(i == j || TChar(j) == 'N')
+				if(i == j || TChar(j) == 'N' || (isAdapterRemoval && TChar(i) == 'N'))
 					 setScore(m_scoreMatrix, TChar(i), TChar(j), match);
 				else setScore(m_scoreMatrix, TChar(i), TChar(j), mismatch);
 			}

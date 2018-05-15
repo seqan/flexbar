@@ -39,7 +39,7 @@ public:
 			m_out(o.out),
 			m_nPreShortReads(0),
 			m_modified(0),
-			m_algo(TAlgorithm(o, match, mismatch, gapCost)){
+			m_algo(TAlgorithm(o, match, mismatch, gapCost, true)){
 		
 		m_rmOverlaps = tbb::concurrent_vector<unsigned long>(flexbar::MAX_READLENGTH + 1, 0);
 	};
@@ -136,7 +136,7 @@ public:
 				  << "  score            " << a.score                             << "\n"
 				  << "  overlap          " << a.overlapLength                     << "\n"
 				  << "  errors           " << a.gapsR + a.gapsA + a.mismatches    << "\n"
-				  << "  error threshold  " << a.allowedErrors                     << "\n";
+				  << "  error threshold  " << a.allowedErrors                     << "\n"
 				  << "  remaining read   " << seqRead.seq                         << "\n";
 				
 				if(m_format == FASTQ)
