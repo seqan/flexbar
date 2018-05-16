@@ -296,7 +296,7 @@ void startProcessing(Options &o){
 	if(o.barDetect != BOFF && ! o.writeUnassigned)
 	*out << "  skipped unassigned reads        " << alignValue(len, alignFilter.getNrUnassignedReads()) << endl;
 	
-	if(o.adapRm != AOFF)
+	if(o.adapRm != AOFF || o.pairOverlap)
 	*out << "  short prior to adapter removal  " << alignValue(len, alignFilter.getNrPreShortReads()) << endl;
 	
 	if(o.qTrim != QOFF && o.qtrimPostRm)

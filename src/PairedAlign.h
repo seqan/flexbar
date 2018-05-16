@@ -406,8 +406,9 @@ public:
 		
 		using namespace flexbar;
 		
-		if(m_adapRem != NORMAL2) return m_a1->getNrPreShortReads();
-		else return m_a1->getNrPreShortReads() + m_a2->getNrPreShortReads();
+		if     (m_pairOverlap)        return m_p->getNrPreShortReads();
+		else if(m_adapRem != NORMAL2) return m_a1->getNrPreShortReads();
+		else                          return m_a1->getNrPreShortReads() + m_a2->getNrPreShortReads();
 	}
 	
 	
