@@ -4,6 +4,7 @@
 #define FLEXBAR_PAIREDALIGN_H
 
 #include "SeqAlign.h"
+#include "SeqAlignPair.h"
 #include "SeqAlignAlgo.h"
 
 
@@ -13,7 +14,7 @@ class PairedAlign : public tbb::filter {
 private:
 	
 	const bool m_writeUnassigned, m_twoBarcodes, m_umiTags, m_useRcTrimEnd;
-	const bool m_htrim, m_htrimAdapterRm, m_htrimMaxFirstOnly;
+	const bool m_htrim, m_htrimAdapterRm, m_htrimMaxFirstOnly, m_pairOverlap;
 	
 	const std::string m_htrimLeft, m_htrimRight;
 	
@@ -36,6 +37,9 @@ private:
 	typedef SeqAlign<TSeqStr, TString, SeqAlignAlgo<TSeqStr> > TSeqAlign;
 	TSeqAlign *m_a1, *m_b1, *m_a2, *m_b2;
 	
+	typedef SeqAlignPair<TSeqStr, TString, SeqAlignAlgo<TSeqStr> > TSeqAlignPair;
+	TSeqAlignPair *m_p;
+	
 	std::ostream *out;
 	
 public:
@@ -48,6 +52,7 @@ public:
 		m_runType(o.runType),
 		m_barType(o.barDetect),
 		m_adapRem(o.adapRm),
+		m_pairOverlap(o.pairOverlap),
 		m_aTrimEnd(o.a_end),
 		m_arcTrimEnd(o.arc_end),
 		m_bTrimEnd(o.b_end),
@@ -72,11 +77,13 @@ public:
 		m_barcodes2 = &o.barcodes2;
 		m_adapters2 = &o.adapters2;
 		
-		m_b1 = new TSeqAlign(m_barcodes, o, o.b_min_overlap, o.b_errorRate, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, true);
-		m_a1 = new TSeqAlign(m_adapters, o, o.a_min_overlap, o.a_errorRate, o.a_tail_len, o.match, o.mismatch, o.gapCost, false);
-		
+		m_b1 = new TSeqAlign(m_barcodes,  o, o.b_min_overlap, o.b_errorRate, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, true);
 		m_b2 = new TSeqAlign(m_barcodes2, o, o.b_min_overlap, o.b_errorRate, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, true);
+		
+		m_a1 = new TSeqAlign(m_adapters,  o, o.a_min_overlap, o.a_errorRate, o.a_tail_len, o.match, o.mismatch, o.gapCost, false);
 		m_a2 = new TSeqAlign(m_adapters2, o, o.a_min_overlap, o.a_errorRate, o.a_tail_len, o.match, o.mismatch, o.gapCost, false);
+		
+		m_p  = new TSeqAlignPair(o, o.p_min_overlap, o.a_errorRate, o.match, o.mismatch, o.gapCost);
 		
 		if(m_log == flexbar::TAB)
 		*out << "ReadTag\tQueryTag\tQueryStart\tQueryEnd\tOverlapLength\tMismatches\tIndels\tAllowedErrors" << std::endl;
@@ -85,9 +92,10 @@ public:
 	
 	virtual ~PairedAlign(){
 		delete m_b1;
-		delete m_a1;
 		delete m_b2;
+		delete m_a1;
 		delete m_a2;
+		delete m_p;
 	};
 	
 	
@@ -95,21 +103,18 @@ public:
 		
 		using namespace flexbar;
 		
-		if(m_barType != BOFF){
+		switch(m_barType){
+			case BARCODE_READ:         pRead->barID  = m_b1->alignSeqRead(pRead->b,  false, alBundle[0], cycle[0], idxAl[0], alMode, m_bTrimEnd); break;
+			case WITHIN_READ_REMOVAL2: pRead->barID2 = m_b2->alignSeqRead(pRead->r2, true,  alBundle[2], cycle[2], idxAl[2], alMode, m_bTrimEnd);
+			case WITHIN_READ_REMOVAL:  pRead->barID  = m_b1->alignSeqRead(pRead->r1, true,  alBundle[1], cycle[1], idxAl[1], alMode, m_bTrimEnd); break;
+			case WITHIN_READ2:         pRead->barID2 = m_b2->alignSeqRead(pRead->r2, false, alBundle[2], cycle[2], idxAl[2], alMode, m_bTrimEnd);
+			case WITHIN_READ:          pRead->barID  = m_b1->alignSeqRead(pRead->r1, false, alBundle[1], cycle[1], idxAl[1], alMode, m_bTrimEnd); break;
+			case BOFF: break;
+		}
+		
+		if(pRead->barID == 0 || (m_twoBarcodes && pRead->barID2 == 0)){
 			
-			switch(m_barType){
-				case BARCODE_READ:         pRead->barID  = m_b1->alignSeqRead(pRead->b,  false, alBundle[0], cycle[0], idxAl[0], alMode, m_bTrimEnd); break;
-				case WITHIN_READ_REMOVAL2: pRead->barID2 = m_b2->alignSeqRead(pRead->r2, true,  alBundle[2], cycle[2], idxAl[2], alMode, m_bTrimEnd);
-				case WITHIN_READ_REMOVAL:  pRead->barID  = m_b1->alignSeqRead(pRead->r1, true,  alBundle[1], cycle[1], idxAl[1], alMode, m_bTrimEnd); break;
-				case WITHIN_READ2:         pRead->barID2 = m_b2->alignSeqRead(pRead->r2, false, alBundle[2], cycle[2], idxAl[2], alMode, m_bTrimEnd);
-				case WITHIN_READ:          pRead->barID  = m_b1->alignSeqRead(pRead->r1, false, alBundle[1], cycle[1], idxAl[1], alMode, m_bTrimEnd); break;
-				case BOFF: break;
-			}
-			
-			if(pRead->barID == 0 || (m_twoBarcodes && pRead->barID2 == 0)){
-				
-				if(cycle[0] != PRELOAD) m_unassigned++;
-			}
+			if(cycle[0] != PRELOAD) m_unassigned++;
 		}
 	}
 	
@@ -118,15 +123,12 @@ public:
 		
 		using namespace flexbar;
 		
-		if(m_adapRem != AOFF){
-			
-			if(m_adapRem != ATWO)
-				m_a1->alignSeqRead(pRead->r1, true, alBundle[0], cycle[0], idxAl[0], alMode, trimEnd);
-			
-			if(pRead->r2 != NULL && m_adapRem != AONE){
-				if(m_adapRem != NORMAL2) m_a1->alignSeqRead(pRead->r2, true, alBundle[1], cycle[1], idxAl[1], alMode, trimEnd);
-				else                     m_a2->alignSeqRead(pRead->r2, true, alBundle[1], cycle[1], idxAl[1], alMode, trimEnd);
-			}
+		if(m_adapRem != ATWO)
+			m_a1->alignSeqRead(pRead->r1, true, alBundle[0], cycle[0], idxAl[0], alMode, trimEnd);
+		
+		if(pRead->r2 != NULL && m_adapRem != AONE){
+			if(m_adapRem != NORMAL2) m_a1->alignSeqRead(pRead->r2, true, alBundle[1], cycle[1], idxAl[1], alMode, trimEnd);
+			else                     m_a2->alignSeqRead(pRead->r2, true, alBundle[1], cycle[1], idxAl[1], alMode, trimEnd);
 		}
 	}
 	
@@ -280,6 +282,25 @@ public:
 			}
 			
 			// adapter removal
+			
+			if(m_pairOverlap){
+				
+				Alignments alignments;
+				
+				unsigned int idxAl = 0;
+				ComputeCycle cycle = PRELOAD;
+				
+				for(unsigned int i = 0; i < prBundle->size(); ++i){
+					m_p->alignSeqReadPair(prBundle->at(i)->r1, prBundle->at(i)->r2, alignments, cycle, idxAl);
+				}
+				
+				idxAl = 0;
+				cycle = COMPUTE;
+				
+				for(unsigned int i = 0; i < prBundle->size(); ++i){
+					m_p->alignSeqReadPair(prBundle->at(i)->r1, prBundle->at(i)->r2, alignments, cycle, idxAl);
+				}
+			}
 			
 			if(m_adapRem != AOFF){
 				

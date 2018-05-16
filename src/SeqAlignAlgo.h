@@ -21,13 +21,14 @@ private:
 	// TScoreSimple m_score;
 	TScoreMatrix m_scoreMatrix;
 	
-	const bool m_umiTags;
+	const bool m_umiTags, m_isAdapterRm;
 	const flexbar::LogAlign m_log;
 	
 public:
 	
-	SeqAlignAlgo(const Options &o, const int match, const int mismatch, const int gapCost):
+	SeqAlignAlgo(const Options &o, const int match, const int mismatch, const int gapCost, const bool isAdapterRm):
 			m_umiTags(o.umiTags),
+			m_isAdapterRm(isAdapterRm),
 			m_log(o.logAlign){
 		
 		using namespace seqan;
@@ -38,7 +39,7 @@ public:
 		for(unsigned i = 0; i < ValueSize<TChar>::VALUE; ++i){
 			for(unsigned j = 0; j < ValueSize<TChar>::VALUE; ++j){
 				
-				if(i == j || TChar(j) == 'N')
+				if(i == j || TChar(j) == 'N' || (TChar(i) == 'N' && isAdapterRm))
 					 setScore(m_scoreMatrix, TChar(i), TChar(j), match);
 				else setScore(m_scoreMatrix, TChar(i), TChar(j), mismatch);
 			}
@@ -125,10 +126,10 @@ public:
 		for(; it1 != end(row1); ++it1){
 			
 			if(a.startPos <= alPos && alPos < a.endPos){
-				     if(isGap(it1))                   ++a.gapsR;
-				else if(isGap(it2))                   ++a.gapsA;
-				else if(*it1 != *it2 && *it2 != 'N')  ++a.mismatches;
-				else if(m_umiTags    && *it2 == 'N')  append(a.umiTag, (TChar) *it1);
+				     if(isGap(it1))                                                       ++a.gapsR;
+				else if(isGap(it2))                                                       ++a.gapsA;
+				else if(*it1 != *it2 && *it2 != 'N' && (*it1 != 'N' || ! m_isAdapterRm))  ++a.mismatches;
+				else if(m_umiTags    && *it2 == 'N')                                      append(a.umiTag, (TChar) *it1);
 			}
 			++alPos;
 			++it2;
