@@ -246,6 +246,8 @@ void startProcessing(Options &o){
 	
 	if(o.writeLengthDist) outputFilter.writeLengthDist();
 	
+	if(o.pairOverlap) alignFilter.printPairOverlapStats();
+	
 	if(o.adapRm != AOFF){
 		outputFilter.printAdapterRemovalStats();
 		alignFilter.printAdapterOverlapStats();

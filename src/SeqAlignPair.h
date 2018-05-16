@@ -202,7 +202,7 @@ public:
 		
 		stringstream s;
 		
-		s << "Min, max, mean and median overlap: ";
+		s << "Min, max, mean and median overlap of paired reads: ";
 		s << min << " / " << max << " / " << mean << " / " << median;
 		
 		return s.str();
