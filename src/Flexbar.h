@@ -192,13 +192,13 @@ void printMessage(Options &o){
 	
 	string s = "Flexbar completed ";
 	
-	if(o.barDetect != BOFF)                      s += "barcode";
-	if(o.barDetect == WITHIN_READ_REMOVAL)       s += " removal within reads";
-	if(o.barDetect == WITHIN_READ)               s += " detection within reads";
-	if(o.barDetect == BARCODE_READ)              s += " detection with separate reads";
-	if(o.barDetect != BOFF && o.adapRm != AOFF)  s += " and ";
-	if(o.barDetect == BOFF && o.adapRm == AOFF)  s += "basic processing";
-	if(o.adapRm    != AOFF)                      s += "adapter removal";
+	if(o.barDetect != BOFF)                                          s += "barcode";
+	if(o.barDetect == WITHIN_READ_REMOVAL)                           s += " removal within reads";
+	if(o.barDetect == WITHIN_READ)                                   s += " detection within reads";
+	if(o.barDetect == BARCODE_READ)                                  s += " detection with separate reads";
+	if(o.barDetect != BOFF && (o.adapRm != AOFF ||   o.pairOverlap)) s += " and ";
+	if(o.barDetect == BOFF &&  o.adapRm == AOFF && ! o.pairOverlap)  s += "basic processing";
+	if(o.adapRm    != AOFF ||  o.pairOverlap)                        s += "adapter removal";
 	
 	*o.out << s << ".\n" << endl;
 	
