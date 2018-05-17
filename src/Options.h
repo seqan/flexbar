@@ -265,6 +265,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "htrim-max-first");
 	setAdvanced(parser, "htrim-adapter");
 	
+	setAdvanced(parser, "version-check");
 	setAdvanced(parser, "man-help");
 	setAdvanced(parser, "bundle");
 	setAdvanced(parser, "interleaved");
@@ -316,6 +317,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setValidValues(parser, "adapter-read-set", "1 2");
 	setValidValues(parser, "adapter-revcomp", "ON ONLY");
 	
+	// setDefaultValue(parser, "version-check", "OFF");
 	setDefaultValue(parser, "target",  "flexbarOut");
 	setDefaultValue(parser, "threads", "1");
 	setDefaultValue(parser, "bundle",  "256");
