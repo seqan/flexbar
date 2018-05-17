@@ -134,7 +134,7 @@ const std::string getFlexbarURL(){
 
 
 const std::string getFlexbarDescription(){
-	return "The program Flexbar preprocesses high-throughput sequencing data efficiently. It demultiplexes barcoded runs and removes adapter sequences. Moreover, trimming and filtering features are provided. Flexbar increases read mapping rates and improves genome as well as transcriptome assemblies. Unique molecular identifiers can be extracted in a flexible way. The program supports sequencing data in fasta and fastq format, e.g. from the Illumina platform.\n\nRefer to the manual (https://github.com/seqan/flexbar/wiki) or contact Johannes Roehr (https://github.com/jtroehr) for support with this application.";
+	return "The program Flexbar preprocesses high-throughput sequencing data efficiently. It demultiplexes barcoded runs and removes adapter sequences. Moreover, trimming and filtering features are provided. Flexbar increases read mapping rates and improves genome as well as transcriptome assemblies. Unique molecular identifiers can be extracted in a flexible way. The program supports sequencing data in fasta and fastq format, e.g. from the Illumina platform. Refer to the manual on github.com/seqan/flexbar/wiki or contact Johannes Roehr on github.com/jtroehr for support with this application.";
 }
 
 
@@ -147,14 +147,13 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setVersion(parser, version);
 	setDate(parser, date);
 	
-	// setCitation(parser, "\n\n" + getFlexbarCitation());
-	
 	// setAppName(parser, "Flexbar");
+	// setCitation(parser, "\n\n" + getFlexbarCitation());
 	// setShortCopyright(parser, "BSD 3-Clause License");
 	// setLongCopyright(parser, "");
 	
-	setShortDescription(parser, "flexible barcode and adapter removal");
 	addDescription(parser, getFlexbarDescription());
+	setShortDescription(parser, "flexible barcode and adapter removal");
 	
 	addUsageLine(parser, "\\fB-r\\fP reads [\\fB-b\\fP barcodes] [\\fB-a\\fP adapters] [options]");
 	
