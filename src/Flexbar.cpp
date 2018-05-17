@@ -6,7 +6,7 @@
    
    BSD 3-Clause License
    
-   uses SeqAn library release 2.2.0
+   uses SeqAn library release 2.4.0
    and TBB library 4.0 or later
    
    
