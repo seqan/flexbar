@@ -202,6 +202,14 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("ai", "adapter-mismatch", "Alignment mismatch score.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ag", "adapter-gap", "Alignment gap score.", ARG::INTEGER));
 	
+	// addSection(parser, "Joining paired reads");
+	// addOption(parser, ArgParseOption("j",  "join", "Align paired reads and join them in case of sufficient overlap."));
+	// addOption(parser, ArgParseOption("jo", "join-min-overlap", "Minimum overlap of adapter and read sequence.", ARG::INTEGER));
+	// addOption(parser, ArgParseOption("jt", "join-error-rate", "Error rate threshold for mismatches and gaps.", ARG::DOUBLE));
+	// addOption(parser, ArgParseOption("jm", "join-match", "Alignment match score.", ARG::INTEGER));
+	// addOption(parser, ArgParseOption("ji", "join-mismatch", "Alignment mismatch score.", ARG::INTEGER));
+	// addOption(parser, ArgParseOption("jg", "join-gap", "Alignment gap score.", ARG::INTEGER));
+	
 	addSection(parser, "Filtering and trimming");
 	addOption(parser, ArgParseOption("u", "max-uncalled", "Allowed uncalled bases N for each read.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("x", "pre-trim-left", "Trim given number of bases on 5' read end before detection.", ARG::INTEGER));
@@ -217,7 +225,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("qa", "qtrim-post-removal", "Perform quality-based trimming after removal steps."));
 	
 	addSection(parser, "Trimming of homopolymers");
-	addOption(parser, ArgParseOption("X", "htrim-left", "Trim certain homopolymers on left read end after removal.", ARG::STRING));
+	addOption(parser, ArgParseOption("X", "htrim-left", "Trim specific homopolymers on left read end after removal.", ARG::STRING));
 	addOption(parser, ArgParseOption("Y", "htrim-right", "Trim certain homopolymers on right read end after removal.", ARG::STRING));
 	addOption(parser, ArgParseOption("M", "htrim-min-length", "Minimum length of homopolymers at read ends.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("L", "htrim-max-length", "Maximum length of homopolymers at read ends.", ARG::INTEGER));
