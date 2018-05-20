@@ -7,5 +7,6 @@ cmake_install.cmake
 # misc
 flexbar
 .DS_Store
+wget-log
 include
 local
