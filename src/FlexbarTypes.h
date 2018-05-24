@@ -132,6 +132,12 @@ namespace flexbar{
 	};
 	
 	
+	enum PairOverlapMode {
+		PODOFF,
+		PODON,
+		PODONLY
+	};
+	
 	enum RevCompMode {
 		RCOFF,
 		RCON,
