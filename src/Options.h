@@ -264,7 +264,6 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "adapter-revcomp-end");
 	setAdvanced(parser, "adapter-tail-length");
 	setAdvanced(parser, "adapter-relaxed");
-	setAdvanced(parser, "adapter-pair-overlap");
 	setAdvanced(parser, "adapter-min-poverlap");
 	setAdvanced(parser, "adapter-read-set");
 	setAdvanced(parser, "adapter-cycles");
@@ -332,7 +331,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setValidValues(parser, "zip-output", "GZ BZ2");
 	setValidValues(parser, "adapter-read-set", "1 2");
 	setValidValues(parser, "adapter-revcomp", "ON ONLY");
-	setValidValues(parser, "adapter-pair-overlap", "OFF ONLY");
+	setValidValues(parser, "adapter-pair-overlap", "ON ONLY");
 	
 	// setDefaultValue(parser, "version-check", "OFF");
 	setDefaultValue(parser, "target",  "flexbarOut");
@@ -856,22 +855,21 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	
 	if(o.isPaired){
 		
-		if(o.adapRm != AOFF) o.poMode = PON;
+		// if(o.adapRm != AOFF) o.poMode = PON;
 		
 		if(isSet(parser, "adapter-pair-overlap")){
 			
 			string pOverlap;
 			getOptionValue(pOverlap, parser, "adapter-pair-overlap");
 			
-			if     (pOverlap == "OFF")   o.poMode = POFF;
+			if     (pOverlap == "ON")    o.poMode = PON;
 			else if(pOverlap == "ONLY")  o.poMode = PONLY;
 			else {
 				cerr << "\nSpecified pair overlap mode is unknown.\n" << endl;
 				exit(1);
 			}
-			if(o.poMode == PONLY || (o.poMode == POFF && o.adapRm != AOFF)){
-				*out << "adapter-pair-overlap:  " << pOverlap << endl;
-			}
+			if(o.adapRm == AOFF && o.poMode == PON) o.poMode = POFF;
+			else *out << "adapter-pair-overlap:  " << pOverlap << endl;
 		}
 	}
 	
