@@ -14,7 +14,7 @@ class PairedAlign : public tbb::filter {
 private:
 	
 	const bool m_writeUnassigned, m_twoBarcodes, m_umiTags, m_useRcTrimEnd;
-	const bool m_htrim, m_htrimAdapterRm, m_htrimMaxFirstOnly, m_pairOverlap;
+	const bool m_htrim, m_htrimAdapterRm, m_htrimMaxFirstOnly;
 	
 	const std::string m_htrimLeft, m_htrimRight;
 	
@@ -29,6 +29,7 @@ private:
 	const flexbar::BarcodeDetect  m_barType;
 	const flexbar::AdapterRemoval m_adapRem;
 	const flexbar::TrimEnd        m_aTrimEnd, m_arcTrimEnd, m_bTrimEnd;
+	const flexbar::PairOverlap    m_poMode;
 	
 	tbb::atomic<unsigned long> m_unassigned;
 	tbb::concurrent_vector<flexbar::TBar> *m_adapters, *m_adapters2;
@@ -52,7 +53,7 @@ public:
 		m_runType(o.runType),
 		m_barType(o.barDetect),
 		m_adapRem(o.adapRm),
-		m_pairOverlap(o.pairOverlap),
+		m_poMode(o.poMode),
 		m_aTrimEnd(o.a_end),
 		m_arcTrimEnd(o.arc_end),
 		m_bTrimEnd(o.b_end),
@@ -283,7 +284,7 @@ public:
 			
 			// adapter removal
 			
-			if(m_pairOverlap){
+			if(m_poMode != POFF){
 				
 				Alignments alignments;
 				
@@ -406,7 +407,7 @@ public:
 		
 		using namespace flexbar;
 		
-		if     (m_pairOverlap)        return m_p->getNrPreShortReads();
+		if     (m_poMode  != POFF)    return m_p->getNrPreShortReads();
 		else if(m_adapRem != NORMAL2) return m_a1->getNrPreShortReads();
 		else                          return m_a1->getNrPreShortReads() + m_a2->getNrPreShortReads();
 	}

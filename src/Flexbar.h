@@ -192,13 +192,13 @@ void printMessage(Options &o){
 	
 	string s = "Flexbar completed ";
 	
-	if(o.barDetect != BOFF)                                          s += "barcode";
-	if(o.barDetect == WITHIN_READ_REMOVAL)                           s += " removal within reads";
-	if(o.barDetect == WITHIN_READ)                                   s += " detection within reads";
-	if(o.barDetect == BARCODE_READ)                                  s += " detection with separate reads";
-	if(o.barDetect != BOFF && (o.adapRm != AOFF ||   o.pairOverlap)) s += " and ";
-	if(o.barDetect == BOFF &&  o.adapRm == AOFF && ! o.pairOverlap)  s += "basic processing";
-	if(o.adapRm    != AOFF ||  o.pairOverlap)                        s += "adapter removal";
+	if(o.barDetect != BOFF)                                           s += "barcode";
+	if(o.barDetect == WITHIN_READ_REMOVAL)                            s += " removal within reads";
+	if(o.barDetect == WITHIN_READ)                                    s += " detection within reads";
+	if(o.barDetect == BARCODE_READ)                                   s += " detection with separate reads";
+	if(o.barDetect != BOFF && (o.adapRm != AOFF || o.poMode != POFF)) s += " and ";
+	if(o.barDetect == BOFF &&  o.adapRm == AOFF && o.poMode == POFF)  s += "basic processing";
+	if(o.adapRm    != AOFF ||  o.poMode != POFF)                      s += "adapter removal";
 	
 	*o.out << s << ".\n" << endl;
 	
@@ -246,7 +246,7 @@ void startProcessing(Options &o){
 	
 	if(o.writeLengthDist) outputFilter.writeLengthDist();
 	
-	if(o.pairOverlap) alignFilter.printPairOverlapStats();
+	if(o.poMode != POFF) alignFilter.printPairOverlapStats();
 	
 	if(o.adapRm != AOFF){
 		outputFilter.printAdapterRemovalStats();
@@ -298,7 +298,7 @@ void startProcessing(Options &o){
 	if(o.barDetect != BOFF && ! o.writeUnassigned)
 	*out << "  skipped unassigned reads        " << alignValue(len, alignFilter.getNrUnassignedReads()) << endl;
 	
-	if(o.adapRm != AOFF || o.pairOverlap)
+	if(o.adapRm != AOFF || o.poMode != POFF)
 	*out << "  short prior to adapter removal  " << alignValue(len, alignFilter.getNrPreShortReads()) << endl;
 	
 	if(o.qTrim != QOFF && o.qtrimPostRm)

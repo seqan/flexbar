@@ -41,7 +41,7 @@ struct Options{
 	flexbar::BarcodeDetect   barDetect;
 	flexbar::AdapterRemoval  adapRm;
 	flexbar::RevCompMode     rcMode;
-	flexbar::PairOverlapMode poMode;
+	flexbar::PairOverlap     poMode;
 	
 	tbb::concurrent_vector<flexbar::TBar> barcodes, adapters, barcodes2, adapters2;
 	
@@ -98,7 +98,7 @@ struct Options{
 		barDetect = flexbar::BOFF;
 		adapRm    = flexbar::AOFF;
 		rcMode    = flexbar::RCOFF;
-		poMode    = flexbar::PODOFF;
+		poMode    = flexbar::POFF;
     }
 };
 
@@ -856,24 +856,26 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	
 	if(o.isPaired){
 		
-		o.poMode = PODON;
+		if(o.adapRm != AOFF) o.poMode = PON;
 		
 		if(isSet(parser, "adapter-pair-overlap")){
 			
 			string pOverlap;
 			getOptionValue(pOverlap, parser, "adapter-pair-overlap");
 			
-			if     (pOverlap == "OFF")   o.poMode = PODOFF;
-			else if(pOverlap == "ONLY")  o.poMode = PODONLY;
+			if     (pOverlap == "OFF")   o.poMode = POFF;
+			else if(pOverlap == "ONLY")  o.poMode = PONLY;
 			else {
 				cerr << "\nSpecified pair overlap mode is unknown.\n" << endl;
 				exit(1);
 			}
-			*out << "adapter-pair-overlap:  " << pOverlap << endl;
+			if(o.poMode == PONLY || (o.poMode == POFF && o.adapRm != AOFF)){
+				*out << "adapter-pair-overlap:  " << pOverlap << endl;
+			}
 		}
 	}
 	
-	if(o.adapRm != AOFF || o.poMode == PODONLY){
+	if(o.adapRm != AOFF || o.poMode == PONLY){
 		
 		if(o.adapRm != AOFF){
 			
@@ -962,7 +964,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 			// *out << "adapter-overhang:      " << o.a_overhang << endl;
 		}
 		
-		if(o.poMode != PODOFF){
+		if(o.poMode != POFF){
 			getOptionValue(o.p_min_overlap, parser, "adapter-min-poverlap");
 			*out << "adapter-min-poverlap:  " << o.p_min_overlap << endl;
 			
