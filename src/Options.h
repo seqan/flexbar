@@ -884,6 +884,11 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 				cerr << "\nSpecified adapter trim-end is unknown.\n" << endl;
 				exit(1);
 			}
+			
+			if(o.poMode == PON && o.a_end != RIGHT){
+				cerr << "\nAdapter trim-end should be RIGHT if pair overlap is ON.\n" << endl;
+				exit(1);
+			}
 			*out << "adapter-trim-end:      " << a_trim_end << endl;
 			
 			
