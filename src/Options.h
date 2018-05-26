@@ -195,8 +195,8 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("ax", "adapter-relaxed", "Skip restriction to pass read ends in right and left modes."));
 	addOption(parser, ArgParseOption("ac", "adapter-revcomp", "Include reverse complements of adapters.", ARG::STRING));
 	addOption(parser, ArgParseOption("ad", "adapter-revcomp-end", "Use different trim-end for reverse complements of adapters.", ARG::STRING));
-	addOption(parser, ArgParseOption("ap", "adapter-pair-overlap", "Overlap detection for paired reads.", ARG::STRING));
-	addOption(parser, ArgParseOption("av", "adapter-min-poverlap", "Minimum overlap of paired reads for removal.", ARG::INTEGER));
+	addOption(parser, ArgParseOption("ap", "adapter-pair-overlap", "Overlap detection of paired reads.", ARG::STRING));
+	addOption(parser, ArgParseOption("av", "adapter-min-poverlap", "Minimum overlap of paired reads for detection.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ar", "adapter-read-set", "Consider only single read set for adapters.", ARG::STRING));
 	addOption(parser, ArgParseOption("ay", "adapter-cycles", "Number of adapter removal cycles.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("am", "adapter-match", "Alignment match score.", ARG::INTEGER));
@@ -331,7 +331,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setValidValues(parser, "zip-output", "GZ BZ2");
 	setValidValues(parser, "adapter-read-set", "1 2");
 	setValidValues(parser, "adapter-revcomp", "ON ONLY");
-	setValidValues(parser, "adapter-pair-overlap", "ON ONLY");
+	setValidValues(parser, "adapter-pair-overlap", "ON SHORT ONLY");
 	
 	// setDefaultValue(parser, "version-check", "OFF");
 	setDefaultValue(parser, "target",  "flexbarOut");
@@ -859,12 +859,13 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		getOptionValue(pOverlap, parser, "adapter-pair-overlap");
 		
 		if     (pOverlap == "ON")    o.poMode = PON;
+		else if(pOverlap == "SHORT") o.poMode = PSHORT;
 		else if(pOverlap == "ONLY")  o.poMode = PONLY;
 		else {
 			cerr << "\nSpecified pair overlap mode is unknown.\n" << endl;
 			exit(1);
 		}
-		if(o.adapRm == AOFF && o.poMode == PON) o.poMode = POFF;
+		if(o.adapRm == AOFF && (o.poMode == PON || o.poMode == PSHORT)) o.poMode = POFF;
 		else *out << "adapter-pair-overlap:  " << pOverlap << endl;
 	}
 	
@@ -885,8 +886,8 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 				exit(1);
 			}
 			
-			if(o.poMode == PON && o.a_end != RIGHT){
-				cerr << "\nAdapter trim-end should be RIGHT if pair overlap is ON.\n" << endl;
+			if((o.poMode == PON || o.poMode == PSHORT) && o.a_end != RIGHT){
+				cerr << "\nAdapter trim-end should be RIGHT if pair overlap is ON or SHORT.\n" << endl;
 				exit(1);
 			}
 			*out << "adapter-trim-end:      " << a_trim_end << endl;

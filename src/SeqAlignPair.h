@@ -16,7 +16,7 @@ private:
 	const flexbar::PairOverlap m_poMode;
 	
 	const bool m_writeTag;
-	const int m_minLength, m_minOverlap;
+	const int m_minLength, m_minOverlap, m_aMinOverlap;
 	const float m_errorRate;
 	const unsigned int m_bundleSize;
 	
@@ -31,6 +31,7 @@ public:
 	SeqAlignPair(const Options &o, const int minOverlap, const float errorRate, const int match, const int mismatch, const int gapCost):
 			
 			m_minOverlap(minOverlap),
+			m_aMinOverlap(o.a_min_overlap),
 			m_errorRate(errorRate),
 			m_minLength(o.min_readLen),
 			m_poMode(o.poMode),
@@ -99,11 +100,12 @@ public:
 		if((a.startPosA < a.startPosS || a.endPosA < a.endPosS) && madeErrors <= a.allowedErrors && a.overlapLength >= m_minOverlap){
 			
 			if(a.startPosA < a.startPosS){
-				unsigned int rCutPos = readLength2 - a.startPosS;
 				
-				seqRead2.pairOverlapPos = rCutPos;
+				seqRead2.pairOverlap = true;
 				
-				if(m_poMode == PONLY){
+				if(m_poMode == PONLY || (m_poMode == PSHORT && a.startPosS < m_aMinOverlap)){
+					
+					unsigned int rCutPos = readLength2 - a.startPosS;
 					erase(seqRead2.seq, rCutPos, readLength2);
 					
 					if(m_format == FASTQ)
@@ -114,11 +116,12 @@ public:
 			}
 			
 			if(a.endPosA < a.endPosS){
-				unsigned int rCutPos = readLength - (a.endPosS - a.endPosA);
 				
-				seqRead.pairOverlapPos = rCutPos;
+				seqRead.pairOverlap = true;
 				
-				if(m_poMode == PONLY){
+				if(m_poMode == PONLY || (m_poMode == PSHORT && (a.endPosS - a.endPosA) < m_aMinOverlap)){
+					
+					unsigned int rCutPos = readLength - (a.endPosS - a.endPosA);
 					erase(seqRead.seq, rCutPos, readLength);
 					
 					if(m_format == FASTQ)

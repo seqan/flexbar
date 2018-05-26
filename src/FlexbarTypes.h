@@ -11,15 +11,14 @@ class SeqRead {
 	TSeqStr seq;
 	TString id, qual, umi;
 	
-	bool rmAdapter, rmAdapterRC;
-	unsigned int pairOverlapPos;
+	bool rmAdapter, rmAdapterRC, pairOverlap;
 	
 	SeqRead(TSeqStr& sequence, TString& seqID) :
 		seq(sequence),
 		id(seqID),
 		rmAdapter(false),
 		rmAdapterRC(false),
-		pairOverlapPos(0){
+		pairOverlap(false){
 	}
 	
 	SeqRead(TSeqStr& sequence, TString& seqID, TString& quality) :
@@ -28,7 +27,7 @@ class SeqRead {
 		qual(quality),
 		rmAdapter(false),
 		rmAdapterRC(false),
-		pairOverlapPos(0){
+		pairOverlap(false){
 	}
 };
 
@@ -138,6 +137,7 @@ namespace flexbar{
 	enum PairOverlap {
 		POFF,
 		PON,
+		PSHORT,
 		PONLY
 	};
 	
