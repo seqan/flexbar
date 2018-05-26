@@ -853,24 +853,19 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	
 	// adapter options
 	
-	if(o.isPaired){
+	if(o.isPaired && isSet(parser, "adapter-pair-overlap")){
 		
-		// if(o.adapRm != AOFF) o.poMode = PON;
+		string pOverlap;
+		getOptionValue(pOverlap, parser, "adapter-pair-overlap");
 		
-		if(isSet(parser, "adapter-pair-overlap")){
-			
-			string pOverlap;
-			getOptionValue(pOverlap, parser, "adapter-pair-overlap");
-			
-			if     (pOverlap == "ON")    o.poMode = PON;
-			else if(pOverlap == "ONLY")  o.poMode = PONLY;
-			else {
-				cerr << "\nSpecified pair overlap mode is unknown.\n" << endl;
-				exit(1);
-			}
-			if(o.adapRm == AOFF && o.poMode == PON) o.poMode = POFF;
-			else *out << "adapter-pair-overlap:  " << pOverlap << endl;
+		if     (pOverlap == "ON")    o.poMode = PON;
+		else if(pOverlap == "ONLY")  o.poMode = PONLY;
+		else {
+			cerr << "\nSpecified pair overlap mode is unknown.\n" << endl;
+			exit(1);
 		}
+		if(o.adapRm == AOFF && o.poMode == PON) o.poMode = POFF;
+		else *out << "adapter-pair-overlap:  " << pOverlap << endl;
 	}
 	
 	if(o.adapRm != AOFF || o.poMode == PONLY){

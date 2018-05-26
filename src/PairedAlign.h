@@ -267,7 +267,6 @@ public:
 					idxAl.push_back(0);
 					cycle.push_back(PRELOAD);
 				}
-				
 				for(unsigned int i = 0; i < prBundle->size(); ++i){
 					alignPairedReadToBarcodes(prBundle->at(i), alBundle, cycle, idxAl, alMode);
 				}
@@ -276,7 +275,6 @@ public:
 					idxAl[i] = 0;
 					cycle[i] = COMPUTE;
 				}
-				
 				for(unsigned int i = 0; i < prBundle->size(); ++i){
 					alignPairedReadToBarcodes(prBundle->at(i), alBundle, cycle, idxAl, alMode);
 				}
@@ -287,7 +285,6 @@ public:
 			if(m_poMode != POFF){
 				
 				Alignments alignments;
-				
 				unsigned int idxAl = 0;
 				ComputeCycle cycle = PRELOAD;
 				
@@ -308,7 +305,6 @@ public:
 				for(unsigned int c = 0; c < m_arTimes; ++c){
 					
 					flexbar::TrimEnd trimEnd = m_aTrimEnd;
-					
 					unsigned int rc = 1;
 					
 					if(m_useRcTrimEnd){
@@ -336,7 +332,6 @@ public:
 							idxAl.push_back(0);
 							cycle.push_back(PRELOAD);
 						}
-						
 						for(unsigned int i = 0; i < prBundle->size(); ++i){
 							alignPairedReadToAdapters(prBundle->at(i), alBundle, cycle, idxAl, alMode, trimEnd);
 						}
@@ -345,7 +340,6 @@ public:
 							idxAl[i] = 0;
 							cycle[i] = COMPUTE;
 						}
-						
 						for(unsigned int i = 0; i < prBundle->size(); ++i){
 							alignPairedReadToAdapters(prBundle->at(i), alBundle, cycle, idxAl, alMode, trimEnd);
 						}
@@ -355,12 +349,10 @@ public:
 			
 			if(m_umiTags){
 				for(unsigned int i = 0; i < prBundle->size(); ++i){
-					
 					append(prBundle->at(i)->r1->id, prBundle->at(i)->r1->umi);
 					
 					if(prBundle->at(i)->r2 != NULL){
 						append(prBundle->at(i)->r1->id, prBundle->at(i)->r2->umi);
-						
 						append(prBundle->at(i)->r2->id, prBundle->at(i)->r1->umi);
 						append(prBundle->at(i)->r2->id, prBundle->at(i)->r2->umi);
 					}
@@ -369,7 +361,6 @@ public:
 			
 			if(m_htrim){
 				if(m_htrimLeft != ""){
-					
 					for(unsigned int i = 0; i < prBundle->size(); ++i){
 						trimLeftHPS(prBundle->at(i)->r1);
 						
@@ -378,7 +369,6 @@ public:
 					}
 				}
 				if(m_htrimRight != ""){
-					
 					for(unsigned int i = 0; i < prBundle->size(); ++i){
 						trimRightHPS(prBundle->at(i)->r1);
 						
