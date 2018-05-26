@@ -11,8 +11,9 @@ private:
 	
 	typedef AlignResults<TSeqStr> TAlignResults;
 	
-	const flexbar::LogAlign m_log;
-	const flexbar::FileFormat m_format;
+	const flexbar::LogAlign    m_log;
+	const flexbar::FileFormat  m_format;
+	const flexbar::PairOverlap m_poMode;
 	
 	const bool m_isBarcoding, m_writeTag, m_umiTags, m_strictRegion;
 	const int m_minLength, m_minOverlap, m_tailLength;
@@ -36,6 +37,7 @@ public:
 			m_isBarcoding(isBarcoding),
 			m_umiTags(o.umiTags),
 			m_minLength(o.min_readLen),
+			m_poMode(o.poMode),
 			m_log(o.logAlign),
 			m_format(o.format),
 			m_writeTag(o.useRemovalTag),
@@ -129,6 +131,8 @@ public:
 			
 			float madeErrors = static_cast<float>(a.mismatches + a.gapsR + a.gapsA);
 			int minOverlap   = (m_isBarcoding && m_minOverlap == 0) ? a.queryLength : m_minOverlap;
+			
+			if(m_poMode == PON && ! m_isBarcoding && seqRead.pairOverlapPos > 0) minOverlap = 1;
 			
 			bool validAl = true;
 			
