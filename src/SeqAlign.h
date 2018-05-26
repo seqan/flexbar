@@ -132,7 +132,8 @@ public:
 			float madeErrors = static_cast<float>(a.mismatches + a.gapsR + a.gapsA);
 			int minOverlap   = (m_isBarcoding && m_minOverlap == 0) ? a.queryLength : m_minOverlap;
 			
-			if(m_poMode == PON && seqRead.pairOverlap && trimEnd == RIGHT && ! m_isBarcoding) minOverlap = 1;
+			if(! m_isBarcoding && m_poMode == PON && seqRead.pairOverlap &&
+				(trimEnd == RIGHT || trimEnd == RTAIL)) minOverlap = 1;
 			
 			bool validAl = true;
 			

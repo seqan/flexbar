@@ -956,8 +956,9 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 				exit(1);
 			}
 			
-			if((o.poMode == PON || o.poMode == PSHORT) && o.a_end != RIGHT && o.arc_end != RIGHT){
-				cerr << "\nOne adapter trim-end should be RIGHT if pair overlap is ON or SHORT.\n" << endl;
+			if((o.poMode == PON || o.poMode == PSHORT) &&
+				o.a_end != RIGHT && o.a_end != RTAIL && o.arc_end != RIGHT && o.arc_end != RTAIL){
+				cerr << "\nOne adapter trim-end should be RIGHT or RTAIL if pair overlap is ON or SHORT.\n" << endl;
 				exit(1);
 			}
 			
