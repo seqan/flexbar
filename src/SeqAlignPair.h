@@ -11,8 +11,9 @@ private:
 	
 	typedef AlignResults<TSeqStr> TAlignResults;
 	
-	const flexbar::LogAlign m_log;
-	const flexbar::FileFormat m_format;
+	const flexbar::LogAlign    m_log;
+	const flexbar::FileFormat  m_format;
+	const flexbar::PairOverlap m_poMode;
 	
 	const bool m_writeTag;
 	const int m_minLength, m_minOverlap;
@@ -32,6 +33,7 @@ public:
 			m_minOverlap(minOverlap),
 			m_errorRate(errorRate),
 			m_minLength(o.min_readLen),
+			m_poMode(o.poMode),
 			m_log(o.logAlign),
 			m_format(o.format),
 			m_writeTag(o.useRemovalTag),
@@ -99,23 +101,31 @@ public:
 			if(a.startPosA < a.startPosS){
 				unsigned int rCutPos = readLength2 - a.startPosS;
 				
-				erase(seqRead2.seq, rCutPos, readLength2);
+				seqRead2.pairOverlapPos = rCutPos;
 				
-				if(m_format == FASTQ)
-				erase(seqRead2.qual, rCutPos, readLength2);
-				
-				if(m_writeTag) append(seqRead2.id, "_Flexbar_removal_PO");
+				if(m_poMode == PONLY){
+					erase(seqRead2.seq, rCutPos, readLength2);
+					
+					if(m_format == FASTQ)
+					erase(seqRead2.qual, rCutPos, readLength2);
+					
+					if(m_writeTag) append(seqRead2.id, "_Flexbar_removal_PO");
+				}
 			}
 			
 			if(a.endPosA < a.endPosS){
 				unsigned int rCutPos = readLength - (a.endPosS - a.endPosA);
 				
-				erase(seqRead.seq, rCutPos, readLength);
+				seqRead.pairOverlapPos = rCutPos;
 				
-				if(m_format == FASTQ)
-				erase(seqRead.qual, rCutPos, readLength);
-				
-				if(m_writeTag) append(seqRead.id, "_Flexbar_removal_PO");
+				if(m_poMode == PONLY){
+					erase(seqRead.seq, rCutPos, readLength);
+					
+					if(m_format == FASTQ)
+					erase(seqRead.qual, rCutPos, readLength);
+					
+					if(m_writeTag) append(seqRead.id, "_Flexbar_removal_PO");
+				}
 			}
 			
 			++m_modified;
