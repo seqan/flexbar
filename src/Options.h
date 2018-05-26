@@ -99,6 +99,9 @@ struct Options{
 		adapRm    = flexbar::AOFF;
 		rcMode    = flexbar::RCOFF;
 		poMode    = flexbar::POFF;
+		a_end     = flexbar::RIGHT;
+		arc_end   = flexbar::RIGHT;
+		b_end     = flexbar::LTAIL;
     }
 };
 
@@ -885,13 +888,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 				cerr << "\nSpecified adapter trim-end is unknown.\n" << endl;
 				exit(1);
 			}
-			
-			if((o.poMode == PON || o.poMode == PSHORT) && o.a_end != RIGHT){
-				cerr << "\nAdapter trim-end should be RIGHT if pair overlap is ON or SHORT.\n" << endl;
-				exit(1);
-			}
 			*out << "adapter-trim-end:      " << a_trim_end << endl;
-			
 			
 			if(isSet(parser, "adapter-tail-length")){
 				getOptionValue(o.a_tail_len, parser, "adapter-tail-length");
@@ -956,6 +953,11 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 			
 			if(o.a_min_overlap < 1){
 				cerr << "\nAdapter min-overlap should be 1 at least.\n" << endl;
+				exit(1);
+			}
+			
+			if((o.poMode == PON || o.poMode == PSHORT) && o.a_end != RIGHT && o.arc_end != RIGHT){
+				cerr << "\nOne adapter trim-end should be RIGHT if pair overlap is ON or SHORT.\n" << endl;
 				exit(1);
 			}
 			
