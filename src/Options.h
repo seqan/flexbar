@@ -374,8 +374,10 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addText(parser._toolDoc, "\\fBRTAIL:\\fP use only last n bases, see tail-length options",       false);
 	
 	addTextSection(parser, "EXAMPLES");
-	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq \\fB-t\\fP target \\fB-b\\fP brc.fa \\fB-be\\fP LTAIL \\fB-a\\fP adp.fa", false);
-	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq.gz \\fB-q\\fP TAIL \\fB-qf\\fP i1.8 \\fB-a\\fP adp.fa \\fB-ao\\fP 5 \\fB-at\\fP 0.2");
+	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq \\fB-t\\fP target \\fB-q\\fP TAIL \\fB-qf\\fP i1.8", false);
+	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq \\fB-b\\fP barcodes.fa \\fB-be\\fP LTAIL", false);
+	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq \\fB-a\\fP adapters.fa \\fB-ao\\fP 3 \\fB-at\\fP 0.2", false);
+	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP r1.fq \\fB-p\\fP r2.fq \\fB-a\\fP adapters.fa \\fB-ap\\fP ON");
 }
 
 
