@@ -71,7 +71,7 @@ Flexbar needs at least one file with sequencing reads in fasta or fastq format a
 
 	flexbar -r reads [-b barcodes] [-a adapters] [options]
 
-Refer to the help screen `flexbar -h` or [manual](https://github.com/seqan/flexbar/wiki) for more information. Although default parameters of Flexbar are optimized to deliver good results in many scenarios, the adjustment of parameters like `--adapter-min-overlap` might improve results. For tests, make sure `flexbar` is reachable via the path variable and run `flexbar_test.sh` within the test folder.
+Refer to the help screen `flexbar -h` or [manual](https://github.com/seqan/flexbar/wiki) for more information. Although default parameters of Flexbar are optimized to deliver good results in many scenarios, the adjustment of parameters like `--adapter-min-overlap` might improve results. For tests, run `flexbar_test.sh` within the test folder if `flexbar` is reachable via the path variable.
 
 #### Examples
 
