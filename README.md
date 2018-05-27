@@ -9,11 +9,13 @@ Refer to the [manual](https://github.com/seqan/flexbar/wiki) or contact [Johanne
 
 ### References
 
-Johannes T. Roehr, Christoph Dieterich, Knut Reinert: Flexbar 3.0 – SIMD and multicore parallelization. Bioinformatics 2017.
+Johannes T. Roehr, Christoph Dieterich, Knut Reinert:  
+Flexbar 3.0 – SIMD and multicore parallelization. Bioinformatics 2017.
 
 See article on [PubMed](https://www.ncbi.nlm.nih.gov/pubmed/28541403)
 
-Matthias Dodt, Johannes T. Roehr, Rina Ahmed, Christoph Dieterich: Flexbar – flexible barcode and adapter processing for next-generation sequencing platforms. Biology 2012.
+Matthias Dodt, Johannes T. Roehr, Rina Ahmed, Christoph Dieterich:  
+Flexbar – flexible barcode and adapter processing for next-generation sequencing platforms. Biology 2012.
 
 See article on [PubMed](https://www.ncbi.nlm.nih.gov/pubmed/24832523)
 
