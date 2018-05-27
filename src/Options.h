@@ -87,6 +87,7 @@ struct Options{
 		qtrimWinSize   = 0;
 		a_tail_len     = 0;
 		b_tail_len     = 0;
+		a_min_overlap  = 3;
 		b_min_overlap  = 0;
 		htrimMaxLength = 0;
 		
@@ -958,8 +959,8 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 				exit(1);
 			}
 			
-			if((o.poMode == PON || o.poMode == PSHORT) &&
-				o.a_end != RIGHT && o.a_end != RTAIL && o.arc_end != RIGHT && o.arc_end != RTAIL){
+			if((o.poMode == PON || o.poMode == PSHORT) && o.a_end != RIGHT && o.a_end != RTAIL &&
+				(! o.useRcTrimEnd || (o.arc_end != RIGHT && o.arc_end != RTAIL))){
 				cerr << "\nOne adapter trim-end should be RIGHT or RTAIL if pair overlap is ON or SHORT.\n" << endl;
 				exit(1);
 			}
