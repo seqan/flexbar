@@ -102,10 +102,10 @@ public:
 					b2 << barcode2;
 					
 					string s = m_target + "_barcode_" + b1.str();
-					TSeqOutput *of1 = new TSeqOutput(s, barcode1, false, o);
+					TSeqOutput *of1 = new TSeqOutput(s, barcode, false, o);
 					
 					s = m_target + "_barcode_" + b2.str();
-					TSeqOutput *of2 = new TSeqOutput(s, barcode2, false, o);
+					TSeqOutput *of2 = new TSeqOutput(s, barcode, false, o);
 					
 					TOutFiles& f = m_outMap[i + 1];
 					f.f1 = of1;
@@ -125,10 +125,10 @@ public:
 				
 				if(m_writeUnassigned){
 					string s = m_target + "_barcode_unassigned_1";
-					TSeqOutput *of1 = new TSeqOutput(s, "unassigned_1", false, o);
+					TSeqOutput *of1 = new TSeqOutput(s, "unassigned", false, o);
 					
 					s = m_target + "_barcode_unassigned_2";
-					TSeqOutput *of2 = new TSeqOutput(s, "unassigned_2", false, o);
+					TSeqOutput *of2 = new TSeqOutput(s, "unassigned", false, o);
 					
 					TOutFiles& f = m_outMap[0];
 					f.f1 = of1;
@@ -154,10 +154,10 @@ public:
 				m_outMap  = new TOutFiles[m_mapsize];
 				
 				string s = m_target + "_1";
-				TSeqOutput *of1 = new TSeqOutput(s, "1", false, o);
+				TSeqOutput *of1 = new TSeqOutput(s, "", false, o);
 				
 				s = m_target + "_2";
-				TSeqOutput *of2 = new TSeqOutput(s, "2", false, o);
+				TSeqOutput *of2 = new TSeqOutput(s, "", false, o);
 				
 				TOutFiles& f = m_outMap[0];
 				f.f1 = of1;
