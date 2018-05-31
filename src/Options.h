@@ -356,7 +356,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	setDefaultValue(parser, "adapter-trim-end",     "RIGHT");
 	setDefaultValue(parser, "adapter-min-overlap",  "3");
-	setDefaultValue(parser, "adapter-error-rate",   "0.2");
+	setDefaultValue(parser, "adapter-error-rate",   "0.1");
 	setDefaultValue(parser, "adapter-min-poverlap", "40");
 	setDefaultValue(parser, "adapter-cycles",       "1");
 	setDefaultValue(parser, "adapter-match",        "1");
