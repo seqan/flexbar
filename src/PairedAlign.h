@@ -18,10 +18,10 @@ private:
 	
 	const std::string m_htrimLeft, m_htrimRight;
 	
-	const int m_htrimMinLength, m_htrimMaxLength;
-	const float m_htrimErrorRate;
-	
+	const unsigned int m_htrimMinLength, m_htrimMinLength2, m_htrimMaxLength;
 	const unsigned int m_arTimes;
+	
+	const float m_htrimErrorRate;
 	
 	const flexbar::FileFormat     m_format;
 	const flexbar::LogAlign       m_log;
@@ -64,6 +64,7 @@ public:
 		m_htrimLeft(o.htrimLeft),
 		m_htrimRight(o.htrimRight),
 		m_htrimMinLength(o.htrimMinLength),
+		m_htrimMinLength2(o.htrimMinLength2),
 		m_htrimMaxLength(o.htrimMaxLength),
 		m_htrimMaxFirstOnly(o.htrimMaxFirstOnly),
 		m_htrimErrorRate(o.h_errorRate),
@@ -169,7 +170,10 @@ public:
 					}
 				}
 				
-				if(cutPos > 0 && cutPos >= m_htrimMinLength){
+				unsigned int htrimMinLength = m_htrimMinLength;
+				if(m_htrimMinLength2 > 0 && s > 0) htrimMinLength = m_htrimMinLength2;
+				
+				if(cutPos > 0 && cutPos >= htrimMinLength){
 					erase(seqRead->seq, 0, cutPos);
 					
 					if(m_format == FASTQ){
@@ -217,7 +221,10 @@ public:
 					}
 				}
 				
-				if(cutPos < seqLen && cutPos <= seqLen - m_htrimMinLength){
+				unsigned int htrimMinLength = m_htrimMinLength;
+				if(m_htrimMinLength2 > 0 && s > 0) htrimMinLength = m_htrimMinLength2;
+				
+				if(cutPos < seqLen && cutPos <= seqLen - htrimMinLength){
 					erase(seqRead->seq, cutPos, length(seqRead->seq));
 					
 					if(m_format == FASTQ){
