@@ -134,6 +134,17 @@ namespace flexbar{
 	};
 	
 	
+	struct Adapters {
+		
+		FString id, info;
+		FSeqStr seq1, seq2, seqc;
+		
+		Adapters(FString aid) :
+			id(aid){
+	    }
+	};
+	
+	
 	enum PairOverlap {
 		POFF,
 		PON,
