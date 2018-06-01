@@ -235,7 +235,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("Y", "htrim-right", "Trim certain homopolymers on right read end after removal.", ARG::STRING));
 	addOption(parser, ArgParseOption("M", "htrim-min-length", "Minimum length of homopolymers at read ends.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("I", "htrim-min-length2", "Minimum length for homopolymers specified after first one.", ARG::INTEGER));
-	addOption(parser, ArgParseOption("L", "htrim-max-length", "Maximum length of homopolymers at left and right read end.", ARG::INTEGER));
+	addOption(parser, ArgParseOption("L", "htrim-max-length", "Maximum length of homopolymers on left and right read end.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("F", "htrim-max-first", "Apply maximum length of homopolymers only for first one."));
 	addOption(parser, ArgParseOption("T", "htrim-error-rate", "Error rate threshold for mismatches.", ARG::DOUBLE));
 	addOption(parser, ArgParseOption("A", "htrim-adapter", "Trim only in case of adapter removal on same side."));

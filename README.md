@@ -30,24 +30,24 @@ Flexbar source code as well as binaries for Linux and Mac OS can be downloaded o
 Make sure that `cmake` is available, as well as development and runtime files of the TBB library 4.0 or later (Intel Threading Building Blocks). For example on Debian systems, install the packages `libtbb-dev` and `libtbb2`. Furthermore, the SeqAn library and a compiler that supports C++14 is required:
 
 * Get SeqAn library version 2.4.0 [here](https://github.com/seqan/seqan/releases/download/seqan-v2.4.0/seqan-library-2.4.0.tar.xz)
-* Download Flexbar 3.2 source code [release](https://github.com/seqan/flexbar/releases)
+* Download Flexbar 3.3 source code [release](https://github.com/seqan/flexbar/releases)
 
 Decompress both files:
 
-	tar xzf flexbar-3.2.0.tar.gz
+	tar xzf flexbar-3.3.0.tar.gz
 	tar xJf seqan-library-2.4.0.tar.xz
 
 Move SeqAn include folder to Flexbar:
 
-	mv seqan-library-2.4.0/include flexbar-3.2.0
+	mv seqan-library-2.4.0/include flexbar-3.3.0
 
 Use these commands for building:
 
-	cd flexbar-3.2.0
+	cd flexbar-3.3.0
 	cmake .
 	make
 
-Flexbar version 2.7 requires SeqAn 2.1.1 instead. Releases prior to 2.7 use the SeqAn 1.4.2 library.
+Flexbar versions from 3.0 up to 3.2 require SeqAn 2.2.0 instead. Flexbar version 2.7 uses SeqAn 2.1.1 and releases prior to 2.7 use the SeqAn 1.4.2 library.
 
 
 ### Binaries
@@ -73,19 +73,25 @@ Flexbar needs at least one file with sequencing reads in fasta or fastq format a
 
 Refer to the help screen `flexbar -h` or [manual](https://github.com/seqan/flexbar/wiki) for more information. Although default parameters of Flexbar are optimized to deliver good results in many scenarios, the adjustment of parameters like `--adapter-min-overlap` might improve results. For tests, run `flexbar_test.sh` within the test folder if `flexbar` is reachable via the path variable.
 
-#### Examples
+#### Quality-based trimming
 
 In this example, reads in fastq format are trimmed based on their quality scores in Illumina version 1.8 format. The TAIL method trims the right end of reads until a quality score equal or higher than the threshold is reached, default 20. The option `--qtrim-threshold` can be used to change the score threshold. Trimmed reads are written to `target.fastq` in same format as the input.
 
 	flexbar -r reads.fq -t target -q TAIL -qf i1.8
 
+#### Demultiplexing with barcodes
+
 Reads that are barcoded on the left end are demultiplexed by specifying a file with barcodes in fasta format. Reads that can be assigned are written to separate files using file names that are based on the names of barcodes in the fasta file.
 
 	flexbar -r reads.fq -b barcodes.fa -be LTAIL
 
+#### Adapter removal single-end
+
 To remove adapter sequences from single-end reads, specify a file with adapters in fasta format. These are removed from the right side of reads per default, if they do not align before the read start. The left side of reads is kept if long enough. The overlap of an adapter and read must have at least length 3 with at most 20% errors in default settings.
 
 	flexbar -r reads.fq -a adapters.fa -ao 3 -at 0.2
+
+#### Adapter removal paired-end
 
 For paired-end libraries, specify both files with paired reads and a fasta file with adapters for removal. Given adapters are trimmed in right mode per default. It is recommended to activate the pair overlap detection in case of normal paired reads. This increases the sensitivity by removing very short parts of adapters if an overlap is detected for a pair.
 
