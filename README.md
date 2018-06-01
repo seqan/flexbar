@@ -87,13 +87,13 @@ Reads that are barcoded on the left end are demultiplexed by specifying a file w
 
 #### Adapter removal single-end
 
-To remove adapter sequences from single-end reads, specify a file with adapters in fasta format. These are removed from the right side of reads per default, if they do not align before the read start. The left side of reads is kept if long enough. The overlap of an adapter and read must have at least length 3 with at most 20% errors in default settings.
+To remove adapter sequences from single-end reads, specify a file with adapters in fasta format. These are removed from the right side of reads per default, if they do not align before the read start. The left side of reads is kept if long enough. The overlap of an adapter and read must have at least length 3 with at most 10% errors in default settings.
 
-	flexbar -r reads.fq -a adapters.fa -ao 3 -at 0.2
+	flexbar -r reads.fq -a adapters.fa -ao 3 -at 0.1
 
 #### Adapter removal paired-end
 
-For paired-end libraries, specify both files with paired reads and a fasta file with adapters for removal. Given adapters are trimmed in right mode per default. It is recommended to activate the pair overlap detection in case of normal paired reads. This increases the sensitivity by removing very short parts of adapters if an overlap is detected for a pair.
+For paired-end libraries, specify both files with paired reads and a fasta file with adapters for removal. Given adapters are trimmed in right mode per default. It is recommended to activate the pair overlap detection in case of standard paired reads. This increases the sensitivity by removing very short parts of adapters if an overlap is detected for a pair.
 
 	flexbar -r r1.fq -p r2.fq -a adapters.fa -ap ON
 
