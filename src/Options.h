@@ -248,16 +248,16 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("f", "fasta-output", "Prefer non-quality format fasta for output."));
 	addOption(parser, ArgParseOption("z", "zip-output", "Direct compression of output files.", ARG::STRING));
 	addOption(parser, ArgParseOption("1", "stdout-reads", "Write reads to stdout, tagged and interleaved if needed."));
-	addOption(parser, ArgParseOption("R", "output-reads", "Output file name for reads instead of target prefix.", ARG::OUTPUT_FILE));
-	addOption(parser, ArgParseOption("D", "output-reads2", "Output file name for reads2 instead of target prefix.", ARG::OUTPUT_FILE));
-	addOption(parser, ArgParseOption("O", "output-log", "Output file name for log instead of target prefix.", ARG::OUTPUT_FILE));
+	addOption(parser, ArgParseOption("R", "output-reads", "Output file for reads instead of target prefix usage.", ARG::OUTPUT_FILE));
+	addOption(parser, ArgParseOption("D", "output-reads2", "Output file for reads2 instead of target prefix usage.", ARG::OUTPUT_FILE));
 	addOption(parser, ArgParseOption("j", "length-dist", "Generate length distribution for read output files."));
 	addOption(parser, ArgParseOption("s", "single-reads", "Write single reads for too short counterparts in pairs."));
 	addOption(parser, ArgParseOption("S", "single-reads-paired", "Write paired single reads with N for short counterparts."));
 	
 	addSection(parser, "Logging and tagging");
 	addOption(parser, ArgParseOption("l", "align-log", "Print chosen read alignments.", ARG::STRING));
-	addOption(parser, ArgParseOption("o", "stdout-log", "Write statistics to console instead of target log file."));
+	addOption(parser, ArgParseOption("o", "stdout-log", "Write statistics to stdout instead of target log file."));
+	addOption(parser, ArgParseOption("O", "output-log", "Output file for logging instead of target prefix usage.", ARG::OUTPUT_FILE));
 	addOption(parser, ArgParseOption("g", "removal-tags", "Tag reads that are subject to adapter or barcode removal."));
 	addOption(parser, ArgParseOption("e", "number-tags", "Replace read tags by ascending number to save space."));
 	addOption(parser, ArgParseOption("d", "umi-tags", "Capture UMIs in reads at barcode or adapter N positions."));
