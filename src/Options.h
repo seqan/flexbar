@@ -489,7 +489,15 @@ void initOptions(Options &o, seqan::ArgumentParser &parser){
 	else{
 		string s;
 		getOptionValue(s, parser, "target");
-		openOutputFile(o.fstrmOut, s + ".log");
+		
+		s = s + ".log";
+		
+		if(isSet(parser, "output-log") && ! o.logStdout){
+			getOptionValue(o.outLogFile, parser, "output-log");
+			s = o.outLogFile;
+		}
+		
+		openOutputFile(o.fstrmOut, s);
 		
 		o.out = &o.fstrmOut;
 		*o.out << endl;
@@ -804,22 +812,27 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		o.writeSingleReads  = false;
 	}
 	
-	if(! o.useStdout && (o.runType == SINGLE || o.runType == PAIRED)){
+	if(! o.useStdout && ! o.writeSingleReads && (o.runType == SINGLE || o.runType == PAIRED)){
 		
-		if(isSet(parser, "output-reads")){
+		if(isSet(parser, "output-reads") && (isSet(parser, "output-reads2") || o.runType == SINGLE)){
 			getOptionValue(o.outReadsFile, parser, "output-reads");
 			*out << "output-reads:          " << o.outReadsFile << endl;
 		}
 		
-		if(isSet(parser, "output-reads2") && isSet(parser, "output-reads")){
+		if(isSet(parser, "output-reads2") && isSet(parser, "output-reads") && o.runType == PAIRED){
 			getOptionValue(o.outReadsFile2, parser, "output-reads2");
 			*out << "output-reads2:         " << o.outReadsFile2 << endl;
+			
+			if(o.outReadsFile == o.outReadsFile2){
+				cerr << "\n" << "Output reads and reads2 file should not be the same.\n" << endl;
+				exit(1);
+			}
 		}
-	}
-	
-	if(isSet(parser, "output-log") && ! o.logStdout){
-		getOptionValue(o.outLogFile, parser, "output-log");
-		*out << "output-log:            " << o.outLogFile << endl;
+		
+		if(o.outLogFile != "" && (o.outLogFile == o.outReadsFile || o.outLogFile == o.outReadsFile2)){
+			cerr << "\n" << "Output log file should not be the same as output reads or reads2 file.\n" << endl;
+			exit(1);
+		}
 	}
 	
 	if(isSet(parser, "fasta-output")) o.switch2Fasta    = true;
