@@ -154,9 +154,15 @@ public:
 				m_outMap  = new TOutFiles[m_mapsize];
 				
 				string s = m_target + "_1";
+				
+				if(o.outReadsFile != "") s = o.outReadsFile;
+				
 				TSeqOutput *of1 = new TSeqOutput(s, "", false, o);
 				
 				s = m_target + "_2";
+				
+				if(o.outReadsFile2 != "") s = o.outReadsFile2;
+				
 				TSeqOutput *of2 = new TSeqOutput(s, "", false, o);
 				
 				TOutFiles& f = m_outMap[0];
@@ -182,6 +188,9 @@ public:
 				m_outMap  = new TOutFiles[m_mapsize];
 				
 				string s = m_target;
+				
+				if(o.outReadsFile != "") s = o.outReadsFile;
+				
 				TSeqOutput *of1 = new TSeqOutput(s, "", false, o);
 				
 				TOutFiles& f = m_outMap[0];
