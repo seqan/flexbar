@@ -15,6 +15,7 @@
 struct Options{
 	
 	std::string readsFile, readsFile2, barReadsFile;
+	std::string outReadsFile, outReadsFile2, outLogFile;
 	std::string barcodeFile, adapterFile, barcode2File, adapter2File;
 	std::string adapterSeq, targetName, logAlignStr, outCompression;
 	std::string htrimLeft, htrimRight;
@@ -56,6 +57,9 @@ struct Options{
 		adapterFile    = "";
 		barcode2File   = "";
 		adapter2File   = "";
+		outReadsFile   = "";
+		outReadsFile2  = "";
+		outLogFile     = "";
 		outCompression = "";
 		htrimLeft      = "";
 		htrimRight     = "";
@@ -244,6 +248,9 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("f", "fasta-output", "Prefer non-quality format fasta for output."));
 	addOption(parser, ArgParseOption("z", "zip-output", "Direct compression of output files.", ARG::STRING));
 	addOption(parser, ArgParseOption("1", "stdout-reads", "Write reads to stdout, tagged and interleaved if needed."));
+	addOption(parser, ArgParseOption("R", "output-reads", "Output file name for reads instead of target prefix.", ARG::OUTPUT_FILE));
+	addOption(parser, ArgParseOption("D", "output-reads2", "Output file name for reads2 instead of target prefix.", ARG::OUTPUT_FILE));
+	addOption(parser, ArgParseOption("O", "output-log", "Output file name for log instead of target prefix.", ARG::OUTPUT_FILE));
 	addOption(parser, ArgParseOption("j", "length-dist", "Generate length distribution for read output files."));
 	addOption(parser, ArgParseOption("s", "single-reads", "Write single reads for too short counterparts in pairs."));
 	addOption(parser, ArgParseOption("S", "single-reads-paired", "Write paired single reads with N for short counterparts."));
@@ -291,9 +298,12 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "man-help");
 	setAdvanced(parser, "bundle");
 	setAdvanced(parser, "interleaved");
-	setAdvanced(parser, "stdout-reads");
 	setAdvanced(parser, "length-dist");
+	setAdvanced(parser, "single-reads");
 	setAdvanced(parser, "single-reads-paired");
+	setAdvanced(parser, "output-reads");
+	setAdvanced(parser, "output-reads2");
+	setAdvanced(parser, "output-log");
 	setAdvanced(parser, "number-tags");
 	setAdvanced(parser, "umi-tags");
 	
@@ -792,6 +802,24 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	if(isSet(parser, "single-reads-paired")){
 		o.writeSingleReadsP = true;
 		o.writeSingleReads  = false;
+	}
+	
+	if(! o.useStdout && (o.runType == SINGLE || o.runType == PAIRED)){
+		
+		if(isSet(parser, "output-reads")){
+			getOptionValue(o.outReadsFile, parser, "output-reads");
+			*out << "output-reads:          " << o.outReadsFile << endl;
+		}
+		
+		if(isSet(parser, "output-reads2") && isSet(parser, "output-reads")){
+			getOptionValue(o.outReadsFile2, parser, "output-reads2");
+			*out << "output-reads2:         " << o.outReadsFile2 << endl;
+		}
+	}
+	
+	if(isSet(parser, "output-log") && ! o.logStdout){
+		getOptionValue(o.outLogFile, parser, "output-log");
+		*out << "output-log:            " << o.outLogFile << endl;
 	}
 	
 	if(isSet(parser, "fasta-output")) o.switch2Fasta    = true;
