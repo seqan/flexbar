@@ -27,7 +27,7 @@ struct Options{
 	
 	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len, p_min_overlap;
 	int qtrimThresh, qtrimWinSize, a_overhang, htrimMinLength, htrimMinLength2, htrimMaxLength;
-	int maxUncalled, min_readLen, a_min_overlap, b_min_overlap, nThreads, bundleSize;
+	int maxUncalled, min_readLen, a_min_overlap, b_min_overlap, nThreads, bundleSize, nBundles;
 	int match, mismatch, gapCost, b_match, b_mismatch, b_gapCost, a_cycles;
 	
 	float a_errorRate, b_errorRate, h_errorRate;
@@ -95,6 +95,7 @@ struct Options{
 		b_min_overlap   = 0;
 		htrimMinLength2 = 0;
 		htrimMaxLength  = 0;
+		nBundles        = 0;
 		
 		format    = flexbar::FASTA;
 		qual      = flexbar::SANGER;
@@ -172,7 +173,8 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	addSection(parser, "Basic options");
 	addOption(parser, ArgParseOption("n", "threads", "Number of threads to employ.", ARG::INTEGER));
-	addOption(parser, ArgParseOption("N", "bundle", "Number of read pairs per thread.", ARG::INTEGER));
+	addOption(parser, ArgParseOption("N", "bundle", "Number of (paired) reads per thread.", ARG::INTEGER));
+	addOption(parser, ArgParseOption("M", "bundles", "Process only certain number of bundles for testing.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("t", "target", "Prefix for output file names or paths.", ARG::OUTPUT_PREFIX));
 	addOption(parser, ArgParseOption("r", "reads", "Fasta/q file or stdin (-) with reads that may contain barcodes.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("p", "reads2", "Second input file of paired reads, gz and bz2 files supported.", ARG::INPUT_FILE));
@@ -297,6 +299,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "version-check");
 	setAdvanced(parser, "man-help");
 	setAdvanced(parser, "bundle");
+	setAdvanced(parser, "bundles");
 	setAdvanced(parser, "interleaved");
 	setAdvanced(parser, "length-dist");
 	setAdvanced(parser, "single-reads");
@@ -537,6 +540,16 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	if(o.bundleSize < 1){
 		cerr << "\n" << "Bundle size should be 1 at least.\n" << endl;
 		exit(1);
+	}
+	
+	if(isSet(parser, "bundles")){
+		getOptionValue(o.nBundles, parser, "bundles");
+		*out << "Number of bundles:     " << o.nBundles << endl << endl;
+		
+		if(o.nBundles < 1){
+			cerr << "\n" << "Number of bundles should be 1 at least.\n" << endl;
+			exit(1);
+		}
 	}
 	
 	getOptionValue(o.targetName, parser, "target");
