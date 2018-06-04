@@ -15,7 +15,7 @@ private:
 	const bool m_isPaired, m_useBarRead, m_useNumberTag, m_interleaved;
 	const unsigned int m_bundleSize;
 	
-	tbb::atomic<unsigned long> m_uncalled, m_uncalledPairs, m_tagCounter;
+	tbb::atomic<unsigned long> m_uncalled, m_uncalledPairs, m_tagCounter, m_nBundles;
 	SeqInput<TSeqStr, TString> *m_f1, *m_f2, *m_b;
 	
 public:
@@ -29,6 +29,7 @@ public:
 		m_isPaired(o.isPaired),
 		m_useBarRead(o.barDetect == flexbar::BARCODE_READ),
 		m_bundleSize(o.bundleSize),
+		m_nBundles(o.nBundles),
 		m_tagCounter(0),
 		m_uncalled(0),
 		m_uncalledPairs(0){
@@ -43,6 +44,8 @@ public:
 		
 		if(m_useBarRead)
 		m_b = new SeqInput<TSeqStr, TString>(o, o.barReadsFile, false, false);
+		
+		if(m_nBundles > 0) ++m_nBundles;
 	}
 	
 	virtual ~PairedInput(){
@@ -61,6 +64,10 @@ public:
 		TStrings ids,      ids2,      idsBR;
 		TStrings quals,    quals2,    qualsBR;
 		TBools   uncalled, uncalled2, uncalledBR;
+		
+		if(m_nBundles > 0){
+			if(m_nBundles-- == 1) return NULL;
+		}
 		
 		unsigned int bundleSize      = m_bundleSize;
 		if(m_interleaved) bundleSize = m_bundleSize * 2;
