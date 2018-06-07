@@ -187,8 +187,8 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("b2", "barcodes2", "Additional barcodes file for second read set in paired mode.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("br", "barcode-reads", "Fasta/q file containing separate barcode reads for detection.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("bo", "barcode-min-overlap", "Minimum overlap of barcode and read. Default: barcode length.", ARG::INTEGER));
-	addOption(parser, ArgParseOption("bt", "barcode-error-rate", "Error rate threshold for mismatches and gaps.", ARG::DOUBLE));
-	addOption(parser, ArgParseOption("be", "barcode-trim-end", "Type of detection, see section trim-end modes.", ARG::STRING));
+	addOption(parser, ArgParseOption("be", "barcode-error-rate", "Error rate threshold for mismatches and gaps.", ARG::DOUBLE));
+	addOption(parser, ArgParseOption("bt", "barcode-trim-end", "Type of detection, see section trim-end modes.", ARG::STRING));
 	addOption(parser, ArgParseOption("bn", "barcode-tail-length", "Region size in tail trim-end modes. Default: barcode length.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("bk", "barcode-keep", "Keep barcodes within reads instead of removal."));
 	addOption(parser, ArgParseOption("bu", "barcode-unassigned", "Include unassigned reads in output generation."));
@@ -202,8 +202,8 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("as", "adapter-seq", "Single adapter sequence as alternative to adapters option.", ARG::STRING));
 	addOption(parser, ArgParseOption("aa", "adapter-preset", "", ARG::STRING));
 	addOption(parser, ArgParseOption("ao", "adapter-min-overlap", "Minimum overlap for removal without pair overlap.", ARG::INTEGER));
-	addOption(parser, ArgParseOption("at", "adapter-error-rate", "Error rate threshold for mismatches and gaps.", ARG::DOUBLE));
-	addOption(parser, ArgParseOption("ae", "adapter-trim-end", "Type of removal, see section trim-end modes.", ARG::STRING));
+	addOption(parser, ArgParseOption("ae", "adapter-error-rate", "Error rate threshold for mismatches and gaps.", ARG::DOUBLE));
+	addOption(parser, ArgParseOption("at", "adapter-trim-end", "Type of removal, see section trim-end modes.", ARG::STRING));
 	addOption(parser, ArgParseOption("an", "adapter-tail-length", "Region size for tail trim-end modes. Default: adapter length.", ARG::INTEGER));
 	// addOption(parser, ArgParseOption("ah", "adapter-overhang", "Overhang at read ends in right and left modes.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ax", "adapter-relaxed", "Skip restriction to pass read ends in right and left modes."));
@@ -246,7 +246,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("h2", "htrim-min-length2", "Minimum length for homopolymers specified after first one.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("hx", "htrim-max-length", "Maximum length of homopolymers on left and right read end.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("hf", "htrim-max-first", "Apply maximum length of homopolymers only for first one."));
-	addOption(parser, ArgParseOption("ht", "htrim-error-rate", "Error rate threshold for mismatches.", ARG::DOUBLE));
+	addOption(parser, ArgParseOption("he", "htrim-error-rate", "Error rate threshold for mismatches.", ARG::DOUBLE));
 	addOption(parser, ArgParseOption("ha", "htrim-adapter", "Trim only in case of adapter removal on same side."));
 	
 	addSection(parser, "Output selection");
@@ -397,8 +397,8 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	addTextSection(parser, "EXAMPLES");
 	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq \\fB-t\\fP target \\fB-q\\fP TAIL \\fB-qf\\fP i1.8", false);
-	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq \\fB-b\\fP barcodes.fa \\fB-be\\fP LTAIL", false);
-	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq \\fB-a\\fP adapters.fa \\fB-ao\\fP 3 \\fB-at\\fP 0.1", false);
+	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq \\fB-b\\fP barcodes.fa \\fB-bt\\fP LTAIL", false);
+	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq \\fB-a\\fP adapters.fa \\fB-ao\\fP 3 \\fB-ae\\fP 0.1", false);
 	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP r1.fq \\fB-p\\fP r2.fq \\fB-a\\fP adapters.fa \\fB-ap\\fP ON", false);
 	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP r1.fq \\fB-p\\fP r2.fq \\fB-aa\\fP TruSeq \\fB-ap\\fP ON");
 }
