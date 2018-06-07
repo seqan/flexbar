@@ -43,6 +43,7 @@ struct Options{
 	flexbar::AdapterRemoval  adapRm;
 	flexbar::RevCompMode     rcMode;
 	flexbar::PairOverlap     poMode;
+	flexbar::AdapterPreset   aPreset;
 	
 	tbb::concurrent_vector<flexbar::TBar> barcodes, adapters, barcodes2, adapters2;
 	
@@ -109,6 +110,7 @@ struct Options{
 		a_end     = flexbar::RIGHT;
 		arc_end   = flexbar::RIGHT;
 		b_end     = flexbar::LTAIL;
+		aPreset   = flexbar::APOFF;
     }
 };
 
@@ -198,6 +200,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("a",  "adapters", "Fasta file with adapters for removal that may contain N.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("a2", "adapters2", "File with extra adapters for second read set in paired mode.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("as", "adapter-seq", "Single adapter sequence as alternative to adapters option.", ARG::STRING));
+	addOption(parser, ArgParseOption("aa", "adapter-preset", "", ARG::STRING));
 	addOption(parser, ArgParseOption("ao", "adapter-min-overlap", "Minimum overlap for removal without pair overlap.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("at", "adapter-error-rate", "Error rate threshold for mismatches and gaps.", ARG::DOUBLE));
 	addOption(parser, ArgParseOption("ae", "adapter-trim-end", "Type of removal, see section trim-end modes.", ARG::STRING));
@@ -266,6 +269,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	
 	hideOption(parser, "version");
+	// hideOption(parser, "adapter-preset");
 	
 	setAdvanced(parser, "barcodes2");
 	setAdvanced(parser, "barcode-tail-length");
@@ -352,6 +356,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setValidValues(parser, "adapter-read-set", "1 2");
 	setValidValues(parser, "adapter-revcomp", "ON ONLY");
 	setValidValues(parser, "adapter-pair-overlap", "ON SHORT ONLY");
+	setValidValues(parser, "adapter-preset", "TruSeq SmallRNA Methyl Ribo Nextera NexteraMP");
 	
 	// setDefaultValue(parser, "version-check", "OFF");
 	setDefaultValue(parser, "target",  "flexbarOut");
@@ -655,6 +660,29 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		getOptionValue(o.adapter2File, parser, "adapters2");
 		*out << "Adapter file 2:        " << o.adapter2File << endl;
 		o.adapRm = NORMAL2;
+	}
+	
+	if(isSet(parser, "adapter-preset")){
+		
+		if(o.adapRm == NORMAL || o.adapRm == NORMAL2){
+			cerr << "\n" << "Please specify either adapter preset or custom adapters.\n" << endl;
+			exit(1);
+		}
+		string aa;
+		getOptionValue(aa, parser, "adapter-preset");
+		
+		     if(aa == "TruSeq")    o.aPreset = TRUSEQ;
+ 		else if(aa == "SmallRNA")  o.aPreset = SMALLRNA;
+ 		else if(aa == "Methyl")    o.aPreset = METHYL;
+ 		else if(aa == "Ribo")      o.aPreset = RIBO;
+ 		else if(aa == "Nextera")   o.aPreset = NEXTERA;
+ 		else if(aa == "NexteraMP") o.aPreset = NEXTERAMP;
+		
+		*out << "Adapter preset:        " << aa << endl;
+		
+		o.adapRm = NORMAL;
+		
+		if(o.isPaired && o.aPreset != SMALLRNA && o.aPreset != RIBO) o.adapRm = NORMAL2;
 	}
 	*out << endl;
 	
