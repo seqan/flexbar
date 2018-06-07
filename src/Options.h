@@ -399,7 +399,8 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq \\fB-t\\fP target \\fB-q\\fP TAIL \\fB-qf\\fP i1.8", false);
 	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq \\fB-b\\fP barcodes.fa \\fB-be\\fP LTAIL", false);
 	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP reads.fq \\fB-a\\fP adapters.fa \\fB-ao\\fP 3 \\fB-at\\fP 0.1", false);
-	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP r1.fq \\fB-p\\fP r2.fq \\fB-a\\fP adapters.fa \\fB-ap\\fP ON");
+	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP r1.fq \\fB-p\\fP r2.fq \\fB-a\\fP adapters.fa \\fB-ap\\fP ON", false);
+	addText(parser._toolDoc, "\\fBflexbar\\fP \\fB-r\\fP r1.fq \\fB-p\\fP r2.fq \\fB-aa\\fP TruSeq \\fB-ap\\fP ON");
 }
 
 
