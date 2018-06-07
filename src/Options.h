@@ -1033,18 +1033,19 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 				string a_read_set;
 				getOptionValue(a_read_set, parser, "adapter-read-set");
 				*out << "adapter-read-set:      " << a_read_set << endl;
-			
+				
 				     if(a_read_set == "1") o.adapRm = AONE;
 				else if(a_read_set == "2") o.adapRm = ATWO;
 			}
 			
 			getOptionValue(o.a_cycles, parser, "adapter-cycles");
-			if(o.a_cycles > 1) *out << "adapter-cycles:        " << o.a_cycles << endl;
 			
 			if(o.a_cycles < 1){
 				cerr << "\nNumber of adapter removal cycles should be 1 at least.\n" << endl;
 				exit(1);
 			}
+			if(o.aPreset == NEXTERAMP && o.a_cycles < 3) o.a_cycles = 3;
+			if(o.a_cycles > 1) *out << "adapter-cycles:        " << o.a_cycles << endl;
 			
 			getOptionValue(o.a_min_overlap, parser, "adapter-min-overlap");
 			*out << "adapter-min-overlap:   " << o.a_min_overlap << endl;
