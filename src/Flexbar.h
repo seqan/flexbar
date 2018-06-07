@@ -27,6 +27,7 @@
 #include "Options.h"
 #include "FlexbarIO.h"
 #include "LoadFasta.h"
+#include "LoadAdapters.h"
 #include "SeqInput.h"
 #include "PairedInput.h"
 #include "PairedOutput.h"
@@ -72,52 +73,65 @@ void loadAdapters(Options &o, const bool secondSet, const bool useAdapterFile){
 	using namespace std;
 	using namespace flexbar;
 	
-	LoadFasta<TSeqStr, TString> lf(o, true);
-	
-	if(useAdapterFile){
+	if(o.aPreset != APOFF){
+		LoadAdapters<TSeqStr, TString> la(o);
 		
-		string adapFile = secondSet ? o.adapter2File : o.adapterFile;
+		la.loadSequences(secondSet);
 		
-		lf.loadSequences(adapFile);
+		if(secondSet) o.adapters2 = la.getAdapters();
+		else          o.adapters  = la.getAdapters();
 		
-		if(secondSet){
-			o.adapters2 = lf.getBars();
+		if(secondSet) la.printAdapters("Adapter2");
+		else          la.printAdapters("Adapter");
+	}
+	else{
+		LoadFasta<TSeqStr, TString> lf(o, true);
+		
+		if(useAdapterFile){
 			
-			if(o.adapters2.size() == 0){
-				cerr << "\nERROR: No adapters found in file.\n" << endl;
-				exit(1);
+			string adapFile = secondSet ? o.adapter2File : o.adapterFile;
+			
+			lf.loadSequences(adapFile);
+			
+			if(secondSet){
+				o.adapters2 = lf.getBars();
+				
+				if(o.adapters2.size() == 0){
+					cerr << "\nERROR: No adapters found in file.\n" << endl;
+					exit(1);
+				}
+			}
+			else{
+				o.adapters = lf.getBars();
+				
+				if(o.adapters.size() == 0){
+					cerr << "\nERROR: No adapters found in file.\n" << endl;
+					exit(1);
+				}
 			}
 		}
 		else{
-			o.adapters = lf.getBars();
-			
-			if(o.adapters.size() == 0){
-				cerr << "\nERROR: No adapters found in file.\n" << endl;
-				exit(1);
+			if(o.rcMode == RCOFF || o.rcMode == RCON){
+				TBar bar;
+				bar.id  = "cmdline";
+				bar.seq = o.adapterSeq;
+				o.adapters.push_back(bar);
 			}
+			if(o.rcMode == RCON || o.rcMode == RCONLY){
+				TSeqStr adapterSeqRC = o.adapterSeq;
+				seqan::reverseComplement(adapterSeqRC);
+				
+				TBar barRC;
+				barRC.id  = "cmdline_rc";
+				barRC.seq = adapterSeqRC;
+				o.adapters.push_back(barRC);
+			}
+			lf.setBars(o.adapters);
 		}
+		
+		if(secondSet) lf.printBars("Adapter2");
+		else          lf.printBars("Adapter");
 	}
-	else{
-		if(o.rcMode == RCOFF || o.rcMode == RCON){
-			TBar bar;
-			bar.id  = "cmdline";
-			bar.seq = o.adapterSeq;
-			o.adapters.push_back(bar);
-		}
-		if(o.rcMode == RCON || o.rcMode == RCONLY){
-			TSeqStr adapterSeqRC = o.adapterSeq;
-			seqan::reverseComplement(adapterSeqRC);
-			
-			TBar barRC;
-			barRC.id  = "cmdline_rc";
-			barRC.seq = adapterSeqRC;
-			o.adapters.push_back(barRC);
-		}
-		lf.setBars(o.adapters);
-	}
-	
-	if(secondSet) lf.printBars("Adapter2");
-	else          lf.printBars("Adapter");
 }
 
 
