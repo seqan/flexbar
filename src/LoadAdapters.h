@@ -4,13 +4,49 @@
 #define FLEXBAR_LOADADAPTERS_H
 
 
+// Oligonucleotide sequences © 2018 Illumina, Inc.  All rights reserved.
+// Obtained from https://support.illumina.com/bulletins/2016/12/what-sequences-do-i-use-for-adapter-trimming.html
+
+namespace flexbar{
+	
+	Adapters TrueSeq_ltht = Adapters("TruSeq");
+	TrueSeq_ltht.seq1 = "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA";
+	TrueSeq_ltht.seq2 = "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT";
+	TrueSeq_ltht.info = "TruSeq LT and TruSeq HT-based kits";
+	
+	Adapters TrueSeq_methyl = Adapters("TrueSeq-Methyl");
+	TrueSeq_methyl.seq1 = "AGATCGGAAGAGCACACGTCTGAAC";
+	TrueSeq_methyl.seq2 = "AGATCGGAAGAGCGTCGTGTAGGGA";
+	TrueSeq_methyl.info = "ScriptSeq and TruSeq DNA Methylation";
+	
+	Adapters TrueSeq_smallRNA = Adapters("TrueSeq-smallRNA");
+	TrueSeq_smallRNA.seq1 = "TGGAATTCTCGGGTGCCAAGG";
+	TrueSeq_smallRNA.info = "TruSeq Small RNA";
+	
+	Adapters TrueSeq_ribo = Adapters("TrueSeq-Ribo");
+	TrueSeq_ribo.seq1 = "AGATCGGAAGAGCACACGTCT";
+	TrueSeq_ribo.info = "TruSeq Ribo Profile";
+	
+	Adapters Nextera_TruSight = Adapters("Nextera-TruSight");
+	Nextera_TruSight.seq1 = "CTGTCTCTTATACACATCT";
+	Nextera_TruSight.seq2 = "CTGTCTCTTATACACATCT";
+	Nextera_TruSight.info = "AmpliSeq, Nextera, Nextera DNA Flex, Nextera DNA, Nextera XT, Nextera Enrichment, Nextera Rapid Capture Enrichment, TruSight Enrichment, TruSight Rapid Capture Enrichment, TruSight HLA";
+	
+	Adapters Nextera_matepair = Adapters("Nextera-Matepair");
+	Nextera_matepair.seq1 = "GATCGGAAGAGCACACGTCTGAACTCCAGTCAC";
+	Nextera_matepair.seq2 = "GATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT";
+	Nextera_matepair.seqc = "CTGTCTCTTATACACATCT";
+	Nextera_matepair.info = "Nextera Mate Pair";
+}
+
+
 template <typename TSeqStr, typename TString>
 class LoadAdapters {
 
 private:
 	
 	std::ostream *out;
-	tbb::concurrent_vector<flexbar::TBar> bars;
+	tbb::concurrent_vector<flexbar::TBar> adapters;
 	
 	const flexbar::RevCompMode m_rcMode;
 	
@@ -66,7 +102,7 @@ public:
 					TBar bar;
 					bar.id  =  ids[i];
 					bar.seq = seqs[i];
-					bars.push_back(bar);
+					adapters.push_back(bar);
 				}
 				
 				if(m_isAdapter && (m_rcMode == RCON || m_rcMode == RCONLY)){
@@ -80,7 +116,7 @@ public:
 					barRC.id        = id;
 					barRC.seq       = seq;
 					barRC.rcAdapter = true;
-					bars.push_back(barRC);
+					adapters.push_back(barRC);
 				}
 			}
 		}
@@ -94,17 +130,17 @@ public:
 	};
 	
 	
-	tbb::concurrent_vector<flexbar::TBar> getBars(){
-		return bars;
+	tbb::concurrent_vector<flexbar::TBar> getAdapters(){
+		return adapters;
 	}
 	
 	
-	void setBars(tbb::concurrent_vector<flexbar::TBar> &newBars){
-		bars = newBars;
+	void setAdapters(tbb::concurrent_vector<flexbar::TBar> &newAdapters){
+		adapters = newAdapters;
 	}
 	
 	
-	void printBars(std::string adapterName) const {
+	void printAdapters(std::string adapterName) const {
 		
 		using namespace std;
 		
@@ -117,15 +153,15 @@ public:
 		
 		*out << adapterName << ":" << string(maxSpaceLen - len, ' ') << "Sequence:" << "\n";
 		
-		for(unsigned int i=0; i < bars.size(); ++i){
-			TString seqTag = bars.at(i).id;
+		for(unsigned int i=0; i < adapters.size(); ++i){
+			TString seqTag = adapters.at(i).id;
 			
 			int whiteSpaceLen = maxSpaceLen - length(seqTag);
 			if(whiteSpaceLen < 2) whiteSpaceLen = 2;
 			
 			string whiteSpace = string(whiteSpaceLen, ' ');
 			
-			*out << seqTag << whiteSpace << bars.at(i).seq << "\n";
+			*out << seqTag << whiteSpace << adapters.at(i).seq << "\n";
 		}
 		*out << endl;
 	}
