@@ -4,12 +4,12 @@
 #define FLEXBAR_LOADADAPTERS_H
 
 
-// Oligonucleotide sequences © 2018 Illumina, Inc.  All rights reserved.
-// Obtained from https://support.illumina.com/bulletins/2016/12/what-sequences-do-i-use-for-adapter-trimming.html
-
 namespace flexbar{
 	
-	Adapters TrueSeq_ltht = Adapters("TruSeq");
+	// Oligonucleotide sequences © 2018 Illumina, Inc.  All rights reserved.
+	// Obtained from https://support.illumina.com/bulletins/2016/12/what-sequences-do-i-use-for-adapter-trimming.html
+	
+	Adapters TrueSeq  = Adapters("TruSeq");
 	TrueSeq_ltht.seq1 = "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA";
 	TrueSeq_ltht.seq2 = "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT";
 	TrueSeq_ltht.info = "TruSeq LT and TruSeq HT-based kits";
@@ -48,13 +48,15 @@ private:
 	std::ostream *out;
 	tbb::concurrent_vector<flexbar::TBar> adapters;
 	
-	const flexbar::RevCompMode m_rcMode;
+	const flexbar::AdapterPreset m_aPreset;
+	const flexbar::RevCompMode   m_rcMode;
 	
 public:
 	
 	LoadAdapters(const Options &o) :
 		
 		out(o.out),
+		m_aPreset(o.aPreset),
 		m_rcMode(o.rcMode){
 	};
 	
@@ -62,81 +64,71 @@ public:
 	virtual ~LoadAdapters(){};
 	
 	
-	void loadSequences(const std::string filePath){
+	void loadSequences(const bool secondSet){
 		
 		using namespace std;
 		using namespace flexbar;
 		
-		seqan::SeqFileIn seqFileIn;
+		Adapters a;
 		
-		setFormat(seqFileIn, seqan::Fasta());
+		     if(m_aPreset == TRUSEQ)    a = TrueSeq;
+		else if(m_aPreset == SMALLRNA)  a = TrueSeq_smallRNA;
+		else if(m_aPreset == METHYL)    a = TrueSeq_methyl;
+		else if(m_aPreset == RIBO)      a = TrueSeq_ribo;
+		else if(m_aPreset == NEXTERA)   a = Nextera_TruSight;
+		else if(m_aPreset == NEXTERAMP) a = Nextera_matepair;
 		
-		if(! open(seqFileIn, filePath.c_str())){
-			cerr << "\nERROR: Could not open file " << filePath << "\n" << endl;
-			exit(1);
+		TString id = a.id;
+		TSeqStr seq;
+		
+		if(! secondSet) seq = a.seq1;
+		else            seq = a.seq2;
+		
+		if(m_rcMode == RCOFF || m_rcMode == RCON){
+			TBar adapter;
+			adapter.id  = id;
+			adapter.seq = seq;
+			adapters.push_back(adapter);
 		}
 		
-		TSeqStrs seqs;
-		TStrings ids;
-		
-		try{
-			readRecords(ids, seqs, seqFileIn);
+		if(m_rcMode == RCON || m_rcMode == RCONLY){
+			TString  idRC = id;
+			TSeqStr seqRC = seq;
 			
-			map<TString, short> idMap;
+			append(idRC, "_rc");
+			seqan::reverseComplement(seqRC);
 			
-			for(unsigned int i = 0; i < length(ids); ++i){
-				
-				if(idMap.count(ids[i]) == 1){
-					cerr << "Two ";
-					
-					if(m_isAdapter) cerr << "adapters";
-					else            cerr << "barcodes";
-					
-					cerr << " have the same name.\n";
-					cerr << "Please use unique names and restart.\n" << endl;
-					exit(1);
-				}
-				else idMap[ids[i]] = 1;
-				
-				if(! m_isAdapter || m_rcMode == RCOFF || m_rcMode == RCON){
-					TBar bar;
-					bar.id  =  ids[i];
-					bar.seq = seqs[i];
-					adapters.push_back(bar);
-				}
-				
-				if(m_isAdapter && (m_rcMode == RCON || m_rcMode == RCONLY)){
-					TString  id =  ids[i];
-					TSeqStr seq = seqs[i];
-					
-					append(id, "_rc");
-					seqan::reverseComplement(seq);
-					
-					TBar barRC;
-					barRC.id        = id;
-					barRC.seq       = seq;
-					barRC.rcAdapter = true;
-					adapters.push_back(barRC);
-				}
-			}
-		}
-		catch(seqan::Exception const &e){
-			cerr << "\nERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
-			close(seqFileIn);
-			exit(1);
+			TBar adapterRC;
+			adapterRC.id        = idRC;
+			adapterRC.seq       = seqRC;
+			adapterRC.rcAdapter = true;
+			adapters.push_back(adapterRC);
 		}
 		
-		close(seqFileIn);
+		if(m_aPreset == NEXTERAMP){
+			TString  idc = id;
+			TSeqStr seqc = a.seqc;
+			
+			append(idc, "_circ");
+			
+			TBar adapter;
+			adapter.id  = idc;
+			adapter.seq = seqc;
+			adapters.push_back(adapter);
+			
+			append(idc, "_rc");
+			seqan::reverseComplement(seqc);
+			
+			TBar adapterRC;
+			adapterRC.id  = idc;
+			adapterRC.seq = seqc;
+			adapters.push_back(adapterRC);
+		}
 	};
 	
 	
 	tbb::concurrent_vector<flexbar::TBar> getAdapters(){
 		return adapters;
-	}
-	
-	
-	void setAdapters(tbb::concurrent_vector<flexbar::TBar> &newAdapters){
-		adapters = newAdapters;
 	}
 	
 	
