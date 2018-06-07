@@ -145,6 +145,17 @@ namespace flexbar{
 	};
 	
 	
+	enum AdapterPreset {
+		APOFF,
+		TRUSEQ,
+		SMALLRNA,
+		METHYL,
+		RIBO,
+		NEXTERA,
+		NEXTERAMP
+	};
+	
+	
 	enum PairOverlap {
 		POFF,
 		PON,
