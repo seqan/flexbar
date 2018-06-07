@@ -983,6 +983,11 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 			}
 			*out << "adapter-trim-end:      " << a_trim_end << endl;
 			
+			if(o.aPreset != APOFF && o.a_end != RIGHT){
+				cerr << "\nAdapter trim-end should be RIGHT for adapter presets.\n" << endl;
+				exit(1);
+			}
+			
 			if(isSet(parser, "adapter-tail-length")){
 				getOptionValue(o.a_tail_len, parser, "adapter-tail-length");
 				*out << "adapter-tail-length:   " << o.a_tail_len << endl;
