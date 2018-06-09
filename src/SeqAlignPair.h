@@ -20,7 +20,7 @@ private:
 	const float m_errorRate;
 	const unsigned int m_bundleSize;
 	
-	tbb::atomic<unsigned long> m_nPreShortReads, m_overlaps, m_trimmed;
+	tbb::atomic<unsigned long> m_nPreShortReads, m_overlaps, m_modified;
 	tbb::concurrent_vector<unsigned long> m_overlapLengths;
 	
 	std::ostream *m_out;
@@ -42,7 +42,7 @@ public:
 			m_out(o.out),
 			m_nPreShortReads(0),
 			m_overlaps(0),
-			m_trimmed(0),
+			m_modified(0),
 			m_algo(TAlgorithm(o, match, mismatch, gapCost, true)){
 		
 		m_overlapLengths = tbb::concurrent_vector<unsigned long>(flexbar::MAX_READLENGTH + 1, 0);
@@ -112,7 +112,7 @@ public:
 					if(m_format == FASTQ)
 					erase(seqRead2.qual, rCutPos, readLength2);
 					
-					++m_trimmed;
+					++m_modified;
 					
 					if(m_writeTag) append(seqRead2.id, "_Flexbar_removal_PO");
 				}
@@ -130,7 +130,7 @@ public:
 					if(m_format == FASTQ)
 					erase(seqRead.qual, rCutPos, readLength);
 					
-					++m_trimmed;
+					++m_modified;
 					
 					if(m_writeTag) append(seqRead.id, "_Flexbar_removal_PO");
 				}
@@ -220,9 +220,9 @@ public:
 		
 		stringstream s;
 		
-		if(m_trimmed > 0){
+		if(m_modified > 0){
 			s << "Number of trimmed reads based on pair overlap:     ";
-			s << m_trimmed << "\n";
+			s << m_modified << "\n";
 		}
 		
 		s << "Min, max, mean and median overlap of paired reads: ";
