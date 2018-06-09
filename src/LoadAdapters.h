@@ -55,7 +55,6 @@ public:
 		Adapters Nextera_TruSight;
 		Nextera_TruSight.id   = "Nextera-TruSight";
 		Nextera_TruSight.seq1 = "CTGTCTCTTATACACATCT";
-		Nextera_TruSight.seq2 = "CTGTCTCTTATACACATCT";
 		Nextera_TruSight.info = "AmpliSeq, Nextera, Nextera DNA Flex, Nextera DNA, Nextera XT, Nextera Enrichment, Nextera Rapid Capture Enrichment, TruSight Enrichment, TruSight Rapid Capture Enrichment, TruSight HLA";
 		
 		Adapters Nextera_matepair;
