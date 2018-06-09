@@ -25,50 +25,52 @@ public:
 		m_aPreset(o.aPreset),
 		m_rcMode(o.rcMode){
 		
+		using namespace flexbar;
+		
 		// Oligonucleotide sequences © 2018 Illumina, Inc.  All rights reserved.
 		// Obtained from https://support.illumina.com/bulletins/2016/12/what-sequences-do-i-use-for-adapter-trimming.html
 		
-		flexbar::Adapters TrueSeq;
+		Adapters TrueSeq;
 		TrueSeq.id   = "TruSeq";
 		TrueSeq.seq1 = "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA";
 		TrueSeq.seq2 = "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT";
 		TrueSeq.info = "TruSeq LT and TruSeq HT-based kits";
 		
-		flexbar::Adapters TrueSeq_methyl;
+		Adapters TrueSeq_methyl;
 		TrueSeq_methyl.id   = "TrueSeq-Methyl";
 		TrueSeq_methyl.seq1 = "AGATCGGAAGAGCACACGTCTGAAC";
 		TrueSeq_methyl.seq2 = "AGATCGGAAGAGCGTCGTGTAGGGA";
 		TrueSeq_methyl.info = "ScriptSeq and TruSeq DNA Methylation";
 		
-		flexbar::Adapters TrueSeq_smallRNA;
+		Adapters TrueSeq_smallRNA;
 		TrueSeq_smallRNA.id   = "TrueSeq-smallRNA";
 		TrueSeq_smallRNA.seq1 = "TGGAATTCTCGGGTGCCAAGG";
 		TrueSeq_smallRNA.info = "TruSeq Small RNA";
 		
-		flexbar::Adapters TrueSeq_ribo;
+		Adapters TrueSeq_ribo;
 		TrueSeq_ribo.id   = "TrueSeq-Ribo";
 		TrueSeq_ribo.seq1 = "AGATCGGAAGAGCACACGTCT";
 		TrueSeq_ribo.info = "TruSeq Ribo Profile";
 		
-		flexbar::Adapters Nextera_TruSight;
+		Adapters Nextera_TruSight;
 		Nextera_TruSight.id   = "Nextera-TruSight";
 		Nextera_TruSight.seq1 = "CTGTCTCTTATACACATCT";
 		Nextera_TruSight.seq2 = "CTGTCTCTTATACACATCT";
 		Nextera_TruSight.info = "AmpliSeq, Nextera, Nextera DNA Flex, Nextera DNA, Nextera XT, Nextera Enrichment, Nextera Rapid Capture Enrichment, TruSight Enrichment, TruSight Rapid Capture Enrichment, TruSight HLA";
 		
-		flexbar::Adapters Nextera_matepair;
+		Adapters Nextera_matepair;
 		Nextera_matepair.id   = "Nextera-Matepair";
 		Nextera_matepair.seq1 = "GATCGGAAGAGCACACGTCTGAACTCCAGTCAC";
 		Nextera_matepair.seq2 = "GATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT";
 		Nextera_matepair.seqc = "CTGTCTCTTATACACATCT";
 		Nextera_matepair.info = "Nextera Mate Pair";
 		
-		     if(m_aPreset == flexbar::TRUSEQ)    a = TrueSeq;
-		else if(m_aPreset == flexbar::SMALLRNA)  a = TrueSeq_smallRNA;
-		else if(m_aPreset == flexbar::METHYL)    a = TrueSeq_methyl;
-		else if(m_aPreset == flexbar::RIBO)      a = TrueSeq_ribo;
-		else if(m_aPreset == flexbar::NEXTERA)   a = Nextera_TruSight;
-		else if(m_aPreset == flexbar::NEXTERAMP) a = Nextera_matepair;
+		     if(m_aPreset == TRUSEQ)    a = TrueSeq;
+		else if(m_aPreset == SMALLRNA)  a = TrueSeq_smallRNA;
+		else if(m_aPreset == METHYL)    a = TrueSeq_methyl;
+		else if(m_aPreset == RIBO)      a = TrueSeq_ribo;
+		else if(m_aPreset == NEXTERA)   a = Nextera_TruSight;
+		else if(m_aPreset == NEXTERAMP) a = Nextera_matepair;
 	};
 	
 	
