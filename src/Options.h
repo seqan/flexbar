@@ -207,10 +207,10 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("an", "adapter-tail-length", "Region size for tail trim-end modes. Default: adapter length.", ARG::INTEGER));
 	// addOption(parser, ArgParseOption("ah", "adapter-overhang", "Overhang at read ends in right and left modes.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ax", "adapter-relaxed", "Skip restriction to pass read ends in right and left modes."));
-	addOption(parser, ArgParseOption("ac", "adapter-revcomp", "Include reverse complements of adapters.", ARG::STRING));
-	addOption(parser, ArgParseOption("ad", "adapter-revcomp-end", "Use different trim-end for reverse complements of adapters.", ARG::STRING));
 	addOption(parser, ArgParseOption("ap", "adapter-pair-overlap", "Overlap detection of paired reads.", ARG::STRING));
 	addOption(parser, ArgParseOption("av", "adapter-min-poverlap", "Minimum overlap of paired reads for detection.", ARG::INTEGER));
+	addOption(parser, ArgParseOption("ac", "adapter-revcomp", "Include reverse complements of adapters.", ARG::STRING));
+	addOption(parser, ArgParseOption("ad", "adapter-revcomp-end", "Use different trim-end for reverse complements of adapters.", ARG::STRING));
 	addOption(parser, ArgParseOption("ar", "adapter-read-set", "Consider only single read set for adapters.", ARG::STRING));
 	addOption(parser, ArgParseOption("ay", "adapter-cycles", "Number of adapter removal cycles.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("am", "adapter-match", "Alignment match score.", ARG::INTEGER));
@@ -280,10 +280,11 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "barcode-gap");
 	
 	setAdvanced(parser, "adapter-seq");
-	setAdvanced(parser, "adapter-revcomp-end");
 	setAdvanced(parser, "adapter-tail-length");
 	setAdvanced(parser, "adapter-relaxed");
 	setAdvanced(parser, "adapter-min-poverlap");
+	setAdvanced(parser, "adapter-revcomp");
+	setAdvanced(parser, "adapter-revcomp-end");
 	setAdvanced(parser, "adapter-read-set");
 	setAdvanced(parser, "adapter-cycles");
 	setAdvanced(parser, "adapter-match");
