@@ -75,7 +75,7 @@ Refer to the help screen `flexbar -h` or [manual](https://github.com/seqan/flexb
 
 #### Quality-based trimming
 
-In this example, reads in fastq format are trimmed based on their quality scores in Illumina version 1.8 format. The TAIL method trims the right end of reads until a quality score equal or higher than the threshold is reached, default 20. The option `--qtrim-threshold` can be used to change the score threshold. Trimmed reads are written to `target.fastq` in same format as the input.
+In this example, reads in fastq format are trimmed based on their quality scores in Illumina version 1.8 format. The TAIL method trims the right end of reads until a quality score equal or higher than the threshold is reached, default 20. Trimmed reads are written to `target.fastq` in same format as the input.
 
 	flexbar -r reads.fq -t target -q TAIL -qf i1.8
 
@@ -83,19 +83,25 @@ In this example, reads in fastq format are trimmed based on their quality scores
 
 Reads that are barcoded on the left end are demultiplexed by specifying a file with barcodes in fasta format. Reads that can be assigned are written to separate files using file names that are based on the names of barcodes in the fasta file.
 
-	flexbar -r reads.fq -b barcodes.fa -be LTAIL
+	flexbar -r reads.fq -b barcodes.fa -bt LTAIL
 
 #### Adapter removal single-end
 
 To remove adapter sequences from single-end reads, specify a file with adapters in fasta format. These are removed from the right side of reads per default, if they do not align before the read start. The left side of reads is kept if long enough. The overlap of an adapter and read must have at least length 3 with at most 10% errors in default settings.
 
-	flexbar -r reads.fq -a adapters.fa -ao 3 -at 0.1
+	flexbar -r reads.fq -a adapters.fa -ao 3 -ae 0.1
 
 #### Adapter removal paired-end
 
 For paired-end libraries, specify both files with paired reads and a fasta file with adapters for removal. Given adapters are trimmed in right mode per default. It is recommended to activate the pair overlap detection in case of standard paired reads. This increases the sensitivity by removing very short parts of adapters if an overlap is detected for a pair.
 
 	flexbar -r r1.fq -p r2.fq -a adapters.fa -ap ON
+
+#### Adapter removal presets
+
+Several adapter presets for Illumina libraries are included in Flexbar. For example, select the `TruSeq` preset for standard TruSeq adapters and specify two read files for paired reads. If a preset is chosen a separate file with adapters is not needed for removal. It is recommended to turn on the pair overlap detection for standard paired-end libraries.
+
+	flexbar -r r1.fq -p r2.fq -aa TruSeq -ap ON
 
 For further examples visit the [manual](https://github.com/seqan/flexbar/wiki) page.
 
