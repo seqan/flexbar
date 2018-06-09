@@ -685,6 +685,11 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		o.adapRm = NORMAL;
 		
 		if(o.isPaired && (o.aPreset == TRUSEQ || o.aPreset == METHYL || o.aPreset == NEXTERAMP)) o.adapRm = NORMAL2;
+		
+		if(! o.isPaired && o.aPreset == NEXTERAMP){
+			cerr << "\n" << "Please provide paired reads for preset NexteraMP.\n" << endl;
+			exit(1);
+		}
 	}
 	*out << endl;
 	
