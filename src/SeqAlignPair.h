@@ -20,8 +20,8 @@ private:
 	const float m_errorRate;
 	const unsigned int m_bundleSize;
 	
-	tbb::atomic<unsigned long> m_nPreShortReads, m_modified;
-	tbb::concurrent_vector<unsigned long> m_rmOverlaps;
+	tbb::atomic<unsigned long> m_nPreShortReads, m_overlaps, m_trimmed;
+	tbb::concurrent_vector<unsigned long> m_overlapLengths;
 	
 	std::ostream *m_out;
 	TAlgorithm m_algo;
@@ -41,10 +41,11 @@ public:
 			m_bundleSize(o.bundleSize),
 			m_out(o.out),
 			m_nPreShortReads(0),
-			m_modified(0),
+			m_overlaps(0),
+			m_trimmed(0),
 			m_algo(TAlgorithm(o, match, mismatch, gapCost, true)){
 		
-		m_rmOverlaps = tbb::concurrent_vector<unsigned long>(flexbar::MAX_READLENGTH + 1, 0);
+		m_overlapLengths = tbb::concurrent_vector<unsigned long>(flexbar::MAX_READLENGTH + 1, 0);
 	};
 	
 	
@@ -111,6 +112,8 @@ public:
 					if(m_format == FASTQ)
 					erase(seqRead2.qual, rCutPos, readLength2);
 					
+					++m_trimmed;
+					
 					if(m_writeTag) append(seqRead2.id, "_Flexbar_removal_PO");
 				}
 			}
@@ -127,14 +130,16 @@ public:
 					if(m_format == FASTQ)
 					erase(seqRead.qual, rCutPos, readLength);
 					
+					++m_trimmed;
+					
 					if(m_writeTag) append(seqRead.id, "_Flexbar_removal_PO");
 				}
 			}
 			
-			++m_modified;
+			++m_overlaps;
 			
 			// store overlap occurrences
-			if(a.overlapLength <= MAX_READLENGTH) m_rmOverlaps.at(a.overlapLength)++;
+			if(a.overlapLength <= MAX_READLENGTH) m_overlapLengths.at(a.overlapLength)++;
 			else cerr << "\nCompile Flexbar with larger max read length for correct overlap stats.\n" << endl;
 			
 			// alignment stats
@@ -191,7 +196,7 @@ public:
 		unsigned int min = numeric_limits<unsigned int>::max();
 		
 		for(unsigned int i = 0; i <= MAX_READLENGTH; ++i){
-			unsigned long lenCount = m_rmOverlaps.at(i);
+			unsigned long lenCount = m_overlapLengths.at(i);
 			
 			if(lenCount > 0 && i < min) min = i;
 			if(lenCount > 0 && i > max) max = i;
@@ -203,7 +208,7 @@ public:
 		halfValues = nValues / 2;
 		
 		for(unsigned int i = 0; i <= MAX_READLENGTH; ++i){
-			cumValues += m_rmOverlaps.at(i);
+			cumValues += m_overlapLengths.at(i);
 			
 			if(cumValues >= halfValues){
 				median = i;
@@ -211,9 +216,14 @@ public:
 			}
 		}
 		
-		if(m_modified > 0) mean = lenSum / m_modified;
+		if(m_overlaps > 0) mean = lenSum / m_overlaps;
 		
 		stringstream s;
+		
+		if(m_trimmed > 0){
+			s << "Number of trimmed reads based on pair overlap:     ";
+			s << m_trimmed << "\n";
+		}
 		
 		s << "Min, max, mean and median overlap of paired reads: ";
 		s << min << " / " << max << " / " << mean << " / " << median;
@@ -227,8 +237,8 @@ public:
 	}
 	
 	
-	unsigned long getNrModifiedReads() const {
-		return m_modified;
+	unsigned long getNrOverlappingReads() const {
+		return m_overlaps;
 	}
 	
 };

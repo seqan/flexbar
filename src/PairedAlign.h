@@ -414,7 +414,7 @@ public:
 		
 		using namespace flexbar;
 		
-		if(m_p->getNrModifiedReads() > 0)
+		if(m_p->getNrOverlappingReads() > 0)
 			*out << m_p->getOverlapStatsString() << "\n\n";
 		
 		if(m_adapRem == AOFF) *out << std::endl;
