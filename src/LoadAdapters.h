@@ -64,6 +64,11 @@ public:
 		Nextera_matepair.seqc = "CTGTCTCTTATACACATCT";
 		Nextera_matepair.info = "Nextera Mate Pair";
 		
+		Adapters IonTorrent;
+		IonTorrent.id   = "IonTorrent";
+		IonTorrent.seq1 = "ATCACCGACTGCCCATAGAGAGGCTGAGAC";
+		IonTorrent.info = "IonTorrent";
+		
 		     if(m_aPreset == TRUSEQ)    a = TrueSeq;
 		else if(m_aPreset == SMALLRNA)  a = TrueSeq_smallRNA;
 		else if(m_aPreset == METHYL)    a = TrueSeq_methyl;
