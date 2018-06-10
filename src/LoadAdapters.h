@@ -67,6 +67,8 @@ public:
 		Adapters IonTorrent;
 		IonTorrent.id   = "IonTorrent";
 		IonTorrent.seq1 = "ATCACCGACTGCCCATAGAGAGGCTGAGAC";
+		IonTorrent.seq1 = "CCATCTCATCCCTGCGTGTCTCCGACTCAG";
+		IonTorrent.seq2 = "CCTCTCTATGGGCAGTCGGTGAT";
 		IonTorrent.info = "IonTorrent";
 		
 		     if(m_aPreset == TRUSEQ)    a = TrueSeq;
