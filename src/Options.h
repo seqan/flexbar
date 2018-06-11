@@ -51,6 +51,9 @@ struct Options{
 	std::fstream fstrmOut;
 	
 	Options(){
+		
+		using namespace flexbar;
+		
 		readsFile      = "";
 		readsFile2     = "";
 		barReadsFile   = "";
@@ -98,19 +101,19 @@ struct Options{
 		htrimMaxLength  = 0;
 		nBundles        = 0;
 		
-		format    = flexbar::FASTA;
-		qual      = flexbar::SANGER;
-		qTrim     = flexbar::QOFF;
-		logAlign  = flexbar::NONE;
-		cmprsType = flexbar::UNCOMPRESSED;
-		barDetect = flexbar::BOFF;
-		adapRm    = flexbar::AOFF;
-		rcMode    = flexbar::RCOFF;
-		poMode    = flexbar::POFF;
-		a_end     = flexbar::RIGHT;
-		arc_end   = flexbar::RIGHT;
-		b_end     = flexbar::LTAIL;
-		aPreset   = flexbar::APOFF;
+		format    = FASTA;
+		qual      = SANGER;
+		qTrim     = QOFF;
+		logAlign  = NONE;
+		cmprsType = UNCOMPRESSED;
+		barDetect = BOFF;
+		adapRm    = AOFF;
+		rcMode    = RCOFF;
+		poMode    = POFF;
+		a_end     = RIGHT;
+		arc_end   = RIGHT;
+		b_end     = LTAIL;
+		aPreset   = APOFF;
     }
 };
 
@@ -596,10 +599,11 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		}
 		getOptionValue(o.readsFile2, parser, "reads2");
 		*out << "Reads file 2:          " << o.readsFile2 << "   (paired run)" << endl;
+		
 		o.runType  = PAIRED;
 		o.isPaired = true;
 		
-		flexbar::FileFormat fformat;
+		FileFormat fformat;
 		checkInputType(o.readsFile2, fformat, false);
 		
 		if(o.format != fformat){
@@ -617,7 +621,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 			getOptionValue(o.barReadsFile, parser, "barcode-reads");
 			*out << "Barcode reads file:    " << o.barReadsFile << endl;
 			
-			flexbar::FileFormat fformat;
+			FileFormat fformat;
 			checkInputType(o.barReadsFile, fformat, false);
 			
 			if(o.format != fformat){
@@ -640,6 +644,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		}
 		
 		if(isSet(parser, "barcodes2") && o.barDetect != BARCODE_READ && o.isPaired){
+			
 			getOptionValue(o.barcode2File, parser, "barcodes2");
 			*out << "Barcode file 2:        " << o.barcode2File << endl;
 			
