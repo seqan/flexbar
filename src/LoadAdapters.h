@@ -31,39 +31,40 @@ public:
 		// Oligonucleotide sequences © 2018 Illumina, Inc.  All rights reserved.
 		// Obtained from https://support.illumina.com/bulletins/2016/12/what-sequences-do-i-use-for-adapter-trimming.html
 		
-		Adapters TrueSeq;
-		TrueSeq.id   = "TruSeq";
-		TrueSeq.seq1 = "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA";
-		TrueSeq.seq2 = "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT";
-		TrueSeq.info = "TruSeq LT and TruSeq HT-based kits";
-		
-		Adapters TrueSeq_methyl;
-		TrueSeq_methyl.id   = "TrueSeq-Methyl";
-		TrueSeq_methyl.seq1 = "AGATCGGAAGAGCACACGTCTGAAC";
-		TrueSeq_methyl.seq2 = "AGATCGGAAGAGCGTCGTGTAGGGA";
-		TrueSeq_methyl.info = "ScriptSeq and TruSeq DNA Methylation";
-		
-		Adapters TrueSeq_smallRNA;
-		TrueSeq_smallRNA.id   = "TrueSeq-smallRNA";
-		TrueSeq_smallRNA.seq1 = "TGGAATTCTCGGGTGCCAAGG";
-		TrueSeq_smallRNA.info = "TruSeq Small RNA";
-		
-		Adapters TrueSeq_ribo;
-		TrueSeq_ribo.id   = "TrueSeq-Ribo";
-		TrueSeq_ribo.seq1 = "AGATCGGAAGAGCACACGTCT";
-		TrueSeq_ribo.info = "TruSeq Ribo Profile";
-		
-		Adapters Nextera_TruSight;
-		Nextera_TruSight.id   = "Nextera-TruSight";
-		Nextera_TruSight.seq1 = "CTGTCTCTTATACACATCT";
-		Nextera_TruSight.info = "AmpliSeq, Nextera, Nextera DNA Flex, Nextera DNA, Nextera XT, Nextera Enrichment, Nextera Rapid Capture Enrichment, TruSight Enrichment, TruSight Rapid Capture Enrichment, TruSight HLA";
-		
-		Adapters Nextera_matepair;
-		Nextera_matepair.id   = "Nextera-Matepair";
-		Nextera_matepair.seq1 = "GATCGGAAGAGCACACGTCTGAACTCCAGTCAC";
-		Nextera_matepair.seq2 = "GATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT";
-		Nextera_matepair.seqc = "CTGTCTCTTATACACATCT";
-		Nextera_matepair.info = "Nextera Mate Pair";
+		if(m_aPreset == TRUSEQ){
+			a.id   = "TruSeq";
+			a.seq1 = "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA";
+			a.seq2 = "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT";
+			a.info = "TruSeq LT and TruSeq HT-based kits";
+		}
+		else if(m_aPreset == METHYL){
+			a.id   = "TrueSeq-Methyl";
+			a.seq1 = "AGATCGGAAGAGCACACGTCTGAAC";
+			a.seq2 = "AGATCGGAAGAGCGTCGTGTAGGGA";
+			a.info = "ScriptSeq and TruSeq DNA Methylation";
+		}
+		else if(m_aPreset == SMALLRNA){
+			a.id   = "TrueSeq-smallRNA";
+			a.seq1 = "TGGAATTCTCGGGTGCCAAGG";
+			a.info = "TruSeq Small RNA";
+		}
+		else if(m_aPreset == RIBO){
+			a.id   = "TrueSeq-Ribo";
+			a.seq1 = "AGATCGGAAGAGCACACGTCT";
+			a.info = "TruSeq Ribo Profile";
+		}
+		else if(m_aPreset == NEXTERA){
+			a.id   = "Nextera-TruSight";
+			a.seq1 = "CTGTCTCTTATACACATCT";
+			a.info = "AmpliSeq, Nextera, Nextera DNA Flex, Nextera DNA, Nextera XT, Nextera Enrichment, Nextera Rapid Capture Enrichment, TruSight Enrichment, TruSight Rapid Capture Enrichment, TruSight HLA";
+		}
+		else if(m_aPreset == NEXTERAMP){
+			a.id   = "Nextera-Matepair";
+			a.seq1 = "GATCGGAAGAGCACACGTCTGAACTCCAGTCAC";
+			a.seq2 = "GATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT";
+			a.seqc = "CTGTCTCTTATACACATCT";
+			a.info = "Nextera Mate Pair";
+		}
 		
 		// IonTorrent sequencing adapters
 		
@@ -73,13 +74,6 @@ public:
 		IonTorrent.seq1 = "CCATCTCATCCCTGCGTGTCTCCGACTCAG";
 		IonTorrent.seq2 = "CCTCTCTATGGGCAGTCGGTGAT";
 		IonTorrent.info = "IonTorrent";
-		
-		     if(m_aPreset == TRUSEQ)    a = TrueSeq;
-		else if(m_aPreset == SMALLRNA)  a = TrueSeq_smallRNA;
-		else if(m_aPreset == METHYL)    a = TrueSeq_methyl;
-		else if(m_aPreset == RIBO)      a = TrueSeq_ribo;
-		else if(m_aPreset == NEXTERA)   a = Nextera_TruSight;
-		else if(m_aPreset == NEXTERAMP) a = Nextera_matepair;
 	};
 	
 	
