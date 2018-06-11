@@ -4,8 +4,6 @@ The program Flexbar preprocesses high-throughput sequencing data efficiently. It
 
 Refer to the [manual](https://github.com/seqan/flexbar/wiki) or contact [Johannes Roehr](https://github.com/jtroehr) for support with this application.
 
-![Flexbar logo](https://github.com/seqan/flexbar/wiki/images/flexbar-logo.png)
-
 
 ### References
 
@@ -18,6 +16,8 @@ Matthias Dodt, Johannes T. Roehr, Rina Ahmed, Christoph Dieterich:
 Flexbar – flexible barcode and adapter processing for next-generation sequencing platforms. Biology 2012.
 
 See article on [PubMed](https://www.ncbi.nlm.nih.gov/pubmed/24832523)
+
+![Flexbar logo](https://github.com/seqan/flexbar/wiki/images/flexbar-logo.png)
 
 
 ### Download
