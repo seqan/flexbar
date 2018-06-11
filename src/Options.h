@@ -542,7 +542,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 	}
 	
 	getOptionValue(o.bundleSize, parser, "bundle");
-	*out << "Bundled fragments:     " << o.bundleSize << endl << endl;
+	*out << "Bundled fragments:     " << o.bundleSize << endl;
 	
 	if(o.bundleSize < 1){
 		cerr << "\n" << "Bundle size should be 1 at least.\n" << endl;
@@ -558,6 +558,7 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 			exit(1);
 		}
 	}
+	else *out << endl;
 	
 	getOptionValue(o.targetName, parser, "target");
 	*out << "Target name:           " << o.targetName << endl;
