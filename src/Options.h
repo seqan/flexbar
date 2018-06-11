@@ -28,7 +28,7 @@ struct Options{
 	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len, p_min_overlap;
 	int qtrimThresh, qtrimWinSize, a_overhang, htrimMinLength, htrimMinLength2, htrimMaxLength;
 	int maxUncalled, min_readLen, a_min_overlap, b_min_overlap, nThreads, bundleSize, nBundles;
-	int match, mismatch, gapCost, b_match, b_mismatch, b_gapCost, a_cycles;
+	int a_match, a_mismatch, a_gapCost, b_match, b_mismatch, b_gapCost, a_cycles;
 	
 	float a_errorRate, b_errorRate, h_errorRate;
 	
@@ -1096,21 +1096,21 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 			exit(1);
 		}
 		
-		getOptionValue(o.match,    parser, "adapter-match");
-		getOptionValue(o.mismatch, parser, "adapter-mismatch");
-		getOptionValue(o.gapCost,  parser, "adapter-gap");
+		getOptionValue(o.a_match,    parser, "adapter-match");
+		getOptionValue(o.a_mismatch, parser, "adapter-mismatch");
+		getOptionValue(o.a_gapCost,  parser, "adapter-gap");
 		
 		*out << "adapter-match:        ";
-		if(o.match >= 0) *out << " ";
-		*out << o.match << endl;
+		if(o.a_match >= 0) *out << " ";
+		*out << o.a_match << endl;
 		
 		*out << "adapter-mismatch:     ";
-		if(o.mismatch >= 0) *out << " ";
-		*out << o.mismatch << endl;
+		if(o.a_mismatch >= 0) *out << " ";
+		*out << o.a_mismatch << endl;
 		
 		*out << "adapter-gap:          ";
-		if(o.gapCost >= 0) *out << " ";
-		*out << o.gapCost << "\n" << endl;
+		if(o.a_gapCost >= 0) *out << " ";
+		*out << o.a_gapCost << "\n" << endl;
 	}
 	
 }

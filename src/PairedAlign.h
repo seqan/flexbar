@@ -82,10 +82,10 @@ public:
 		m_b1 = new TSeqAlign(m_barcodes,  o, o.b_min_overlap, o.b_errorRate, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, true);
 		m_b2 = new TSeqAlign(m_barcodes2, o, o.b_min_overlap, o.b_errorRate, o.b_tail_len, o.b_match, o.b_mismatch, o.b_gapCost, true);
 		
-		m_a1 = new TSeqAlign(m_adapters,  o, o.a_min_overlap, o.a_errorRate, o.a_tail_len, o.match, o.mismatch, o.gapCost, false);
-		m_a2 = new TSeqAlign(m_adapters2, o, o.a_min_overlap, o.a_errorRate, o.a_tail_len, o.match, o.mismatch, o.gapCost, false);
+		m_a1 = new TSeqAlign(m_adapters,  o, o.a_min_overlap, o.a_errorRate, o.a_tail_len, o.a_match, o.a_mismatch, o.a_gapCost, false);
+		m_a2 = new TSeqAlign(m_adapters2, o, o.a_min_overlap, o.a_errorRate, o.a_tail_len, o.a_match, o.a_mismatch, o.a_gapCost, false);
 		
-		m_p  = new TSeqAlignPair(o, o.p_min_overlap, o.a_errorRate, o.match, o.mismatch, o.gapCost);
+		m_p  = new TSeqAlignPair(o, o.p_min_overlap, o.a_errorRate, o.a_match, o.a_mismatch, o.a_gapCost);
 		
 		if(m_log == flexbar::TAB)
 		*out << "ReadTag\tQueryTag\tQueryStart\tQueryEnd\tOverlapLength\tMismatches\tIndels\tAllowedErrors" << std::endl;
