@@ -27,6 +27,7 @@ public:
 		
 		using namespace flexbar;
 		
+		// Illumina sequencing adapters
 		// Oligonucleotide sequences © 2018 Illumina, Inc.  All rights reserved.
 		// Obtained from https://support.illumina.com/bulletins/2016/12/what-sequences-do-i-use-for-adapter-trimming.html
 		
@@ -63,6 +64,8 @@ public:
 		Nextera_matepair.seq2 = "GATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT";
 		Nextera_matepair.seqc = "CTGTCTCTTATACACATCT";
 		Nextera_matepair.info = "Nextera Mate Pair";
+		
+		// IonTorrent sequencing adapters
 		
 		Adapters IonTorrent;
 		IonTorrent.id   = "IonTorrent";
