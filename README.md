@@ -22,7 +22,7 @@ See article on [PubMed](https://www.ncbi.nlm.nih.gov/pubmed/24832523)
 
 ### Download
 
-Flexbar source code as well as binaries for Linux and Mac OS can be downloaded on the [release](https://github.com/seqan/flexbar/releases) page. Please follow instructions for building or setup of binaries below. Additionally, Flexbar is available via package manager on Debian systems. Versions before 2.4 can be found on the [old](https://sourceforge.net/projects/flexbar) page.
+Flexbar source code as well as binaries for Linux and Mac OS can be downloaded on the [release](https://github.com/seqan/flexbar/releases) page. Please follow instructions for building or setup of binaries below. Additionally, Flexbar is available via package manager on Debian systems and in Conda. Versions before 2.4 can be found on the [old](https://sourceforge.net/projects/flexbar) page.
 
 
 ### Building from source
@@ -99,7 +99,7 @@ For paired-end libraries, specify both files with paired reads and a fasta file 
 
 #### Adapter removal presets
 
-Several adapter presets for Illumina libraries are included in Flexbar. For example, select the `TruSeq` preset for standard TruSeq adapters and specify two read files for paired reads. If a preset is chosen a separate file with adapters is not needed for removal. It is recommended to turn on the pair overlap detection for standard paired-end libraries.
+Several adapter presets for Illumina libraries are included in Flexbar. For example, select the `TruSeq` preset for standard TruSeq adapters and specify two read files for paired reads. If a preset is chosen, a separate file with adapters is not needed for removal. It is recommended to turn on the pair overlap detection for standard paired-end libraries.
 
 	flexbar -r r1.fq -p r2.fq -aa TruSeq -ap ON
 
