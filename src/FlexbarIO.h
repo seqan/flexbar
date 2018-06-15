@@ -9,6 +9,7 @@
 
 #include <fstream>
 #include <seqan/seq_io.h>
+#include <seqan/stream.h>
 
 #if SEQAN_HAS_ZLIB
 #include <zlib.h>
@@ -44,6 +45,53 @@ void openOutputFile(std::fstream &strm, std::string path){
 void closeFile(std::fstream &strm){
 	strm.close();
 }
+
+
+
+namespace seqan{
+	// Your custom file format
+	struct MyFastaAdaptor_;
+	using MyFastaAdaptor = Tag<MyFastaAdaptor_>;
+	
+	// Specilaize sequence input file with custom tag
+	using MySeqFileIn = FormattedFile<Fastq, Input, MyFastaAdaptor>;
+	
+	// Your custom format tag
+	struct MySeqFormat_;
+	using MySeqFormat = Tag<MySeqFormat_>;
+	
+	// The extended TagList containing our custom format
+	using MySeqInFormats = TagList<MySeqFormat, SeqInFormats>;
+	
+	// Overloaded file format metafunction
+	template <>
+	struct FileFormat<FormattedFile<Fastq, Input, MyFastaAdaptor> >{
+	    using Type = TagSelector<MySeqInFormats>;
+	};
+	
+	// Set magic header
+	template <typename T>
+	struct MagicHeader<MySeqFormat, T> : public MagicHeader<Fasta, T>{};
+	
+	// Specify the valid ending for your fasta adaptor
+	template <typename T>
+	struct FileExtensions<MySeqFormat, T>{
+	    static char const * VALUE[1];
+	};
+	
+	template <typename T>
+	char const * FileExtensions<MySeqFormat, T>::VALUE[1] = { ".dat" };
+	
+	// Overload an inner readRecord function to delegate to the actual fasta parser
+	template <typename TIdString, typename TSeqString, typename TSpec>
+	inline void
+	readRecord(TIdString & meta, TSeqString & seq, FormattedFile<Fastq, Input, TSpec> & file, MySeqFormat){
+	    readRecord(meta, seq, file.iter, Fasta());  // Just delegate to Fasta parser
+	}
+	
+	// MySeqFileIn seqFile(path.c_str());
+}
+
 
 
 void checkFileCompression(const std::string path){
