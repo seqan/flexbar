@@ -49,47 +49,94 @@ void closeFile(std::fstream &strm){
 
 
 namespace seqan{
+	
+	// fasta file with dat ending
+	
 	// Your custom file format
-	struct MyFastaAdaptor_;
-	using MyFastaAdaptor = Tag<MyFastaAdaptor_>;
+	struct DatFastaAdaptor_;
+	using DatFastaAdaptor = Tag<DatFastaAdaptor_>;
 	
 	// Specilaize sequence input file with custom tag
-	using MySeqFileIn = FormattedFile<Fastq, Input, MyFastaAdaptor>;
+	using DatFastaSeqFileIn = FormattedFile<Fastq, Input, DatFastaAdaptor>;
 	
 	// Your custom format tag
-	struct MySeqFormat_;
-	using MySeqFormat = Tag<MySeqFormat_>;
+	struct DatFastaSeqFormat_;
+	using DatFastaSeqFormat = Tag<DatFastaSeqFormat_>;
 	
 	// The extended TagList containing our custom format
-	using MySeqInFormats = TagList<MySeqFormat, SeqInFormats>;
+	using DatFastaSeqInFormats = TagList<DatFastaSeqFormat, SeqInFormats>;
 	
 	// Overloaded file format metafunction
 	template <>
-	struct FileFormat<FormattedFile<Fastq, Input, MyFastaAdaptor> >{
-	    using Type = TagSelector<MySeqInFormats>;
+	struct FileFormat<FormattedFile<Fastq, Input, DatFastaAdaptor> >{
+	    using Type = TagSelector<DatFastaSeqInFormats>;
 	};
 	
 	// Set magic header
 	template <typename T>
-	struct MagicHeader<MySeqFormat, T> : public MagicHeader<Fasta, T>{};
+	struct MagicHeader<DatFastaSeqFormat, T> : public MagicHeader<Fasta, T>{};
 	
 	// Specify the valid ending for your fasta adaptor
 	template <typename T>
-	struct FileExtensions<MySeqFormat, T>{
+	struct FileExtensions<DatFastaSeqFormat, T>{
 	    static char const * VALUE[1];
 	};
 	
 	template <typename T>
-	char const * FileExtensions<MySeqFormat, T>::VALUE[1] = { ".dat" };
+	char const * FileExtensions<DatFastaSeqFormat, T>::VALUE[1] = { ".dat" };
 	
 	// Overload an inner readRecord function to delegate to the actual fasta parser
 	template <typename TIdString, typename TSeqString, typename TSpec>
 	inline void
-	readRecord(TIdString & meta, TSeqString & seq, FormattedFile<Fastq, Input, TSpec> & file, MySeqFormat){
+	readRecord(TIdString & meta, TSeqString & seq, FormattedFile<Fastq, Input, TSpec> & file, DatFastaSeqFormat){
 	    readRecord(meta, seq, file.iter, Fasta());  // Just delegate to Fasta parser
 	}
 	
-	// MySeqFileIn seqFile(path.c_str());
+	// DatFastaSeqFileIn seqFile(path.c_str());
+	
+	
+	// fastq file with dat ending
+	
+	// Your custom file format
+	struct DatFastqAdaptor_;
+	using DatFastqAdaptor = Tag<DatFastqAdaptor_>;
+	
+	// Specilaize sequence input file with custom tag
+	using DatFastqSeqFileIn = FormattedFile<Fastq, Input, DatFastqAdaptor>;
+	
+	// Your custom format tag
+	struct DatFastqSeqFormat_;
+	using DatFastqSeqFormat = Tag<DatFastqSeqFormat_>;
+	
+	// The extended TagList containing our custom format
+	using DatFastqSeqInFormats = TagList<DatFastqSeqFormat, SeqInFormats>;
+	
+	// Overloaded file format metafunction
+	template <>
+	struct FileFormat<FormattedFile<Fastq, Input, DatFastqAdaptor> >{
+	    using Type = TagSelector<DatFastqSeqInFormats>;
+	};
+	
+	// Set magic header
+	template <typename T>
+	struct MagicHeader<DatFastqSeqFormat, T> : public MagicHeader<Fastq, T>{};
+	
+	// Specify the valid ending for your fasta adaptor
+	template <typename T>
+	struct FileExtensions<DatFastqSeqFormat, T>{
+	    static char const * VALUE[1];
+	};
+	
+	template <typename T>
+	char const * FileExtensions<DatFastqSeqFormat, T>::VALUE[1] = { ".dat" };
+	
+	// Overload an inner readRecord function to delegate to the actual fasta parser
+	template <typename TIdString, typename TSeqString, typename TSpec>
+	inline void
+	readRecord(TIdString & meta, TSeqString & seq, TIdString & qual, FormattedFile<Fastq, Input, TSpec> & file, DatFastqSeqFormat){
+	    readRecord(meta, seq, qual, file.iter, Fastq());  // Just delegate to Fastq parser
+	}
+	
 }
 
 
@@ -157,7 +204,7 @@ void checkInputType(const std::string path, flexbar::FileFormat &format, const b
 		else if(c == '@') format = FASTQ;
 		else{
 			cerr << "\nERROR: Reads file type not conform.\n";
-			cerr << "Uncompressed fasta or fastq for stdin.\n" << endl;
+			cerr << "Use uncompressed fasta or fastq for stdin.\n" << endl;
 			exit(1);
 		}
 	}
