@@ -15,7 +15,6 @@ private:
 	seqan::SeqFileIn seqFileIn;
 	const flexbar::QualTrimType m_qtrim;
 	const flexbar::FileFormat m_format;
-	// typedef seqan::String<char, seqan::MMap<> > TMMapString;
 	
 	const bool m_preProcess, m_useStdin, m_qtrimPostRm;
 	const int m_maxUncalled, m_preTrimBegin, m_preTrimEnd, m_qtrimThresh, m_qtrimWinSize;
