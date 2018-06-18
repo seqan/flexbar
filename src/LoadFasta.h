@@ -33,19 +33,19 @@ public:
 		using namespace std;
 		using namespace flexbar;
 		
-		seqan::DatFastaSeqFileIn seqFileIn(filePath.c_str());
-		
-		setFormat(seqFileIn, seqan::Fasta());
-		
-		// if(! open(seqFileIn, filePath.c_str())){
-		// 	cerr << "\nERROR: Could not open file " << filePath << "\n" << endl;
-		// 	exit(1);
-		// }
-		
-		TSeqStrs seqs;
-		TStrings ids;
-		
 		try{
+			seqan::DatFastaSeqFileIn seqFileIn(filePath.c_str());
+			
+			setFormat(seqFileIn, seqan::Fasta());
+			
+			// if(! open(seqFileIn, filePath.c_str())){
+			// 	cerr << "\nERROR: Could not open file " << filePath << "\n" << endl;
+			// 	exit(1);
+			// }
+			
+			TSeqStrs seqs;
+			TStrings ids;
+			
 			readRecords(ids, seqs, seqFileIn);
 			
 			map<TString, short> idMap;
@@ -85,14 +85,14 @@ public:
 					bars.push_back(barRC);
 				}
 			}
+			
+			close(seqFileIn);
 		}
 		catch(seqan::Exception const &e){
 			cerr << "\nERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
-			close(seqFileIn);
+			// close(seqFileIn);
 			exit(1);
 		}
-		
-		close(seqFileIn);
 	};
 	
 	
