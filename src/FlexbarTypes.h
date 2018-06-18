@@ -197,12 +197,6 @@ namespace flexbar{
 		RTAIL
 	};
 	
-	enum InputFileEnd {
-		IOFF,
-		DAT,
-		TXT
-	};
-	
 	enum FileFormat {
 		FASTA,
 		FASTQ
