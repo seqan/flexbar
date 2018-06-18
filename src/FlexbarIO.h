@@ -49,7 +49,7 @@ void closeFile(std::fstream &strm){
 
 namespace seqan{
 	
-	// fasta file with dat ending
+	// extension for fasta file with dat ending
 	
 	struct DatFastaAdaptor_;
 	using DatFastaAdaptor = Tag<DatFastaAdaptor_>;
@@ -91,7 +91,7 @@ namespace seqan{
 	}
 	
 	
-	// fastq file with dat ending
+	// extension for fastq file with dat ending
 	
 	struct DatFastqAdaptor_;
 	using DatFastqAdaptor = Tag<DatFastqAdaptor_>;
@@ -135,6 +135,54 @@ namespace seqan{
 	template <typename TIdString, typename TSeqString, typename TSpec>
 	inline void
 	readRecord(TIdString & id, TSeqString & seq, FormattedFile<Fastq, Input, TSpec> & file, DatFastqSeqFormat){
+	    readRecord(id, seq, file.iter, Fasta());  // Delegate to Fasta parser
+	}
+	
+	
+	// extension for fastq file with txt ending
+	
+	struct FlexbarReadsAdaptor_;
+	using FlexbarReadsAdaptor = Tag<FlexbarReadsAdaptor_>;
+	
+	// Specilaize sequence input file with custom tag
+	using FlexbarReadsSeqFileIn = FormattedFile<Fastq, Input, FlexbarReadsAdaptor>;
+	
+	// Your custom format tag
+	struct FlexbarReadsSeqFormat_;
+	using FlexbarReadsSeqFormat = Tag<FlexbarReadsSeqFormat_>;
+	
+	// The extended TagList containing our custom format
+	using FlexbarReadsSeqInFormats = TagList<FlexbarReadsSeqFormat, DatFastqSeqInFormats>;  // SeqInFormats>;
+	
+	// Overloaded file format metafunction
+	template <>
+	struct FileFormat<FormattedFile<Fastq, Input, FlexbarReadsAdaptor> >{
+	    using Type = TagSelector<FlexbarReadsSeqInFormats>;
+	};
+	
+	// Set magic header
+	template <typename T>
+	struct MagicHeader<FlexbarReadsSeqFormat, T> : public MagicHeader<Fastq, T>{};
+	
+	// Specify the valid ending for your fasta adaptor
+	template <typename T>
+	struct FileExtensions<FlexbarReadsSeqFormat, T>{
+	    static char const * VALUE[1];
+	};
+	
+	template <typename T>
+	char const * FileExtensions<FlexbarReadsSeqFormat, T>::VALUE[1] = { ".txt" };
+	
+	// Overload an inner readRecord function to delegate to the actual fastq parser
+	template <typename TIdString, typename TSeqString, typename TSpec>
+	inline void
+	readRecord(TIdString & id, TSeqString & seq, TIdString & qual, FormattedFile<Fastq, Input, TSpec> & file, FlexbarReadsSeqFormat){
+	    readRecord(id, seq, qual, file.iter, Fastq());  // Delegate to Fastq parser
+	}
+	
+	template <typename TIdString, typename TSeqString, typename TSpec>
+	inline void
+	readRecord(TIdString & id, TSeqString & seq, FormattedFile<Fastq, Input, TSpec> & file, FlexbarReadsSeqFormat){
 	    readRecord(id, seq, file.iter, Fasta());  // Delegate to Fasta parser
 	}
 }
@@ -208,7 +256,7 @@ void checkInputType(const std::string path, flexbar::FileFormat &format, const b
 		}
 	}
 	else{
-		seqan::DatFastqSeqFileIn seqFileIn;
+		seqan::FlexbarReadsSeqFileIn seqFileIn;
 		
 		if(! open(seqFileIn, path.c_str())){
 			cerr << "\nERROR: Could not open file " << path << "\n" << endl;
