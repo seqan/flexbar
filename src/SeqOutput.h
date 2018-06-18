@@ -9,7 +9,7 @@ class SeqOutput {
 
 private:
 	
-	seqan::DatFastqSeqFileOut seqFileOut;
+	seqan::FlexbarReadsSeqFileOut seqFileOut;
 	std::string m_filePath;
 	
 	const TString m_tagStr;

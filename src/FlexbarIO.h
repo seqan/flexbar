@@ -49,7 +49,7 @@ void closeFile(std::fstream &strm){
 
 namespace seqan{
 	
-	// extension for input fasta file with dat ending
+	// Extension for input fasta file with dat ending
 	
 	struct DatFastaAdaptor_;
 	using DatFastaAdaptor = Tag<DatFastaAdaptor_>;
@@ -92,7 +92,7 @@ namespace seqan{
 	}
 	
 	
-	// extension for input fastq file with dat ending
+	// Extension for input fastq file with dat ending
 	
 	struct DatFastqAdaptor_;
 	using DatFastqAdaptor = Tag<DatFastqAdaptor_>;
@@ -141,7 +141,7 @@ namespace seqan{
 	}
 	
 	
-	// extension for input fastq file with txt ending
+	// Extension for input fastq file with txt ending
 	
 	struct FlexbarReadsAdaptor_;
 	using FlexbarReadsAdaptor = Tag<FlexbarReadsAdaptor_>;
@@ -190,21 +190,18 @@ namespace seqan{
 	}
 	
 	
-	// extension for output fastq file with dat ending
+	// Extension for output reads file with dat ending
 	
-	// Specilaize sequence input file with custom tag
-	using DatFastqSeqFileOut = FormattedFile<Fastq, Output, DatFastqAdaptor>;
+	using FlexbarReadsSeqFileOut = FormattedFile<Fastq, Output, DatFastqAdaptor>;
 	
-	// The extended TagList containing our custom format
-	using DatFastqSeqOutFormats = TagList<DatFastqSeqFormat, SeqOutFormats>;
+	using FlexbarReadsSeqOutFormats = TagList<DatFastqSeqFormat, SeqOutFormats>;
 	
-	// Overloaded file format metafunction
 	template <>
 	struct FileFormat<FormattedFile<Fastq, Output, DatFastqAdaptor> >{
-	    using Type = TagSelector<DatFastqSeqOutFormats>;
+	    using Type = TagSelector<FlexbarReadsSeqOutFormats>;
 	};
 	
-	// Overload inner writeRecord function
+	// Inner writeRecord function
 	
 	template <typename TSpec, typename TIdString, typename TSeqString>
 	inline void
