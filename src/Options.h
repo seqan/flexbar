@@ -44,7 +44,6 @@ struct Options{
 	flexbar::RevCompMode     rcMode;
 	flexbar::PairOverlap     poMode;
 	flexbar::AdapterPreset   aPreset;
-	// flexbar::InputFileEnd    inFileEnd;
 	
 	tbb::concurrent_vector<flexbar::TBar> barcodes, adapters, barcodes2, adapters2;
 	
@@ -115,7 +114,6 @@ struct Options{
 		arc_end   = RIGHT;
 		b_end     = LTAIL;
 		aPreset   = APOFF;
-		// inFileEnd = IOFF;
     }
 };
 
@@ -186,7 +184,6 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("r", "reads", "Fasta/q file or stdin (-) with reads that may contain barcodes.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("p", "reads2", "Second input file of paired reads, gz and bz2 files supported.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("i", "interleaved", "Interleaved format for first input set with paired reads."));
-	// addOption(parser, ArgParseOption("I", "input-file-end", "Non-standard input file end.", ARG::STRING));
 	
 	addSection(parser, "Barcode detection");
 	addOption(parser, ArgParseOption("b",  "barcodes", "Fasta file with barcodes for demultiplexing, may contain N.", ARG::INPUT_FILE));
@@ -275,7 +272,6 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	
 	hideOption(parser, "version");
-	// hideOption(parser, "input-file-end");
 	
 	setAdvanced(parser, "barcodes2");
 	setAdvanced(parser, "barcode-tail-length");
@@ -360,7 +356,6 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setValidValues(parser, "qtrim-format", "sanger solexa i1.3 i1.5 i1.8");
 	setValidValues(parser, "align-log", "ALL MOD TAB");
 	setValidValues(parser, "zip-output", "GZ BZ2");
-	// setValidValues(parser, "input-file-end", "DAT TXT");
 	
 	setValidValues(parser, "adapter-read-set", "1 2");
 	setValidValues(parser, "adapter-revcomp", "ON ONLY");
@@ -521,14 +516,6 @@ void initOptions(Options &o, seqan::ArgumentParser &parser){
 		o.out = &o.fstrmOut;
 		*o.out << endl;
 	}
-	
-	// if(isSet(parser, "input-file-end")){
-	// 	string end;
-	// 	getOptionValue(end, parser, "input-file-end");
-	//
-	// 	     if(end == "DAT") o.inFileEnd = DAT;
-	//  		else if(end == "TXT") o.inFileEnd = TXT;
-	// }
 	
 	getOptionValue(o.readsFile, parser, "reads");
 	checkInputType(o.readsFile, o.format, true);
