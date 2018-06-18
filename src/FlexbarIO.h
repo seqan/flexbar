@@ -49,7 +49,7 @@ void closeFile(std::fstream &strm){
 
 namespace seqan{
 	
-	// extension for fasta file with dat ending
+	// extension for input fasta file with dat ending
 	
 	struct DatFastaAdaptor_;
 	using DatFastaAdaptor = Tag<DatFastaAdaptor_>;
@@ -83,7 +83,7 @@ namespace seqan{
 	template <typename T>
 	char const * FileExtensions<DatFastaSeqFormat, T>::VALUE[1] = { ".dat" };
 	
-	// Overload an inner readRecord function to delegate to the actual fasta parser
+	// Overload an inner readRecord function
 	template <typename TIdString, typename TSeqString, typename TSpec>
 	inline void
 	readRecord(TIdString & id, TSeqString & seq, FormattedFile<Fastq, Input, TSpec> & file, DatFastaSeqFormat){
@@ -91,7 +91,7 @@ namespace seqan{
 	}
 	
 	
-	// extension for fastq file with dat ending
+	// extension for input fastq file with dat ending
 	
 	struct DatFastqAdaptor_;
 	using DatFastqAdaptor = Tag<DatFastqAdaptor_>;
@@ -116,7 +116,7 @@ namespace seqan{
 	template <typename T>
 	struct MagicHeader<DatFastqSeqFormat, T> : public MagicHeader<Fastq, T>{};
 	
-	// Specify the valid ending for your fasta adaptor
+	// Specify the valid ending for your fastq adaptor
 	template <typename T>
 	struct FileExtensions<DatFastqSeqFormat, T>{
 	    static char const * VALUE[1];
@@ -125,7 +125,7 @@ namespace seqan{
 	template <typename T>
 	char const * FileExtensions<DatFastqSeqFormat, T>::VALUE[1] = { ".dat" };
 	
-	// Overload an inner readRecord function to delegate to the actual fastq parser
+	// Overload an inner readRecord function
 	template <typename TIdString, typename TSeqString, typename TSpec>
 	inline void
 	readRecord(TIdString & id, TSeqString & seq, TIdString & qual, FormattedFile<Fastq, Input, TSpec> & file, DatFastqSeqFormat){
@@ -139,7 +139,7 @@ namespace seqan{
 	}
 	
 	
-	// extension for fastq file with txt ending
+	// extension for input fastq file with txt ending
 	
 	struct FlexbarReadsAdaptor_;
 	using FlexbarReadsAdaptor = Tag<FlexbarReadsAdaptor_>;
@@ -152,7 +152,7 @@ namespace seqan{
 	using FlexbarReadsSeqFormat = Tag<FlexbarReadsSeqFormat_>;
 	
 	// The extended TagList containing our custom format
-	using FlexbarReadsSeqInFormats = TagList<FlexbarReadsSeqFormat, DatFastqSeqInFormats>;  // SeqInFormats>;
+	using FlexbarReadsSeqInFormats = TagList<FlexbarReadsSeqFormat, DatFastqSeqInFormats>;
 	
 	// Overloaded file format metafunction
 	template <>
@@ -164,7 +164,7 @@ namespace seqan{
 	template <typename T>
 	struct MagicHeader<FlexbarReadsSeqFormat, T> : public MagicHeader<Fastq, T>{};
 	
-	// Specify the valid ending for your fasta adaptor
+	// Specify the valid ending for your fastq adaptor
 	template <typename T>
 	struct FileExtensions<FlexbarReadsSeqFormat, T>{
 	    static char const * VALUE[1];
@@ -173,7 +173,7 @@ namespace seqan{
 	template <typename T>
 	char const * FileExtensions<FlexbarReadsSeqFormat, T>::VALUE[1] = { ".txt" };
 	
-	// Overload an inner readRecord function to delegate to the actual fastq parser
+	// Overload an inner readRecord function
 	template <typename TIdString, typename TSeqString, typename TSpec>
 	inline void
 	readRecord(TIdString & id, TSeqString & seq, TIdString & qual, FormattedFile<Fastq, Input, TSpec> & file, FlexbarReadsSeqFormat){
@@ -185,6 +185,34 @@ namespace seqan{
 	readRecord(TIdString & id, TSeqString & seq, FormattedFile<Fastq, Input, TSpec> & file, FlexbarReadsSeqFormat){
 	    readRecord(id, seq, file.iter, Fasta());  // Delegate to Fasta parser
 	}
+	
+	
+	// // extension for output fastq file with dat ending
+	//
+	// // Specilaize sequence input file with custom tag
+	// using DatFastqSeqFileOut = FormattedFile<Fastq, Output, DatFastqAdaptor>;
+	//
+	// // The extended TagList containing our custom format
+	// using DatFastqSeqOutFormats = TagList<DatFastqSeqFormat, SeqOutFormats>;
+	//
+	// // Overloaded file format metafunction
+	// template <>
+	// struct FileFormat<FormattedFile<Fastq, Output, DatFastqAdaptor> >{
+	//     using Type = TagSelector<DatFastqSeqOutFormats>;
+	// };
+	//
+	// // Overload an inner writeRecord function
+	// template <typename TIdString, typename TSeqString, typename TSpec>
+	// inline void
+	// writeRecord(FormattedFile<Fastq, Output, TSpec> & file, DatFastqSeqFormat, TIdString & id, TSeqString & seq, TIdString & qual){
+	//     writeRecord(file.iter, id, seq, qual, Fastq());  // Delegate to Fastq parser
+	// }
+	//
+	// template <typename TIdString, typename TSeqString, typename TSpec>
+	// inline void
+	// writeRecord(FormattedFile<Fastq, Output, TSpec> & file, DatFastqSeqFormat, TIdString & id, TSeqString & seq){
+	//     writeRecord(file.iter, id, seq, Fasta());  // Delegate to Fasta parser
+	// }
 }
 
 
