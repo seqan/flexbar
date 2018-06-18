@@ -14,7 +14,6 @@ private:
 	
 	const bool m_isAdapter;
 	const flexbar::RevCompMode m_rcMode;
-	const flexbar::InputFileEnd m_inFileEnd;
 	
 public:
 	
@@ -22,7 +21,6 @@ public:
 		
 		out(o.out),
 		m_rcMode(o.rcMode),
-		m_inFileEnd(o.inFileEnd),
 		m_isAdapter(isAdapter){
 	};
 	
@@ -35,35 +33,20 @@ public:
 		using namespace std;
 		using namespace flexbar;
 		
-		seqan::SeqFileIn         seqFileIn;
-		seqan::DatFastaSeqFileIn datSeqFileIn(filePath.c_str());
+		seqan::DatFastaSeqFileIn seqFileIn(filePath.c_str());
 		
-		setFormat(seqFileIn,    seqan::Fasta());
-		setFormat(datSeqFileIn, seqan::Fasta());
+		setFormat(seqFileIn, seqan::Fasta());
 		
-		if(m_inFileEnd == IOFF || m_inFileEnd == TXT){
-			if(! open(seqFileIn, filePath.c_str())){
-				cerr << "\nERROR: Could not open file " << filePath << "\n" << endl;
-				exit(1);
-			}
-		}
-		// else if(m_inFileEnd == DAT){
-		// 	if(! open(datSeqFileIn, filePath.c_str())){
-		// 		cerr << "\nERROR: Could not open file " << filePath << "\n" << endl;
-		// 		exit(1);
-		// 	}
+		// if(! open(seqFileIn, filePath.c_str())){
+		// 	cerr << "\nERROR: Could not open file " << filePath << "\n" << endl;
+		// 	exit(1);
 		// }
 		
 		TSeqStrs seqs;
 		TStrings ids;
 		
 		try{
-			if(m_inFileEnd == IOFF || m_inFileEnd == TXT){
-				readRecords(ids, seqs, seqFileIn);
-			}
-			else if(m_inFileEnd == DAT){
-				readRecords(ids, seqs, datSeqFileIn);
-			}
+			readRecords(ids, seqs, seqFileIn);
 			
 			map<TString, short> idMap;
 			
@@ -105,22 +88,11 @@ public:
 		}
 		catch(seqan::Exception const &e){
 			cerr << "\nERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
-			
-			if(m_inFileEnd == IOFF || m_inFileEnd == TXT){
-				close(seqFileIn);
-			}
-			else if(m_inFileEnd == DAT){
-				close(datSeqFileIn);
-			}
+			close(seqFileIn);
 			exit(1);
 		}
 		
-		if(m_inFileEnd == IOFF || m_inFileEnd == TXT){
-			close(seqFileIn);
-		}
-		else if(m_inFileEnd == DAT){
-			close(datSeqFileIn);
-		}
+		close(seqFileIn);
 	};
 	
 	
