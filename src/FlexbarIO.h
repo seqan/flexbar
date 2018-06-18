@@ -83,7 +83,8 @@ namespace seqan{
 	template <typename T>
 	char const * FileExtensions<DatFastaSeqFormat, T>::VALUE[1] = { ".dat" };
 	
-	// Overload an inner readRecord function
+	// Overload inner readRecord function
+	
 	template <typename TIdString, typename TSeqString, typename TSpec>
 	inline void
 	readRecord(TIdString & id, TSeqString & seq, FormattedFile<Fastq, Input, TSpec> & file, DatFastaSeqFormat){
@@ -125,7 +126,8 @@ namespace seqan{
 	template <typename T>
 	char const * FileExtensions<DatFastqSeqFormat, T>::VALUE[1] = { ".dat" };
 	
-	// Overload an inner readRecord function
+	// Overload inner readRecord function
+	
 	template <typename TIdString, typename TSeqString, typename TSpec>
 	inline void
 	readRecord(TIdString & id, TSeqString & seq, TIdString & qual, FormattedFile<Fastq, Input, TSpec> & file, DatFastqSeqFormat){
@@ -173,7 +175,8 @@ namespace seqan{
 	template <typename T>
 	char const * FileExtensions<FlexbarReadsSeqFormat, T>::VALUE[1] = { ".txt" };
 	
-	// Overload an inner readRecord function
+	// Overload inner readRecord function
+	
 	template <typename TIdString, typename TSeqString, typename TSpec>
 	inline void
 	readRecord(TIdString & id, TSeqString & seq, TIdString & qual, FormattedFile<Fastq, Input, TSpec> & file, FlexbarReadsSeqFormat){
@@ -187,32 +190,33 @@ namespace seqan{
 	}
 	
 	
-	// // extension for output fastq file with dat ending
-	//
-	// // Specilaize sequence input file with custom tag
-	// using DatFastqSeqFileOut = FormattedFile<Fastq, Output, DatFastqAdaptor>;
-	//
-	// // The extended TagList containing our custom format
-	// using DatFastqSeqOutFormats = TagList<DatFastqSeqFormat, SeqOutFormats>;
-	//
-	// // Overloaded file format metafunction
-	// template <>
-	// struct FileFormat<FormattedFile<Fastq, Output, DatFastqAdaptor> >{
-	//     using Type = TagSelector<DatFastqSeqOutFormats>;
-	// };
-	//
-	// // Overload an inner writeRecord function
-	// template <typename TIdString, typename TSeqString, typename TSpec>
-	// inline void
-	// writeRecord(FormattedFile<Fastq, Output, TSpec> & file, DatFastqSeqFormat, TIdString & id, TSeqString & seq, TIdString & qual){
-	//     writeRecord(file.iter, id, seq, qual, Fastq());  // Delegate to Fastq parser
-	// }
-	//
-	// template <typename TIdString, typename TSeqString, typename TSpec>
-	// inline void
-	// writeRecord(FormattedFile<Fastq, Output, TSpec> & file, DatFastqSeqFormat, TIdString & id, TSeqString & seq){
-	//     writeRecord(file.iter, id, seq, Fasta());  // Delegate to Fasta parser
-	// }
+	// extension for output fastq file with dat ending
+	
+	// Specilaize sequence input file with custom tag
+	using DatFastqSeqFileOut = FormattedFile<Fastq, Output, DatFastqAdaptor>;
+	
+	// The extended TagList containing our custom format
+	using DatFastqSeqOutFormats = TagList<DatFastqSeqFormat, SeqOutFormats>;
+	
+	// Overloaded file format metafunction
+	template <>
+	struct FileFormat<FormattedFile<Fastq, Output, DatFastqAdaptor> >{
+	    using Type = TagSelector<DatFastqSeqOutFormats>;
+	};
+	
+	// Overload inner writeRecord function
+	
+	template <typename TSpec, typename TIdString, typename TSeqString>
+	inline void
+	writeRecord(FormattedFile<Fastq, Output, TSpec> & file, TIdString & id, TSeqString & seq, TIdString & qual){
+	    writeRecord(file.iter, id, seq, qual, Fastq());  // Delegate to Fastq parser
+	}
+	
+	template <typename TSpec, typename TIdString, typename TSeqString>
+	inline void
+	writeRecord(FormattedFile<Fastq, Output, TSpec> & file, TIdString & id, TSeqString & seq){
+	    writeRecord(file.iter, id, seq, Fasta());  // Delegate to Fasta parser
+	}
 }
 
 
