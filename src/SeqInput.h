@@ -12,7 +12,7 @@ class SeqInput {
 
 private:
 	
-	seqan::SeqFileIn seqFileIn;
+	seqan::DatFastqSeqFileIn seqFileIn;
 	const flexbar::QualTrimType m_qtrim;
 	const flexbar::FileFormat m_format;
 	
