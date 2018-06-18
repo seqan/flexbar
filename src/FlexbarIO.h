@@ -52,7 +52,6 @@ namespace seqan{
 	
 	// fasta file with dat ending
 	
-	// Your custom file format
 	struct DatFastaAdaptor_;
 	using DatFastaAdaptor = Tag<DatFastaAdaptor_>;
 	
@@ -88,16 +87,13 @@ namespace seqan{
 	// Overload an inner readRecord function to delegate to the actual fasta parser
 	template <typename TIdString, typename TSeqString, typename TSpec>
 	inline void
-	readRecord(TIdString & meta, TSeqString & seq, FormattedFile<Fastq, Input, TSpec> & file, DatFastaSeqFormat){
-	    readRecord(meta, seq, file.iter, Fasta());  // Just delegate to Fasta parser
+	readRecord(TIdString & id, TSeqString & seq, FormattedFile<Fastq, Input, TSpec> & file, DatFastaSeqFormat){
+	    readRecord(id, seq, file.iter, Fasta());  // Just delegate to Fasta parser
 	}
-	
-	// DatFastaSeqFileIn seqFile(path.c_str());
 	
 	
 	// fastq file with dat ending
 	
-	// Your custom file format
 	struct DatFastqAdaptor_;
 	using DatFastqAdaptor = Tag<DatFastqAdaptor_>;
 	
@@ -133,8 +129,8 @@ namespace seqan{
 	// Overload an inner readRecord function to delegate to the actual fasta parser
 	template <typename TIdString, typename TSeqString, typename TSpec>
 	inline void
-	readRecord(TIdString & meta, TSeqString & seq, TIdString & qual, FormattedFile<Fastq, Input, TSpec> & file, DatFastqSeqFormat){
-	    readRecord(meta, seq, qual, file.iter, Fastq());  // Just delegate to Fastq parser
+	readRecord(TIdString & id, TSeqString & seq, TIdString & qual, FormattedFile<Fastq, Input, TSpec> & file, DatFastqSeqFormat){
+	    readRecord(id, seq, qual, file.iter, Fastq());  // Just delegate to Fastq parser
 	}
 	
 }
@@ -203,44 +199,44 @@ void checkInputType(const std::string path, flexbar::FileFormat &format, const b
 		     if(c == '>') format = FASTA;
 		else if(c == '@') format = FASTQ;
 		else{
-			cerr << "\nERROR: Reads file type not conform.\n";
+			cerr << "\nERROR: Format of reads from standard input not conform.\n";
 			cerr << "Use uncompressed fasta or fastq for stdin.\n" << endl;
 			exit(1);
 		}
 	}
 	else{
 		
-		seqan::SeqFileIn seqFileIn;
-		
-		if(!open(seqFileIn, path.c_str())){
-			cerr << "\nERROR: Could not open file " << path << "\n" << endl;
-			exit(1);
-		}
-		
-		if(! atEnd(seqFileIn)){
+		try{
+			seqan::DatFastqSeqFileIn seqFileIn(path.c_str());
 			
-			try{
-				FSeqStr rseq;
-				FString tag, qual;
+			// if(!open(seqFileIn, path.c_str())){
+			// 	cerr << "\nERROR: Could not open file " << path << "\n" << endl;
+			// 	exit(1);
+			// }
+			
+			if(! atEnd(seqFileIn)){
 				
-				readRecord(tag, rseq, qual, seqFileIn);
+				FSeqStr seq;
+				FString id, qual;
+				
+				readRecord(id, seq, qual, seqFileIn);
 				
 				if(qual == "") format = FASTA;
 				else           format = FASTQ;
 			}
-			catch(seqan::Exception const &e){
-				cerr << "\nERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
+			else{
+				cerr << "\nReads file seems to be empty.\n\n" << endl;
 				close(seqFileIn);
 				exit(1);
 			}
-		}
-		else{
-			cerr << "\nReads file seems to be empty.\n\n" << endl;
+			
 			close(seqFileIn);
+		}
+		catch(seqan::Exception const &e){
+			cerr << "\nERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
+			// close(seqFileIn);
 			exit(1);
 		}
-		
-		close(seqFileIn);
 	}
 }
 
