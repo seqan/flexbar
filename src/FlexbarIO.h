@@ -47,7 +47,6 @@ void closeFile(std::fstream &strm){
 }
 
 
-
 namespace seqan{
 	
 	// fasta file with dat ending
@@ -88,7 +87,7 @@ namespace seqan{
 	template <typename TIdString, typename TSeqString, typename TSpec>
 	inline void
 	readRecord(TIdString & id, TSeqString & seq, FormattedFile<Fastq, Input, TSpec> & file, DatFastaSeqFormat){
-	    readRecord(id, seq, file.iter, Fasta());  // Just delegate to Fasta parser
+	    readRecord(id, seq, file.iter, Fasta());  // Delegate to Fasta parser
 	}
 	
 	
@@ -126,15 +125,19 @@ namespace seqan{
 	template <typename T>
 	char const * FileExtensions<DatFastqSeqFormat, T>::VALUE[1] = { ".dat" };
 	
-	// Overload an inner readRecord function to delegate to the actual fasta parser
+	// Overload an inner readRecord function to delegate to the actual fastq parser
 	template <typename TIdString, typename TSeqString, typename TSpec>
 	inline void
 	readRecord(TIdString & id, TSeqString & seq, TIdString & qual, FormattedFile<Fastq, Input, TSpec> & file, DatFastqSeqFormat){
-	    readRecord(id, seq, qual, file.iter, Fastq());  // Just delegate to Fastq parser
+	    readRecord(id, seq, qual, file.iter, Fastq());  // Delegate to Fastq parser
 	}
 	
+	template <typename TIdString, typename TSeqString, typename TSpec>
+	inline void
+	readRecord(TIdString & id, TSeqString & seq, FormattedFile<Fastq, Input, TSpec> & file, DatFastqSeqFormat){
+	    readRecord(id, seq, file.iter, Fasta());  // Delegate to Fasta parser
+	}
 }
-
 
 
 void checkFileCompression(const std::string path){
@@ -205,15 +208,14 @@ void checkInputType(const std::string path, flexbar::FileFormat &format, const b
 		}
 	}
 	else{
+		seqan::DatFastqSeqFileIn seqFileIn;
+		
+		if(! open(seqFileIn, path.c_str())){
+			cerr << "\nERROR: Could not open file " << path << "\n" << endl;
+			exit(1);
+		}
 		
 		try{
-			seqan::DatFastqSeqFileIn seqFileIn(path.c_str());
-			
-			// if(!open(seqFileIn, path.c_str())){
-			// 	cerr << "\nERROR: Could not open file " << path << "\n" << endl;
-			// 	exit(1);
-			// }
-			
 			if(! atEnd(seqFileIn)){
 				
 				FSeqStr seq;
@@ -229,14 +231,14 @@ void checkInputType(const std::string path, flexbar::FileFormat &format, const b
 				close(seqFileIn);
 				exit(1);
 			}
-			
-			close(seqFileIn);
 		}
 		catch(seqan::Exception const &e){
 			cerr << "\nERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
-			// close(seqFileIn);
+			close(seqFileIn);
 			exit(1);
 		}
+		
+		close(seqFileIn);
 	}
 }
 
