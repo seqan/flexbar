@@ -40,9 +40,13 @@ public:
 		
 		m_filePath = filePath;
 		
-		if(m_format == FASTA || m_switch2Fasta)
-		     m_filePath += getExtension(FASTA) + o.outCompression;
-		else m_filePath += getExtension(FASTQ) + o.outCompression;
+		if(filePath != o.outReadsFile && filePath != o.outReadsFile2){
+			
+			if(m_format == FASTA || m_switch2Fasta)
+			     m_filePath += getExtension(FASTA);
+			else m_filePath += getExtension(FASTQ);
+		}
+		m_filePath += o.outCompression;
 		
 		m_lengthDist = tbb::concurrent_vector<unsigned long>(MAX_READLENGTH + 1, 0);
 		
@@ -121,7 +125,6 @@ public:
 		}
 		catch(seqan::Exception const &e){
 			cerr << "\nERROR: " << e.what() << "\nProgram execution aborted.\n" << endl;
-			
 			close(seqFileOut);
 			exit(1);
 		}
