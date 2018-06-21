@@ -257,7 +257,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("z", "zip-output", "Direct compression of output files.", ARG::STRING));
 	addOption(parser, ArgParseOption("1", "stdout-reads", "Write reads to stdout, tagged and interleaved if needed."));
 	addOption(parser, ArgParseOption("R", "output-reads", "Output file for reads instead of target prefix usage.", ARG::OUTPUT_FILE));
-	addOption(parser, ArgParseOption("D", "output-reads2", "Output file for reads2 instead of target prefix usage.", ARG::OUTPUT_FILE));
+	addOption(parser, ArgParseOption("P", "output-reads2", "Output file for reads2 instead of target prefix usage.", ARG::OUTPUT_FILE));
 	addOption(parser, ArgParseOption("j", "length-dist", "Generate length distribution for read output files."));
 	addOption(parser, ArgParseOption("s", "single-reads", "Write single reads for too short counterparts in pairs."));
 	addOption(parser, ArgParseOption("S", "single-reads-paired", "Write paired single reads with N for short counterparts."));
