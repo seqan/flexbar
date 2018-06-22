@@ -5,7 +5,7 @@ project( FLEXBAR )
 set( SEQAN_APP_VERSION "3.4.0" )
 
 include_directories( ${FLEXBAR_SOURCE_DIR}/include )
-link_directories( ${FLEXBAR_SOURCE_DIR}/lib )
+# link_directories( ${FLEXBAR_SOURCE_DIR}/lib )
 
 # file( MAKE_DIRECTORY build )
 
