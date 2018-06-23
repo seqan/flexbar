@@ -22,7 +22,15 @@ See article on [PubMed](https://www.ncbi.nlm.nih.gov/pubmed/24832523)
 
 ### Download
 
-Flexbar source code as well as binaries for Linux and Mac OS can be downloaded on the [release](https://github.com/seqan/flexbar/releases) page. Please follow instructions for building or setup of binaries below. Additionally, Flexbar is available via package manager on Debian systems and in Conda. Versions before 2.4 can be found on the [old](https://sourceforge.net/projects/flexbar) page.
+Flexbar source code as well as binaries for Linux and Mac OS can be downloaded on the [release](https://github.com/seqan/flexbar/releases) page. Please follow instructions for building or setup of binaries below. Additionally, Flexbar is available via package manager on Debian systems, in Homebrew, and in Bioconda. Versions before 2.4 can be found on the [old](https://sourceforge.net/projects/flexbar) page.
+
+Installation with package managers:
+
+* Debian: `sudo apt install flexbar`
+* Homebrew: `brew install brewsci/science/flexbar`
+* Bioconda: `conda install -c bioconda flexbar` only for Linux
+
+Note that these commands often do not install the latest version of Flexbar.
 
 
 ### Building from source
