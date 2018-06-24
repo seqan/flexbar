@@ -65,12 +65,12 @@ For execution of provided Flexbar binaries, the corresponding TBB library has to
 #### Linux
 Adjust lib search path to include the absolute path of the Flexbar directory containing the lib file libtbb.so.2 for the current terminal session, or permanently in shell startup scripts:
 
-	export LD_LIBRARY_PATH=/path/FlexbarDir:$LD_LIBRARY_PATH
+	export LD_LIBRARY_PATH=/YourPath/flexbar-3.4.0-linux:$LD_LIBRARY_PATH
 
 #### Mac OS
 It applies the same as for Linux. Make the file libtbb.dylib available by setting the lib search path:
 
-	export DYLD_LIBRARY_PATH=/path/FlexbarDir:$DYLD_LIBRARY_PATH
+	export DYLD_LIBRARY_PATH=/YourPath/flexbar-3.4.0-macos:$DYLD_LIBRARY_PATH
 
 
 ### Program usage
