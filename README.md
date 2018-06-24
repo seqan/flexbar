@@ -1,3 +1,6 @@
+
+[![GitHub release](https://img.shields.io/badge/release-3.4.0-blue.svg)](https://github.com/seqan/flexbar/releases/)
+
 ## Flexbar – flexible barcode and adapter removal
 
 The program Flexbar preprocesses high-throughput sequencing data efficiently. It demultiplexes barcoded runs and removes adapter sequences. Moreover, trimming and filtering features are provided. Flexbar increases read mapping rates and improves genome as well as transcriptome assemblies. Unique molecular identifiers can be extracted in a flexible way. The program supports sequencing data in fasta and fastq format, e.g. from the Illumina platform.
@@ -28,7 +31,7 @@ Installation with package managers:
 
 * Debian: `sudo apt install flexbar`
 * Homebrew: `brew install brewsci/science/flexbar`
-* Bioconda: `conda install -c bioconda flexbar` only for Linux
+* Bioconda: `conda install -c bioconda flexbar`
 
 Note that these commands often do not install the latest version of Flexbar.
 
@@ -38,7 +41,7 @@ Note that these commands often do not install the latest version of Flexbar.
 Make sure that `cmake` is available, as well as development and runtime files of the TBB library 4.0 or later (Intel Threading Building Blocks). For example on Debian systems, install the packages `libtbb-dev` and `libtbb2`. Furthermore, the SeqAn library and a compiler that supports C++14 is required:
 
 * Get SeqAn library version 2.4.0 [here](https://github.com/seqan/seqan/releases/download/seqan-v2.4.0/seqan-library-2.4.0.tar.xz)
-* Download Flexbar 3.4 source code [release](https://github.com/seqan/flexbar/releases)
+* Download Flexbar 3.4.0 source code [release](https://github.com/seqan/flexbar/releases)
 
 Decompress both files:
 
