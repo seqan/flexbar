@@ -1,7 +1,6 @@
+## Flexbar – flexible barcode and adapter removal
 
 [![GitHub release](https://img.shields.io/badge/release-3.4.0-blue.svg)](https://github.com/seqan/flexbar/releases/)
-
-## Flexbar – flexible barcode and adapter removal
 
 The program Flexbar preprocesses high-throughput sequencing data efficiently. It demultiplexes barcoded runs and removes adapter sequences. Moreover, trimming and filtering features are provided. Flexbar increases read mapping rates and improves genome as well as transcriptome assemblies. Unique molecular identifiers can be extracted in a flexible way. The program supports sequencing data in fasta and fastq format, e.g. from the Illumina platform.
 
@@ -33,7 +32,7 @@ Installation with package managers:
 * Homebrew: `brew install brewsci/science/flexbar`
 * Bioconda: `conda install -c bioconda flexbar`
 
-Note that these commands often do not install the latest version of Flexbar.
+To get the latest version and best performance consider to build Flexbar from source.
 
 
 ### Building from source
