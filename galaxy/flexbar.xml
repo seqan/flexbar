@@ -1,30 +1,34 @@
 
-<!-- Flexbar tool definition for Galaxy, version 3.4 -->
+<!-- Flexbar tool definition for Galaxy, version 3.4.1 -->
 <!-- Author: Johannes Roehr -->
 
 
-<tool id="flexbar" name="Flexbar" version="3.4" force_history_refresh="True">
+<tool id="flexbar" name="Flexbar" version="3.4.1">
 	
-	<description>flexible barcode and adapter removal</description>
+	<description>- flexible barcode and adapter removal</description>
     
 	<requirements>
-        <requirement type="binary" version="3.4">flexbar</requirement>
+        <requirement type="package" version="3.4.0">flexbar</requirement>
     </requirements>
 	
 	<version_command>flexbar --versions</version_command>
 	
-	<command interpreter="perl">
+	<command detect_errors="aggressive">
 		
-		flexbar.pl flexbar
+		<![CDATA[
+		
+		flexbar
 		
 		--threads \${GALAXY_SLOTS:-1}
 		
-		--reads $reads
-		
-		#if $cReads2.select == "on":
-			#if $cReads2.reads2.ext == $reads.ext:
-				--reads2 $cReads2.reads2
-			#end if
+		#if $reads.mode == "se":
+			--reads '$reads.rs'
+		#elif $reads.mode == "pe":
+			--reads '$reads.r1'
+			--reads2 '$reads.r2'
+		#else:
+			--reads '$reads.rc.forward'
+			--reads2 '$reads.rc.reverse'
 		#end if
 		
 		--max-uncalled $maxUncalled
@@ -35,351 +39,365 @@
 			--pre-trim-right $trimEnds.trimRight
 		#end if
 		
-		#if $cTrimPhred.select == "on":
-			--qtrim TAIL --qtrim-threshold $cTrimPhred.trimPhred
-			
-			#if $reads.ext == "fastqsanger":
-				--qtrim-format sanger
-			#end if
-			#if $reads.ext == "fastqsolexa":
-				--qtrim-format solexa
-			#end if
-			#if $reads.ext == "fastqillumina":
-				--qtrim-format i1.3
+		
+		#if $cTrimQual.select != "off":
+			#if $reads.mode == "se":
+				#if $reads.rs.ext == "fastqsanger":
+					--qtrim-format sanger
+				#end if
+				#if $reads.rs.ext == "fastqsolexa":
+					--qtrim-format solexa
+				#end if
+				#if $reads.rs.ext == "fastqillumina":
+					--qtrim-format i1.3
+				#end if
+			#elif $reads.mode == "pe":
+				#if $reads.r1.ext == "fastqsanger":
+					--qtrim-format sanger
+				#end if
+				#if $reads.r1.ext == "fastqsolexa":
+					--qtrim-format solexa
+				#end if
+				#if $reads.r1.ext == "fastqillumina":
+					--qtrim-format i1.3
+				#end if
+			#else:
+				#if $reads.rc.forward.ext == "fastqsanger":
+					--qtrim-format sanger
+				#end if
+				#if $reads.rc.forward.ext == "fastqsolexa":
+					--qtrim-format solexa
+				#end if
+				#if $reads.rc.forward.ext == "fastqillumina":
+					--qtrim-format i1.3
+				#end if
 			#end if
 		#end if
+		
+		#if $cTrimQual.select == "tail":
+			--qtrim TAIL
+			--qtrim-threshold $cTrimQual.trimQualTail
+			$cTrimQual.trimQualPostTail
+		#end if
+		#if $cTrimQual.select == "win":
+			--qtrim WIN
+			--qtrim-threshold $cTrimQual.trimQualWin
+			--qtrim-win-size $cTrimQual.trimQualWinSize
+			$cTrimQual.trimQualPostWin
+		#end if
+		#if $cTrimQual.select == "bwa":
+			--qtrim BWA
+			--qtrim-threshold $cTrimQual.trimQualBWA
+			$cTrimQual.trimQualPostBWA
+		#end if
+		
 		
 		#if $cTrimLen.select == "on":
 			--post-trim-length $cTrimLen.trimLen
 		#end if
 		
 		
-		#if $cBarcodes.select == "on":
-			--barcodes $cBarcodes.barcodes
-			
-			#if $cBarcodes.cbReads.select == "yes":
-				--barcode-reads $cBarcodes.cbReads.bReads
-			#end if
-			
-			#if $cBarcodes.cbReads.select == "no":
-				$cBarcodes.cbReads.bKeep
-			#end if
-			
-			$cBarcodes.bUnassigned
-			
-			--barcode-trim-end $cBarcodes.bTrimEnd
-			
-			#if $cBarcodes.cbTailLen.select == "yes":
-				--barcode-tail-length $cBarcodes.cbTailLen.bTailLen
-			#end if
-			
-			#if $cBarcodes.cbMinOverlap.select == "yes":
-				--barcode-min-overlap $cBarcodes.cbMinOverlap.bMinOverlap
-			#end if
-			
-			--barcode-error-rate $cBarcodes.bThresh
-			
-			#if $cBarcodes.cbAlignScores.select == "yes":
-				--barcode-match    $bMatch
-				--barcode-mismatch $bMismatch
-				--barcode-gap      $bGap
-			#end if
-		#end if
-		
-		
 		#if $cAdapters.select == "on":
 			
-			#if $cAdapters.ccAdapters.select == "data":
-				--adapters $cAdapters.ccAdapters.adaptersData
+			#if $cAdapters.ccAdapters.select == "file":
+				--adapters '$cAdapters.ccAdapters.adapterFile'
 			#end if
-			
+			#if $cAdapters.ccAdapters.select == "files":
+				--adapters '$cAdapters.ccAdapters.adapterFile1'
+				--adapters2 '$cAdapters.ccAdapters.adapterFile2'
+			#end if
+			#if $cAdapters.ccAdapters.select == "preset":
+				--adapter-preset '$cAdapters.ccAdapters.adapterPreset'
+			#end if
 			#if $cAdapters.ccAdapters.select == "seq":
 				--adapter-seq $cAdapters.ccAdapters.adapterSeq
 			#end if
 			
 			--adapter-trim-end $cAdapters.aTrimEnd
-			
-			#if $cAdapters.caTailLen.select == "yes":
-				--adapter-tail-length $cAdapters.caTailLen.aTailLen
-			#end if
-			
-			$cAdapters.aReadSet
-			
 			--adapter-min-overlap $cAdapters.aMinOverlap
-			--adapter-error-rate  $cAdapters.aThresh
+			--adapter-error-rate $cAdapters.aThresh
 			
-			#if $cAdapters.caAlignScores.select == "yes":
-				--adapter-match    $aMatch
-				--adapter-mismatch $aMismatch
-				--adapter-gap      $aGap
+			#if $cAdapters.cPairOverlap.select == "on":
+				--adapter-pair-overlap $cAdapters.cPairOverlap.aPairOverlap
+				--adapter-min-poverlap $cAdapters.cPairOverlap.aMinPoverlap
+			#end if
+			
+			#if $cAdapters.aAdvanced.caTailLen.select == "yes":
+				--adapter-tail-length $cAdapters.aAdvanced.caTailLen.aTailLen
+			#end if
+			
+			#if $cAdapters.aAdvanced.cRevComp.select == "on":
+				--adapter-revcomp ON
+				#if $cAdapters.aAdvanced.cRevComp.aRevCompEnd != "off":
+					--adapter-revcomp-end $cAdapters.aAdvanced.cRevComp.aRevCompEnd
+				#end if
+			#end if
+			#if $cAdapters.aAdvanced.cRevComp.select == "only":
+				--adapter-revcomp ONLY
+			#end if
+			
+			$cAdapters.aAdvanced.aReadSet
+			
+			--adapter-cycles $cAdapters.aAdvanced.aCycles
+			
+			#if $cAdapters.aAdvanced.caAlignScores.select == "yes":
+				--adapter-match    $cAdapters.aAdvanced.caAlignScores.aMatch
+				--adapter-mismatch $cAdapters.aAdvanced.caAlignScores.aMismatch
+				--adapter-gap      $cAdapters.aAdvanced.caAlignScores.aGap
 			#end if
 		#end if
 		
 		
-		#if $cOutput.select == "show":
-			$cOutput.fastaOutput
-			$cOutput.lenDist
-			$cOutput.singleReads
+		#if $cAddOptions.select == "show":
+			$cAddOptions.logLevel
+			$cAddOptions.numTags
+			$cAddOptions.remTags
+			$cAddOptions.rndTags
+			$cAddOptions.singleReadsP
+			
+			#if $cAddOptions.cReadBundle.select == "show":
+				--bundle $cAddOptions.cReadBundle.bundle
+				
+				#if $cAddOptions.cReadBundle.bundles != "":
+					--bundles $cAddOptions.cReadBundle.bundles
+				#end if
+			#end if
 		#end if
 		
-		#if $cLogging.select == "show":
-			$cLogging.logLevel
-			$cLogging.numTags
-			$cLogging.remTags
-			$cLogging.rndTags
+		
+		#if $reads.mode == "se":
+			--output-reads '$rsout'
+		#elif $reads.mode == "pe":
+			--output-reads '$r1out'
+			--output-reads2 '$r2out'
+		#else:
+			--output-reads '$rcout.forward'
+			--output-reads2 '$rcout.reverse'
 		#end if
 		
+		--output-log '$outlog'
 		
-		$output $output.id $__new_file_path__ $reads.ext
-		
+		]]>
 	</command>
 	
 	
 	<inputs>
 		
-		<param format="fastq,fastqsanger,fastqsolexa,fastqillumina" name="reads" type="data" label="Reads fastq file" optional="false"/>
-		
-		
-		<conditional name="cReads2">
-			<param name="select" type="select" label="Paired reads file">
-				<option value="off" selected="true">Off</option>
-				<option value="on">On</option>
+		<conditional name="reads">
+			<param name="mode" type="select" label="Sequencing reads">
+				<option value="se">Single read file</option>
+				<option value="pe" selected="true">Paired read files</option>
+				<option value="pc">Paired read collection</option>
 			</param>
-			<when value="off">
+			<when value="se">
+				<param name="rs" type="data" format="fastqsanger,fastqsolexa,fastqillumina" label="Fastq read file"/>
 			</when>
-			<when value="on">
-				<param format="fastq,fastqsanger,fastqsolexa,fastqillumina" name="reads2" type="data" label="Reads 2" optional="false" help="same format as first read set"/>
+			<when value="pe">
+				<param name="r1" type="data" format="fastqsanger,fastqsolexa,fastqillumina" label="Fastq read file 1"/>
+				<param name="r2" type="data" format="fastqsanger,fastqsolexa,fastqillumina" label="Fastq read file 2"/>
+			</when>
+			<when value="pc">
+				<param name="rc" format="fastqsanger,fastqsolexa,fastqillumina" type="data_collection" collection_type="paired" label="Fastq pair collection"/>
 			</when>
 		</conditional>
 		
-		
-		<param name="maxUncalled" size="4" type="integer" value="0"  label="1) Max uncalled" optional="false" help="allowed uncalled bases per read"/>
+		<param name="maxUncalled" size="4" type="integer" value="0"  label="1) Maximum uncalled bases"/>
 		
 		<conditional name="trimEnds">
-			<param name="select" type="select" label="2) Trimming of ends">
+			<param name="select" type="select" label="2) Trimming of read ends">
 				<option value="off" selected="true">Off</option>
 				<option value="on">On</option>
 			</param>
 			<when value="off">
 			</when>
 			<when value="on">
-				<param name="trimLeft" size="4" type="integer" value="0" label="Left" optional="false"/>
-				<param name="trimRight" size="4" type="integer" value="0" label="Right" optional="false" help="trims specified number of bases from read ends"/>
+				<param name="trimLeft" size="4" type="integer" value="0" label="Left"/>
+				<param name="trimRight" size="4" type="integer" value="0" label="Right" help="trims specified number of bases at ends"/>
 			</when>
 		</conditional>
 		
-		<conditional name="cTrimPhred">
+		<conditional name="cTrimQual">
 			<param name="select" type="select" label="3) Quality-based trimming">
 				<option value="off" selected="true">Off</option>
-				<option value="on">On</option>
+				<option value="tail">Tail</option>
+				<option value="win">Window</option>
+				<option value="bwa">BWA</option>
 			</param>
 			<when value="off">
 			</when>
-			<when value="on">
-				<param name="trimPhred" size="4" type="integer" value="10" label="Threshold" optional="false" help="trim right end until specified or higher quality reached"/>
-			</when>
-		</conditional>
-		
-		
-		<conditional name="cBarcodes">
-			<param name="select" type="select" label="4) Barcode detection">
-				<option value="off" selected="true">Off</option>
-				<option value="on">On</option>
-			</param>
-			<when value="off">
-			</when>
-			<when value="on">
-				<param format="fasta" name="barcodes" type="data" label="Barcodes" optional="false"/>
+			<when value="tail">
+				<param name="trimQualTail" size="4" type="integer" value="20" label="Quality threshold" help="trim right end until specified quality or higher"/>
 				
-				<conditional name="cbReads">
-					<param name="select" type="select" label="Separate barcode reads">
-						<option value="no" selected="true">No</option>
-						<option value="yes">Yes</option>
-					</param>
-					<when value="yes">
-						<param format="fastq,fastqsanger,fastqsolexa,fastqillumina" name="bReads" type="data" label="Separate barcode reads" optional="false"/>
-					</when>
-					<when value="no">
-						<param name="bKeep" type="select" label="Remove barcodes within reads">
-							<option value="" selected="true">Yes</option>
-							<option value="--barcode-keep">No</option>
-						</param>
-					</when>
-				</conditional>
-				
-				<param name="bUnassigned" type="select" label="Include unassigned reads">
+				<param name="trimQualPostTail" type="select" label="After adapter removal">
 					<option value="" selected="true">No</option>
-					<option value="--barcode-unassigned">Yes</option>
+					<option value="--qtrim-post-removal">Yes</option>
 				</param>
+			</when>
+			<when value="win">
+				<param name="trimQualWin" size="4" type="integer" value="20" label="Quality threshold"/>
+				<param name="trimQualWinSize" size="4" type="integer" value="5" label="Window length" help="sliding window average quality approach from left end"/>
 				
-				<param name="bTrimEnd" type="select" label="Trim-end mode" optional="false">
-					<option value="ANY" selected="true">Any</option>
-					<option value="RIGHT">Right</option>
-					<option value="RTAIL">Right tail</option>
-					<option value="LEFT">Left</option>
-					<option value="LTAIL">Left tail</option>
+				<param name="trimQualPostWin" type="select" label="After adapter removal">
+					<option value="" selected="true">No</option>
+					<option value="--qtrim-post-removal">Yes</option>
 				</param>
+			</when>
+			<when value="bwa">
+				<param name="trimQualBWA" size="4" type="integer" value="20" label="Quality threshold" help="trimming approach used by BWA"/>
 				
-				<conditional name="cbTailLen">
-					<param name="select" type="select" label="Change tail length">
-						<option value="no" selected="true">No</option>
-						<option value="yes">Yes</option>
-					</param>
-					<when value="no">
-					</when>
-					<when value="yes">
-						<param name="bTailLen" size="4" type="integer" value="10" label="Tail length" optional="false"/>
-					</when>
-				</conditional>
-				
-				<conditional name="cbMinOverlap">
-					<param name="select" type="select" label="Change min-overlap" help="default: barcode length">
-						<option value="no" selected="true">No</option>
-						<option value="yes">Yes</option>
-					</param>
-					<when value="no">
-					</when>
-					<when value="yes">
-						<param name="bMinOverlap" size="4" type="integer" value="8" label="Min-overlap" optional="false"/>
-					</when>
-				</conditional>
-				
-				<param name="bThresh" size="4" type="integer" value="1" label="Threshold" optional="false" help="allowed mismatches and indels per 10 bases"/>
-				
-				<conditional name="cbAlignScores">
-					<param name="select" type="select" label="Modify alignment scores">
-						<option value="no" selected="true">No</option>
-						<option value="yes">Yes</option>
-					</param>
-					<when value="no">
-					</when>
-					<when value="yes">
-						<param name="bMatch"    size="3" type="integer" value="1"  label="Match" optional="false"/>
-						<param name="bMismatch" size="3" type="integer" value="-1" label="Mismatch" optional="false"/>
-						<param name="bGap"      size="3" type="integer" value="-9" label="Gap" optional="false"/>
-					</when>
-				</conditional>
+				<param name="trimQualPostBWA" type="select" label="After adapter removal">
+					<option value="" selected="true">No</option>
+					<option value="--qtrim-post-removal">Yes</option>
+				</param>
 			</when>
 		</conditional>
 		
 		
 		<conditional name="cAdapters">
-			<param name="select" type="select" label="5) Adapter removal">
+			<param name="select" type="select" label="4) Adapter removal">
 				<option value="off" selected="true">Off</option>
 				<option value="on">On</option>
 			</param>
-			
 			<when value="off">
 			</when>
 			<when value="on">
 				<conditional name="ccAdapters">
 					<param name="select" type="select" label="Adapter source">
-						<option value="data" selected="true">Fasta</option>
-						<option value="seq">Sequence</option>
-						<!-- <option value="file">File</option> -->
+						<option value="file" selected="true">Adapter file</option>
+						<option value="files">Two adapter files</option>
+						<option value="preset">Illumina preset</option>
+						<option value="seq">Single sequence</option>
 					</param>
-					<when value="data">
-						<param format="fasta" name="adaptersData" type="data" label="Adapters" optional="false"/>
+					<when value="file">
+						<param format="fasta" name="adapterFile" type="data" label="Fasta adapter file"/>
+					</when>
+					<when value="files">
+						<param format="fasta" name="adapterFile1" type="data" label="Fasta adapter file for reads 1"/>
+						<param format="fasta" name="adapterFile2" type="data" label="Fasta adapter file for reads 2"/>
+					</when>
+					<when value="preset">
+						<param name="adapterPreset" type="select" label="Adapter preset">
+							<option value="TruSeq" selected="true">TruSeq LT and HT-based kits</option>
+							<option value="SmallRNA">TruSeq Small RNA</option>
+							<option value="Methyl">TruSeq DNA Methylation and ScriptSeq</option>
+							<option value="Ribo">TruSeq Ribo Profile</option>
+							<option value="Nextera">Nextera, AmpliSeq, and TruSight</option>
+							<option value="NexteraMP">Nextera Mate Pair</option>
+						</param>
 					</when>
 					<when value="seq">
-						<param name="adapterSeq" size="40" label="Adapter" type="text" value="AAAAAAAAAAAAAA" optional="false"/>
+						<param name="adapterSeq" size="40" label="Adapter sequence" type="text" value=""/>
 					</when>
-					<!-- <when value="file">
-						<param name="adaptersFile" type="file" label="Adapters file" optional="false"/>
-					</when> -->
 				</conditional>
 				
-				<param name="aTrimEnd" type="select" label="Trim-end mode" optional="false">
-					<option value="ANY">Any</option>
+				<param name="aMinOverlap" size="4" type="integer" value="3" label="Minimum overlap"/>
+				<param name="aThresh" size="4" type="float" value="0.1" label="Error rate" help="allowed fraction of mismatches and indels"/>
+				
+				<param name="aTrimEnd" type="select" label="Trim-end mode">
 					<option value="RIGHT" selected="true">Right</option>
-					<option value="RTAIL">Right tail</option>
 					<option value="LEFT">Left</option>
+					<option value="RTAIL">Right tail</option>
 					<option value="LTAIL">Left tail</option>
+					<option value="ANY">Any</option>
 				</param>
 				
-				<conditional name="caTailLen">
-					<param name="select" type="select" label="Change tail length">
-						<option value="no" selected="true">No</option>
-						<option value="yes">Yes</option>
+				<conditional name="cPairOverlap">
+					<param name="select" type="select" label="Pair overlap detection">
+						<option value="off" selected="true">Off</option>
+						<option value="on">On</option>
 					</param>
-					<when value="no">
+					<when value="off">
 					</when>
-					<when value="yes">
-						<param name="aTailLen" size="4" type="integer" value="10" label="Tail length" optional="false"/>
+					<when value="on">
+						<param name="aPairOverlap" type="select" label="Detection mode">
+							<option value="ON" selected="true">Standard</option>
+							<option value="SHORT">Trim short</option>
+						</param>
+						<param name="aMinPoverlap" size="4" type="integer" value="40" label="Minimum pair overlap"/>
 					</when>
 				</conditional>
 				
-				<param name="aReadSet" type="select" label="Removal for single read set">
-					<option value="" selected="true">No</option>
-					<option value="--adapter-read-set 1">1st</option>
-					<option value="--adapter-read-set 2">2nd</option>
-				</param>
-				
-				<param name="aMinOverlap" size="4" type="integer" value="1" label="Min-overlap" optional="false"/>
-				<param name="aThresh" size="4" type="integer" value="3" label="Threshold" optional="false" help="allowed mismatches and indels per 10 bases"/>
-				
-				<conditional name="caAlignScores">
-					<param name="select" type="select" label="Modify alignment scores">
-						<option value="no" selected="true">No</option>
-						<option value="yes">Yes</option>
+				<section name="aAdvanced" title="Advanced options" expanded="false">
+					
+					<conditional name="caTailLen">
+						<param name="select" type="select" label="Change tail length">
+							<option value="no" selected="true">No</option>
+							<option value="yes">Yes</option>
+						</param>
+						<when value="no">
+						</when>
+						<when value="yes">
+							<param name="aTailLen" size="4" type="integer" value="" label="Tail length"/>
+						</when>
+					</conditional>
+					
+					<conditional name="cRevComp">
+						<param name="select" type="select" label="Reverse complements of adapters">
+							<option value="off" selected="true">Off</option>
+							<option value="on">On</option>
+							<option value="only">Only</option>
+						</param>
+						<when value="off">
+						</when>
+						<when value="on">
+							<param name="aRevCompEnd" type="select" label="Different trim-end for reverse complements">
+								<option value="off" selected="true">Off</option>
+								<option value="RIGHT">Right</option>
+								<option value="LEFT">Left</option>
+								<option value="RTAIL">Right tail</option>
+								<option value="LTAIL">Left tail</option>
+								<option value="ANY">Any</option>
+							</param>
+						</when>
+					</conditional>
+					
+					
+					<param name="aReadSet" type="select" label="Removal for single read set">
+						<option value="" selected="true">No</option>
+						<option value="--adapter-read-set 1">1st</option>
+						<option value="--adapter-read-set 2">2nd</option>
 					</param>
-					<when value="no">
-					</when>
-					<when value="yes">
-						<param name="aMatch"    size="3" type="integer" value="1"  label="Match" optional="false"/>
-						<param name="aMismatch" size="3" type="integer" value="-1" label="Mismatch" optional="false"/>
-						<param name="aGap"      size="3" type="integer" value="-6" label="Gap" optional="false"/>
-					</when>
-				</conditional>
+					
+					<param name="aCycles" size="4" type="integer" value="1" label="Number of removal cycles"/>
+					
+					<conditional name="caAlignScores">
+						<param name="select" type="select" label="Modify alignment scores">
+							<option value="no" selected="true">No</option>
+							<option value="yes">Yes</option>
+						</param>
+						<when value="no">
+						</when>
+						<when value="yes">
+							<param name="aMatch"    size="3" type="integer" value="1"  label="Match"/>
+							<param name="aMismatch" size="3" type="integer" value="-1" label="Mismatch"/>
+							<param name="aGap"      size="3" type="integer" value="-6" label="Gap"/>
+						</when>
+					</conditional>
+				</section>
 			</when>
 		</conditional>
 		
 		
 		<conditional name="cTrimLen">
-			<param name="select" type="select" label="6) Trimming to length">
+			<param name="select" type="select" label="5) Trimming to length">
 				<option value="off" selected="true">Off</option>
 				<option value="on">On</option>
 			</param>
 			<when value="off">
 			</when>
 			<when value="on">
-				<param name="trimLen" size="4" type="integer" value="30" label="Length" optional="false" help="trim reads to certain length from right"/>
+				<param name="trimLen" size="4" type="integer" value="" label="Length" help="trim reads to certain length from right"/>
 			</when>
 		</conditional>
 		
-		<param name="minReadLen"  size="4" type="integer" value="18" label="7) Minimum read length" optional="false" help="shorter reads are discarded"/>
+		<param name="minReadLen"  size="4" type="integer" value="20" label="6) Minimum read length"/>
 		
-		<conditional name="cOutput">
-			<param name="select" type="select" label="Output selection">
-				<option value="off" selected="true">Off</option>
+		<conditional name="cAddOptions">
+			<param name="select" type="select" label="Additional options">
+				<option value="hide" selected="true">Hide</option>
 				<option value="show">Show</option>
 			</param>
-			<when value="off">
-			</when>
-			<when value="show">
-				<param name="fastaOutput" type="select" label="Fasta output">
-					<option value="" selected="true">Off</option>
-					<option value="--fasta-output">Always</option>
-				</param>
-				
-				<param name="lenDist" type="select" label="Read length distribution">
-					<option value="" selected="true">Off</option>
-					<option value="--length-dist">On</option>
-				</param>
-				
-				<param name="singleReads" type="select" label="Single reads">
-					<option value="" selected="true">Off</option>
-					<option value="--single-reads">On</option>
-				</param>
-			</when>
-		</conditional>
-		
-		<conditional name="cLogging">
-			<param name="select" type="select" label="Logging and tagging options">
-				<option value="off" selected="true">Off</option>
-				<option value="show">Show</option>
-			</param>
-			<when value="off">
+			<when value="hide">
 			</when>
 			<when value="show">
 				<param name="logLevel" type="select" label="Alignment logging">
@@ -403,19 +421,49 @@
 					<option value="" selected="true">Off</option>
 					<option value="--umi-tags">On</option>
 				</param>
+				
+				<param name="singleReadsP" type="select" label="Single reads as paired">
+					<option value="" selected="true">Off</option>
+					<option value="--single-reads-paired">On</option>
+				</param>
+				
+				<conditional name="cReadBundle">
+					<param name="select" type="select" label="Read bundle options">
+						<option value="hide" selected="true">Hide</option>
+						<option value="show">Show</option>
+					</param>
+					<when value="hide">
+					</when>
+					<when value="show">
+						<param name="bundle"  size="4" type="integer" value="256" label="Number of paired reads per bundle"/>
+						<param name="bundles"  size="4" type="integer" value="" optional="true" label="Only certain number of bundles for testing"/>
+					</when>
+				</conditional>
 			</when>
 		</conditional>
 		
   	</inputs>
 	
-	<stdio>
-	    <exit_code range="1:" level="fatal" description="Error!" />
-	</stdio>
-	
 	<outputs>
-	    <data format="txt" name="output" metadata_source="reads"/>
+	    <data name="outlog" format="txt" label="Flexbar log for ${on_string}"/>
+		
+		<data name="rsout" label="Flexbar on ${reads.rs.name}" format_source="rs">
+			<filter>reads['mode'] == 'se'</filter>
+		</data>
+		
+		<data name="r1out" label="Flexbar on ${reads.r1.name}" format_source="r1">
+			<filter>reads['mode'] == "pe"</filter>
+		</data>
+		<data name="r2out" label="Flexbar on ${reads.r2.name}" format_source="r2">
+			<filter>reads['mode'] == "pe"</filter>
+		</data>
+		
+		<collection name="rcout" type="paired" label="Flexbar on ${on_string}">
+			<filter>reads['mode'] == "pc"</filter>
+			<data name="forward" label="Flexbar on ${reads.rc.forward.name}" format_source="rc['forward']"/>
+			<data name="reverse" label="Flexbar on ${reads.rc.reverse.name}" format_source="rc['reverse']"/>
+		</collection>
 	</outputs>
-	
 	
 	<help>
 
