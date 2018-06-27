@@ -92,11 +92,6 @@
 		#end if
 		
 		
-		#if $cTrimLen.select == "on":
-			--post-trim-length $cTrimLen.trimLen
-		#end if
-		
-		
 		#if $cAdapters.select == "on":
 			
 			#if $cAdapters.ccAdapters.select == "file":
@@ -147,6 +142,24 @@
 			#end if
 		#end if
 		
+		
+		#if $hTrim.select == "on":
+			--htrim-left $hTrim.hTrimLeft
+			--htrim-right $hTrim.hTrimRight
+			--htrim-min-length $hTrim.hMinLength
+			--htrim-error-rate $hTrim.hErrorRate
+			
+			--htrim-min-length2 $hTrim.hAdvanced.hMinLength2
+			--htrim-max-length $hTrim.hAdvanced.hMaxLength
+			
+			$hTrim.hAdvanced.hMaxFirst
+			$hTrim.hAdvanced.hTrimAdapter
+		#end if
+		
+		
+		#if $cTrimLen.select == "on":
+			--post-trim-length $cTrimLen.trimLen
+		#end if
 		
 		#if $cAddOptions.select == "show":
 			$cAddOptions.logLevel
@@ -353,7 +366,7 @@
 					
 					
 					<param name="aReadSet" type="select" label="Removal for single read set">
-						<option value="" selected="true">No</option>
+						<option value="" selected="true">Off</option>
 						<option value="--adapter-read-set 1">1st</option>
 						<option value="--adapter-read-set 2">2nd</option>
 					</param>
@@ -378,8 +391,42 @@
 		</conditional>
 		
 		
+		<conditional name="hTrim">
+			<param name="select" type="select" label="5) Trimming of homopolymers">
+				<option value="off" selected="true">Off</option>
+				<option value="on">On</option>
+			</param>
+			<when value="off">
+			</when>
+			<when value="on">
+				<param name="hTrimLeft" size="4" label="Trim homopolymers on left end" type="text" value="" optional="true"/>
+				<param name="hTrimRight" size="4" label="Trim homopolymers on right end" type="text" value="" optional="true" help="for example AT"/>
+				
+				<param name="hMinLength" size="4" type="integer" value="3" label="Minimum length"/>
+				<param name="hErrorRate" size="4" type="float" value="0.1" label="Error rate"/>
+				
+				<section name="hAdvanced" title="Advanced options" expanded="false">
+					
+					<param name="hMaxLength" size="4" type="integer" value="" label="Maximum length" optional="true"/>
+					
+					<param name="hMaxFirst" type="select" label="Maximum length only for first one">
+						<option value="" selected="true">Off</option>
+						<option value="--htrim-max-first">On</option>
+					</param>
+					
+					<param name="hMinLength2" size="4" type="integer" value="" label="Minimum length after first one" optional="true"/>
+					
+					<param name="hTrimAdapter" type="select" label="Only in case of adapter on same side">
+						<option value="" selected="true">Off</option>
+						<option value="--htrim-adapter">On</option>
+					</param>
+				</section>
+			</when>
+		</conditional>
+		
+		
 		<conditional name="cTrimLen">
-			<param name="select" type="select" label="5) Trimming to length">
+			<param name="select" type="select" label="6) Trimming to length">
 				<option value="off" selected="true">Off</option>
 				<option value="on">On</option>
 			</param>
@@ -390,7 +437,7 @@
 			</when>
 		</conditional>
 		
-		<param name="minReadLen"  size="4" type="integer" value="20" label="6) Minimum read length"/>
+		<param name="minReadLen"  size="4" type="integer" value="20" label="7) Minimum read length"/>
 		
 		<conditional name="cAddOptions">
 			<param name="select" type="select" label="Additional options">
