@@ -871,12 +871,10 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		
 		if(isSet(parser, "output-reads") && (isSet(parser, "output-reads2") || o.runType == SINGLE)){
 			getOptionValue(o.outReadsFile, parser, "output-reads");
-			*out << "output-reads:          " << o.outReadsFile << endl;
 		}
 		
 		if(isSet(parser, "output-reads2") && isSet(parser, "output-reads") && o.runType == PAIRED){
 			getOptionValue(o.outReadsFile2, parser, "output-reads2");
-			*out << "output-reads2:         " << o.outReadsFile2 << endl;
 			
 			if(o.outReadsFile == o.outReadsFile2){
 				cerr << "\n" << "Output reads and reads2 file should not be the same.\n" << endl;
