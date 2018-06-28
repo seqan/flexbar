@@ -144,13 +144,22 @@
 		
 		
 		#if $hTrim.select == "on":
-			--htrim-left $hTrim.hTrimLeft
-			--htrim-right $hTrim.hTrimRight
+			#if $hTrim.hTrimLeft != "":
+				--htrim-left $hTrim.hTrimLeft
+			#end if
+			#if $hTrim.hTrimRight != "":
+				--htrim-right $hTrim.hTrimRight
+			#end if
+			
 			--htrim-min-length $hTrim.hMinLength
 			--htrim-error-rate $hTrim.hErrorRate
 			
-			--htrim-min-length2 $hTrim.hAdvanced.hMinLength2
-			--htrim-max-length $hTrim.hAdvanced.hMaxLength
+			#if $hTrim.hAdvanced.hMinLength2 != "":
+				--htrim-min-length2 $hTrim.hAdvanced.hMinLength2
+			#end if
+			#if $hTrim.hAdvanced.hMaxLength != "":
+				--htrim-max-length $hTrim.hAdvanced.hMaxLength
+			#end if
 			
 			$hTrim.hAdvanced.hMaxFirst
 			$hTrim.hAdvanced.hTrimAdapter
