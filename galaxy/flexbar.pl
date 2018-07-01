@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# Flexbar wrapper for Galaxy tool definition, version 3.4.1
+# Flexbar wrapper for Galaxy tool definition, version 3.4.2
 # Author: Johannes Roehr
 
 use warnings;
