@@ -222,14 +222,14 @@
 				<option value="pc">Paired read collection</option>
 			</param>
 			<when value="se">
-				<param name="rs" type="data" format="fastqsanger,fastqsolexa,fastqillumina,fastqsanger.gz,fastqsolexa.gz,fastqillumina.gz" label="Fastq read file"/>
+				<param name="rs" type="data" format="fastqsanger,fastqsolexa,fastqillumina,fastqsanger.gz,fastqsolexa.gz,fastqillumina.gz,fastqsanger.bz2,fastqsolexa.bz2,fastqillumina.bz2" label="Fastq read file"/>
 			</when>
 			<when value="pe">
-				<param name="r1" type="data" format="fastqsanger,fastqsolexa,fastqillumina,fastqsanger.gz,fastqsolexa.gz,fastqillumina.gz" label="Fastq read file 1"/>
-				<param name="r2" type="data" format="fastqsanger,fastqsolexa,fastqillumina,fastqsanger.gz,fastqsolexa.gz,fastqillumina.gz" label="Fastq read file 2"/>
+				<param name="r1" type="data" format="fastqsanger,fastqsolexa,fastqillumina,fastqsanger.gz,fastqsolexa.gz,fastqillumina.gz,fastqsanger.bz2,fastqsolexa.bz2,fastqillumina.bz2" label="Fastq read file 1"/>
+				<param name="r2" type="data" format="fastqsanger,fastqsolexa,fastqillumina,fastqsanger.gz,fastqsolexa.gz,fastqillumina.gz,fastqsanger.bz2,fastqsolexa.bz2,fastqillumina.bz2" label="Fastq read file 2"/>
 			</when>
 			<when value="pc">
-				<param name="rc" format="fastqsanger,fastqsolexa,fastqillumina,fastqsanger.gz,fastqsolexa.gz,fastqillumina.gz" type="data_collection" collection_type="paired" label="Fastq pair collection"/>
+				<param name="rc" format="fastqsanger,fastqsolexa,fastqillumina,fastqsanger.gz,fastqsolexa.gz,fastqillumina.gz,fastqsanger.bz2,fastqsolexa.bz2,fastqillumina.bz2" type="data_collection" collection_type="paired" label="Fastq pair collection"/>
 			</when>
 		</conditional>
 		
