@@ -17,18 +17,28 @@
 		
 		<![CDATA[
 		
-		flexbar
+		#if $reads.mode == "se":
+			ln -s '$reads.rs' '$rsout'_input.'$reads.rs.extension' &&
+		#elif $reads.mode == "pe":
+			ln -s '$reads.r1' '$r1out'_input.'$reads.r1.extension' &&
+			ln -s '$reads.r2' '$r2out'_input.'$reads.r2.extension' &&
+		#else:
+			ln -s '$reads.rc.forward' '$rcout.forward'_input.'$reads.rc.forward.extension' &&
+			ln -s '$reads.rc.reverse' '$rcout.reverse'_input.'$reads.rc.reverse.extension' &&
+		#end if
+		
+		'$__tool_directory__/flexbar.pl' flexbar
 		
 		--threads \${GALAXY_SLOTS:-1}
 		
 		#if $reads.mode == "se":
-			--reads '$reads.rs'
+			--reads '$rsout'_input.'$reads.rs.extension'
 		#elif $reads.mode == "pe":
-			--reads '$reads.r1'
-			--reads2 '$reads.r2'
+			--reads '$r1out'_input.'$reads.r1.extension'
+			--reads2 '$r2out'_input.'$reads.r2.extension'
 		#else:
-			--reads '$reads.rc.forward'
-			--reads2 '$reads.rc.reverse'
+			--reads '$rcout.forward'_input.'$reads.rc.forward.extension'
+			--reads2 '$rcout.reverse'_input.'$reads.rc.reverse.extension'
 		#end if
 		
 		--max-uncalled $maxUncalled
@@ -188,13 +198,13 @@
 		
 		
 		#if $reads.mode == "se":
-			--output-reads '$rsout'
+			--output-reads '$rsout'.'$reads.rs.extension'
 		#elif $reads.mode == "pe":
-			--output-reads '$r1out'
-			--output-reads2 '$r2out'
+			--output-reads '$r1out'.'$reads.r1.extension'
+			--output-reads2 '$r2out'.'$reads.r2.extension'
 		#else:
-			--output-reads '$rcout.forward'
-			--output-reads2 '$rcout.reverse'
+			--output-reads '$rcout.forward'.'$reads.rc.forward.extension'
+			--output-reads2 '$rcout.reverse'.'$reads.rc.reverse.extension'
 		#end if
 		
 		--output-log '$outlog'
@@ -212,14 +222,14 @@
 				<option value="pc">Paired read collection</option>
 			</param>
 			<when value="se">
-				<param name="rs" type="data" format="fastqsanger,fastqsolexa,fastqillumina" label="Fastq read file"/>
+				<param name="rs" type="data" format="fastqsanger,fastqsolexa,fastqillumina,fastqsanger.gz,fastqsolexa.gz,fastqillumina.gz" label="Fastq read file"/>
 			</when>
 			<when value="pe">
-				<param name="r1" type="data" format="fastqsanger,fastqsolexa,fastqillumina" label="Fastq read file 1"/>
-				<param name="r2" type="data" format="fastqsanger,fastqsolexa,fastqillumina" label="Fastq read file 2"/>
+				<param name="r1" type="data" format="fastqsanger,fastqsolexa,fastqillumina,fastqsanger.gz,fastqsolexa.gz,fastqillumina.gz" label="Fastq read file 1"/>
+				<param name="r2" type="data" format="fastqsanger,fastqsolexa,fastqillumina,fastqsanger.gz,fastqsolexa.gz,fastqillumina.gz" label="Fastq read file 2"/>
 			</when>
 			<when value="pc">
-				<param name="rc" format="fastqsanger,fastqsolexa,fastqillumina" type="data_collection" collection_type="paired" label="Fastq pair collection"/>
+				<param name="rc" format="fastqsanger,fastqsolexa,fastqillumina,fastqsanger.gz,fastqsolexa.gz,fastqillumina.gz" type="data_collection" collection_type="paired" label="Fastq pair collection"/>
 			</when>
 		</conditional>
 		

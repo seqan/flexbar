@@ -1,34 +1,48 @@
 #!/usr/bin/env perl
 
-# Flexbar wrapper for Galaxy tool definition, version 3.4
+# Flexbar wrapper for Galaxy tool definition, version 3.4.1
 # Author: Johannes Roehr
 
 use warnings;
 use strict;
 
-my ($outFile, $id, $folder, $format) = @ARGV[($#ARGV - 3) .. $#ARGV];
+my $format;
+my @inFiles;
+my @outFiles;
 
-my $call = join " ", @ARGV[0..($#ARGV - 4)];
-
-system $call .' --target FlexbarTargetFile --output-log '. $outFile and exit 1;
-
-
-foreach(<FlexbarTargetFile*>){
+foreach(0..$#ARGV){
+	my $arg = $ARGV[$_];
 	
-	my $fileType;
-	
-	$fileType = $1         if /\.(\w+)$/;
-	$fileType = $format    if /\.\w*fast\w$/;
-	$fileType = 'fasta'    if /\.fasta$/;
-	$fileType = 'tabular'  if /\.lengthdist$/;
+	if($arg =~ /\.(fastq\w+)$/ || $arg =~ /\.(fastq\w+\.gz)$/){
+		
+		$format = $1;
+		my $file = $arg;
+		
+		$arg =~ s/\.fastq\w+$/\.fastq/;
+		$arg =~ s/\.fastq\w+\.gz$/\.fastq\.gz/;
+		
+		$ARGV[$_] = $arg;
+		rename $file, $arg;
+		
+		push @inFiles,  $arg if $arg =~ /\.dat_input\.fastq$/ || $arg =~ /\.dat_input\.fastq\.gz$/;
+		push @outFiles, $arg if $arg =~ /\.dat\.fastq$/       || $arg =~ /\.dat\.fastq\.gz$/;
+	}
+}
+
+my $call = join " ", @ARGV;
+
+system $call and exit 1;
+
+
+unlink $_ or warn "Could not unlink $_: $!" foreach(@inFiles);
+
+foreach(@outFiles){
 	
 	my $file = $_;
 	
-	s/_/-/g;
+	s/\.fastq$//;
+	s/\.fastq\.gz$//;
 	
-	my $name = "primary_". $id ."_". $_ ."_visible_". $fileType;
-	
-	rename $file, $name;
-	rename $name, $folder;
+	rename $file, $_;
 }
 
