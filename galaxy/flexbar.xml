@@ -18,27 +18,37 @@
 		<![CDATA[
 		
 		#if $reads.mode == "se":
-			ln -s '$reads.rs' '$rsout'_input.'$reads.rs.extension' &&
+			ln -s '$reads.rs' '$outlog'_input1.'$reads.rs.extension' &&
 		#elif $reads.mode == "pe":
-			ln -s '$reads.r1' '$r1out'_input.'$reads.r1.extension' &&
-			ln -s '$reads.r2' '$r2out'_input.'$reads.r2.extension' &&
+			ln -s '$reads.r1' '$outlog'_input1.'$reads.r1.extension' &&
+			ln -s '$reads.r2' '$outlog'_input2.'$reads.r2.extension' &&
 		#else:
-			ln -s '$reads.rc.forward' '$rcout.forward'_input.'$reads.rc.forward.extension' &&
-			ln -s '$reads.rc.reverse' '$rcout.reverse'_input.'$reads.rc.reverse.extension' &&
+			ln -s '$reads.rc.forward' '$outlog'_input1.'$reads.rc.forward.extension' &&
+			ln -s '$reads.rc.reverse' '$outlog'_input2.'$reads.rc.reverse.extension' &&
 		#end if
+		
+		#if $cBarcodes.select == "on":
+			
+			mkdir flexbar_barcoded &&
+			
+			#if $cBarcodes.bAdvanced.cbReads.select == "yes":
+				ln -s '$cBarcodes.bAdvanced.cbReads.bReads' '$outlog'_input3.'$cBarcodes.bAdvanced.cbReads.bReads.extension' &&
+			#end if
+		#end if
+		
 		
 		'$__tool_directory__/flexbar.pl' flexbar
 		
 		--threads \${GALAXY_SLOTS:-1}
 		
 		#if $reads.mode == "se":
-			--reads '$rsout'_input.'$reads.rs.extension'
+			--reads '$outlog'_input1.'$reads.rs.extension'
 		#elif $reads.mode == "pe":
-			--reads '$r1out'_input.'$reads.r1.extension'
-			--reads2 '$r2out'_input.'$reads.r2.extension'
+			--reads '$outlog'_input1.'$reads.r1.extension'
+			--reads2 '$outlog'_input2.'$reads.r2.extension'
 		#else:
-			--reads '$rcout.forward'_input.'$reads.rc.forward.extension'
-			--reads2 '$rcout.reverse'_input.'$reads.rc.reverse.extension'
+			--reads '$outlog'_input1.'$reads.rc.forward.extension'
+			--reads2 '$outlog'_input2.'$reads.rc.reverse.extension'
 		#end if
 		
 		--max-uncalled $maxUncalled
@@ -99,6 +109,45 @@
 			--qtrim BWA
 			--qtrim-threshold $cTrimQual.trimQualBWA
 			$cTrimQual.trimQualPostBWA
+		#end if
+		
+		
+		#if $cBarcodes.select == "on":
+			
+			--target flexbar_barcoded/flexbarOut
+			
+			#if $cBarcodes.ccBarcodes.select == "file":
+				--barcodes $cBarcodes.ccBarcodes.barcodeFile
+			#end if
+			#if $cBarcodes.ccBarcodes.select == "files":
+				--barcodes $cBarcodes.ccBarcodes.barcodeFile1
+				--barcodes2 $cBarcodes.ccBarcodes.barcodeFile2
+			#end if
+			
+			--barcode-error-rate $cBarcodes.bThresh
+			
+			--barcode-trim-end $cBarcodes.bTrimEnd
+			
+			#if $cBarcodes.bAdvanced.cbReads.select == "yes":
+				--barcode-reads '$outlog'_input3.'$cBarcodes.bAdvanced.cbReads.bReads.extension'
+			#end if
+			
+			#if $cBarcodes.bAdvanced.cbMinOverlap.select == "yes":
+				--barcode-min-overlap $cBarcodes.bAdvanced.cbMinOverlap.bMinOverlap
+			#end if
+			
+			$cBarcodes.bAdvanced.bKeep
+			$cBarcodes.bAdvanced.bUnassigned
+			
+			#if $cBarcodes.bAdvanced.cbTailLen.select == "yes":
+				--barcode-tail-length $cBarcodes.bAdvanced.cbTailLen.bTailLen
+			#end if
+			
+			#if $cBarcodes.bAdvanced.cbAlignScores.select == "yes":
+				--barcode-match    $cBarcodes.bAdvanced.cbAlignScores.bMatch
+				--barcode-mismatch $cBarcodes.bAdvanced.cbAlignScores.bMismatch
+				--barcode-gap      $cBarcodes.bAdvanced.cbAlignScores.bGap
+			#end if
 		#end if
 		
 		
@@ -196,18 +245,23 @@
 			#end if
 		#end if
 		
-		
-		#if $reads.mode == "se":
-			--output-reads '$rsout'.'$reads.rs.extension'
-		#elif $reads.mode == "pe":
-			--output-reads '$r1out'.'$reads.r1.extension'
-			--output-reads2 '$r2out'.'$reads.r2.extension'
-		#else:
-			--output-reads '$rcout.forward'.'$reads.rc.forward.extension'
-			--output-reads2 '$rcout.reverse'.'$reads.rc.reverse.extension'
+		#if $cBarcodes.select == "off":
+			#if $reads.mode == "se":
+				--output-reads '$rsout'.'$reads.rs.extension'
+			#elif $reads.mode == "pe":
+				--output-reads '$r1out'.'$reads.r1.extension'
+				--output-reads2 '$r2out'.'$reads.r2.extension'
+			#else:
+				--output-reads '$rcout.forward'.'$reads.rc.forward.extension'
+				--output-reads2 '$rcout.reverse'.'$reads.rc.reverse.extension'
+			#end if
 		#end if
 		
 		--output-log '$outlog'
+		
+		#if $cBarcodes.select == "on":
+			flexbar_barcoded
+		#end if
 		
 		]]>
 	</command>
@@ -285,8 +339,106 @@
 		</conditional>
 		
 		
+		<conditional name="cBarcodes">
+			<param name="select" type="select" label="4) Barcode detection">
+				<option value="off" selected="true">Off</option>
+				<option value="on">On</option>
+			</param>
+			<when value="off">
+			</when>
+			<when value="on">
+				<conditional name="ccBarcodes">
+					<param name="select" type="select" label="Barcodes">
+						<option value="file" selected="true">Barcode file</option>
+						<option value="files">Two barcode files</option>
+					</param>
+					<when value="file">
+						<param format="fasta" name="barcodeFile" type="data" label="Fasta file with barcodes for reads 1"/>
+					</when>
+					<when value="files">
+						<param format="fasta" name="barcodeFile1" type="data" label="Fasta file with barcodes for reads 1"/>
+						<param format="fasta" name="barcodeFile2" type="data" label="Fasta file with barcodes for reads 2"/>
+					</when>
+				</conditional>
+				
+				<param name="bThresh" size="4" type="float" value="0.0" label="Error rate" help="allowed fraction of mismatches and indels"/>
+				
+				<param name="bTrimEnd" type="select" label="Trim-end mode">
+					<option value="LTAIL" selected="true">Left tail</option>
+					<option value="LEFT">Left</option>
+					<option value="RTAIL">Right tail</option>
+					<option value="RIGHT">Right</option>
+					<option value="ANY">Any</option>
+				</param>
+				
+				<section name="bAdvanced" title="Advanced options" expanded="false">
+					
+					<conditional name="cbReads">
+						<param name="select" type="select" label="Separate barcode reads">
+							<option value="no" selected="true">No</option>
+							<option value="yes">Yes</option>
+						</param>
+						<when value="no">
+						</when>
+						<when value="yes">
+							<param name="bReads" type="data" label="Fastq file with separate barcode reads" format="fastqsanger,fastqsolexa,fastqillumina,fastqsanger.gz,fastqsolexa.gz,fastqillumina.gz,fastqsanger.bz2,fastqsolexa.bz2,fastqillumina.bz2"/>
+						</when>
+					</conditional>
+					
+					<conditional name="cbMinOverlap">
+						<param name="select" type="select" label="Change minimum overlap" help="default: barcode length">
+							<option value="no" selected="true">No</option>
+							<option value="yes">Yes</option>
+						</param>
+						<when value="no">
+						</when>
+						<when value="yes">
+							<param name="bMinOverlap" size="4" type="integer" value="" label="Minimum overlap"/>
+						</when>
+					</conditional>
+					
+					<param name="bKeep" type="select" label="Remove barcodes within reads">
+						<option value="" selected="true">Yes</option>
+						<option value="--barcode-keep">No</option>
+					</param>
+					
+					<param name="bUnassigned" type="select" label="Include unassigned reads">
+						<option value="" selected="true">No</option>
+						<option value="--barcode-unassigned">Yes</option>
+					</param>
+					
+					<conditional name="cbTailLen">
+						<param name="select" type="select" label="Change tail length">
+							<option value="no" selected="true">No</option>
+							<option value="yes">Yes</option>
+						</param>
+						<when value="no">
+						</when>
+						<when value="yes">
+							<param name="bTailLen" size="4" type="integer" value="" label="Tail length"/>
+						</when>
+					</conditional>
+					
+					<conditional name="cbAlignScores">
+						<param name="select" type="select" label="Modify alignment scores">
+							<option value="no" selected="true">No</option>
+							<option value="yes">Yes</option>
+						</param>
+						<when value="no">
+						</when>
+						<when value="yes">
+							<param name="bMatch"    size="3" type="integer" value="1"  label="Match"/>
+							<param name="bMismatch" size="3" type="integer" value="-1" label="Mismatch"/>
+							<param name="bGap"      size="3" type="integer" value="-9" label="Gap"/>
+						</when>
+					</conditional>
+				</section>
+			</when>
+		</conditional>
+		
+		
 		<conditional name="cAdapters">
-			<param name="select" type="select" label="4) Adapter removal">
+			<param name="select" type="select" label="5) Adapter removal">
 				<option value="off" selected="true">Off</option>
 				<option value="on">On</option>
 			</param>
@@ -411,7 +563,7 @@
 		
 		
 		<conditional name="hTrim">
-			<param name="select" type="select" label="5) Trimming of homopolymers">
+			<param name="select" type="select" label="6) Trimming of homopolymers">
 				<option value="off" selected="true">Off</option>
 				<option value="on">On</option>
 			</param>
@@ -445,7 +597,7 @@
 		
 		
 		<conditional name="cTrimLen">
-			<param name="select" type="select" label="6) Trimming to length">
+			<param name="select" type="select" label="7) Trimming to length">
 				<option value="off" selected="true">Off</option>
 				<option value="on">On</option>
 			</param>
@@ -456,7 +608,7 @@
 			</when>
 		</conditional>
 		
-		<param name="minReadLen"  size="4" type="integer" value="20" label="7) Minimum read length"/>
+		<param name="minReadLen"  size="4" type="integer" value="20" label="8) Minimum read length"/>
 		
 		<conditional name="cAddOptions">
 			<param name="select" type="select" label="Additional options">
@@ -515,20 +667,30 @@
 		
 		<data name="rsout" label="Flexbar on ${reads.rs.name}" format_source="rs">
 			<filter>reads['mode'] == 'se'</filter>
+			<filter>cBarcodes['select'] == "off"</filter>
 		</data>
 		
 		<data name="r1out" label="Flexbar on ${reads.r1.name}" format_source="r1">
 			<filter>reads['mode'] == "pe"</filter>
+			<filter>cBarcodes['select'] == "off"</filter>
 		</data>
 		<data name="r2out" label="Flexbar on ${reads.r2.name}" format_source="r2">
 			<filter>reads['mode'] == "pe"</filter>
+			<filter>cBarcodes['select'] == "off"</filter>
 		</data>
 		
 		<collection name="rcout" type="paired" label="Flexbar on ${on_string}">
 			<filter>reads['mode'] == "pc"</filter>
+			<filter>cBarcodes['select'] == "off"</filter>
 			<data name="forward" label="Flexbar on ${reads.rc.forward.name}" format_source="rc['forward']"/>
 			<data name="reverse" label="Flexbar on ${reads.rc.reverse.name}" format_source="rc['reverse']"/>
 		</collection>
+		
+		<collection type="list" label="Flexbar on ${on_string}" name="barcoded">
+			<filter>cBarcodes['select'] == "on"</filter>
+			<discover_datasets pattern="__designation_and_ext__" directory="flexbar_barcoded" visible="true"/>
+		</collection>
+		
 	</outputs>
 	
 	<help>
