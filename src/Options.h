@@ -22,7 +22,7 @@ struct Options{
 	
 	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, umiTags, logStdout;
 	bool switch2Fasta, writeUnassigned, writeSingleReads, writeSingleReadsP, writeLengthDist;
-	bool useStdin, useStdout, relaxRegion, useRcTrimEnd, qtrimPostRm;
+	bool useStdin, useStdout, relaxRegion, useRcTrimEnd, qtrimPostRm, addBarcodeAdapter;
 	bool interleavedInput, htrimAdapterRm, htrimMaxFirstOnly;
 	
 	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len, p_min_overlap;
@@ -84,6 +84,7 @@ struct Options{
 		useStdout         = false;
 		relaxRegion       = false;
 		useRcTrimEnd      = false;
+		addBarcodeAdapter = false;
 		qtrimPostRm       = false;
 		htrimAdapterRm    = false;
 		htrimMaxFirstOnly = false;
@@ -214,6 +215,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("av", "adapter-min-poverlap", "Minimum overlap of paired reads for detection.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("ac", "adapter-revcomp", "Include reverse complements of adapters.", ARG::STRING));
 	addOption(parser, ArgParseOption("ad", "adapter-revcomp-end", "Use different trim-end for reverse complements of adapters.", ARG::STRING));
+	addOption(parser, ArgParseOption("ab", "adapter-add-barcode", "Add reverse complement of detected barcode to adapters."));
 	addOption(parser, ArgParseOption("ar", "adapter-read-set", "Consider only single read set for adapters.", ARG::STRING));
 	addOption(parser, ArgParseOption("ay", "adapter-cycles", "Number of adapter removal cycles.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("am", "adapter-match", "Alignment match score.", ARG::INTEGER));
@@ -287,6 +289,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "adapter-min-poverlap");
 	setAdvanced(parser, "adapter-revcomp");
 	setAdvanced(parser, "adapter-revcomp-end");
+	setAdvanced(parser, "adapter-add-barcode");
 	setAdvanced(parser, "adapter-read-set");
 	setAdvanced(parser, "adapter-cycles");
 	setAdvanced(parser, "adapter-match");
@@ -1039,6 +1042,11 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 			if(isSet(parser, "adapter-relaxed")){
 				*out << "adapter-relaxed:       on" << endl;
 				o.relaxRegion = true;
+			}
+			
+			if(isSet(parser, "adapter-add-barcode")){
+				*out << "adapter-add-barcode:   on" << endl;
+				o.addBarcodeAdapter = true;
 			}
 			
 			if(isSet(parser, "adapter-read-set") && o.isPaired && o.adapRm != NORMAL2){
