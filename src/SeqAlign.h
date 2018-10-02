@@ -15,7 +15,7 @@ private:
 	const flexbar::FileFormat  m_format;
 	const flexbar::PairOverlap m_poMode;
 	
-	const bool m_isBarcoding, m_writeTag, m_umiTags, m_strictRegion;
+	const bool m_isBarcoding, m_writeTag, m_umiTags, m_strictRegion, m_addBarcodeAdapter;
 	const int m_minLength, m_minOverlap, m_tailLength;
 	const float m_errorRate;
 	const unsigned int m_bundleSize;
@@ -41,6 +41,7 @@ public:
 			m_log(o.logAlign),
 			m_format(o.format),
 			m_writeTag(o.useRemovalTag),
+			m_addBarcodeAdapter(o.addBarcodeAdapter),
 			m_strictRegion(! o.relaxRegion),
 			m_bundleSize(o.bundleSize),
 			m_out(o.out),
@@ -53,7 +54,7 @@ public:
 	};
 	
 	
-	int alignSeqRead(flexbar::TSeqRead* sr, const bool performRemoval, flexbar::Alignments &alignments, flexbar::ComputeCycle &cycle, unsigned int &idxAl, const flexbar::AlignmentMode &alMode, const flexbar::TrimEnd trimEnd){
+	int alignSeqRead(flexbar::TSeqRead* sr, const bool performRemoval, flexbar::Alignments &alignments, flexbar::ComputeCycle &cycle, unsigned int &idxAl, const flexbar::AlignmentMode &alMode, const flexbar::TrimEnd trimEnd, const TSeqStr &addBarcode){
 		
 		using namespace std;
 		using namespace flexbar;
@@ -81,12 +82,18 @@ public:
 				if     (alMode == ALIGNRCOFF &&   m_queries->at(i).rcAdapter) continue;
 				else if(alMode == ALIGNRC    && ! m_queries->at(i).rcAdapter) continue;
 				
-				TSeqStr &qseq = m_queries->at(i).seq;
+				TSeqStr *qseq = &m_queries->at(i).seq;
 				TSeqStr *rseq = &seqRead.seq;
-				TSeqStr tmp;
+				TSeqStr tmp, tmpq;
+				
+				if(! m_isBarcoding && m_addBarcodeAdapter && addBarcode != ""){
+					tmpq = addBarcode;
+					append(tmpq, m_queries->at(i).seq);
+					qseq = &tmpq;
+				}
 				
 				if(trimEnd == LTAIL || trimEnd == RTAIL){
-					int tailLength  = (m_tailLength > 0) ? m_tailLength : length(qseq);
+					int tailLength  = (m_tailLength > 0) ? m_tailLength : length(*qseq);
 					
 					if(tailLength < readLength){
 						if(trimEnd == LTAIL) tmp = prefix(seqRead.seq, tailLength);
@@ -100,7 +107,7 @@ public:
 				resize(rows(alignments.aset[idxAl]), 2);
 				
 				assignSource(row(alignments.aset[idxAl], 0), *rseq);
-				assignSource(row(alignments.aset[idxAl], 1),  qseq);
+				assignSource(row(alignments.aset[idxAl], 1), *qseq);
 				
 				++idxAl;
 			}
@@ -124,6 +131,11 @@ public:
 			m_algo.alignGlobal(a, alignments, cycle, idxAl++, trimEnd);
 			
 			a.queryLength = length(m_queries->at(i).seq);
+			
+			if(! m_isBarcoding && m_addBarcodeAdapter && addBarcode != ""){
+				a.queryLength += length(addBarcode);
+			}
+			
 			a.tailLength  = (m_tailLength > 0) ? m_tailLength : a.queryLength;
 			
 			a.overlapLength = a.endPos - a.startPos;

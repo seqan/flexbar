@@ -14,7 +14,7 @@ class PairedAlign : public tbb::filter {
 private:
 	
 	const bool m_writeUnassigned, m_twoBarcodes, m_umiTags, m_useRcTrimEnd;
-	const bool m_htrim, m_htrimAdapterRm, m_htrimMaxFirstOnly;
+	const bool m_htrim, m_htrimAdapterRm, m_htrimMaxFirstOnly, m_addBarcodeAdapter;
 	
 	const std::string m_htrimLeft, m_htrimRight;
 	
@@ -61,6 +61,7 @@ public:
 		m_umiTags(o.umiTags),
 		m_useRcTrimEnd(o.useRcTrimEnd),
 		m_writeUnassigned(o.writeUnassigned),
+		m_addBarcodeAdapter(o.addBarcodeAdapter),
 		m_htrimLeft(o.htrimLeft),
 		m_htrimRight(o.htrimRight),
 		m_htrimMinLength(o.htrimMinLength),
@@ -106,11 +107,11 @@ public:
 		using namespace flexbar;
 		
 		switch(m_barType){
-			case BARCODE_READ:         pRead->barID  = m_b1->alignSeqRead(pRead->b,  false, alBundle[0], cycle[0], idxAl[0], alMode, m_bTrimEnd); break;
-			case WITHIN_READ_REMOVAL2: pRead->barID2 = m_b2->alignSeqRead(pRead->r2, true,  alBundle[2], cycle[2], idxAl[2], alMode, m_bTrimEnd);
-			case WITHIN_READ_REMOVAL:  pRead->barID  = m_b1->alignSeqRead(pRead->r1, true,  alBundle[1], cycle[1], idxAl[1], alMode, m_bTrimEnd); break;
-			case WITHIN_READ2:         pRead->barID2 = m_b2->alignSeqRead(pRead->r2, false, alBundle[2], cycle[2], idxAl[2], alMode, m_bTrimEnd);
-			case WITHIN_READ:          pRead->barID  = m_b1->alignSeqRead(pRead->r1, false, alBundle[1], cycle[1], idxAl[1], alMode, m_bTrimEnd); break;
+			case BARCODE_READ:         pRead->barID  = m_b1->alignSeqRead(pRead->b,  false, alBundle[0], cycle[0], idxAl[0], alMode, m_bTrimEnd, ""); break;
+			case WITHIN_READ_REMOVAL2: pRead->barID2 = m_b2->alignSeqRead(pRead->r2, true,  alBundle[2], cycle[2], idxAl[2], alMode, m_bTrimEnd, "");
+			case WITHIN_READ_REMOVAL:  pRead->barID  = m_b1->alignSeqRead(pRead->r1, true,  alBundle[1], cycle[1], idxAl[1], alMode, m_bTrimEnd, ""); break;
+			case WITHIN_READ2:         pRead->barID2 = m_b2->alignSeqRead(pRead->r2, false, alBundle[2], cycle[2], idxAl[2], alMode, m_bTrimEnd, "");
+			case WITHIN_READ:          pRead->barID  = m_b1->alignSeqRead(pRead->r1, false, alBundle[1], cycle[1], idxAl[1], alMode, m_bTrimEnd, ""); break;
 			case BOFF: break;
 		}
 		
@@ -125,12 +126,49 @@ public:
 		
 		using namespace flexbar;
 		
-		if(m_adapRem != ATWO)
-			m_a1->alignSeqRead(pRead->r1, true, alBundle[0], cycle[0], idxAl[0], alMode, trimEnd);
+		if(m_adapRem != ATWO){
+			
+			TSeqStr addBarcode = "";
+			
+			if(m_addBarcodeAdapter && pRead->r2 != NULL && pRead->barID2 > 0){
+				addBarcode = m_barcodes2->at(pRead->barID2 - 1).seq;
+				
+				if(m_umiTags && pRead->r2->umi != ""){
+					unsigned int umiPos = 1;
+					
+					for(unsigned int i = 0; i < length(addBarcode); ++i){
+						if(addBarcode[i] == 'N' && length(pRead->r2->umi) > umiPos){
+							addBarcode[i] = pRead->r2->umi[umiPos++];
+						}
+					}
+				}
+				seqan::reverseComplement(addBarcode);
+			}
+			
+			m_a1->alignSeqRead(pRead->r1, true, alBundle[0], cycle[0], idxAl[0], alMode, trimEnd, addBarcode);
+		}
 		
 		if(pRead->r2 != NULL && m_adapRem != AONE){
-			if(m_adapRem != NORMAL2) m_a1->alignSeqRead(pRead->r2, true, alBundle[1], cycle[1], idxAl[1], alMode, trimEnd);
-			else                     m_a2->alignSeqRead(pRead->r2, true, alBundle[1], cycle[1], idxAl[1], alMode, trimEnd);
+			
+			TSeqStr addBarcode = "";
+			
+			if(m_addBarcodeAdapter && pRead->barID > 0){
+				addBarcode = m_barcodes->at(pRead->barID - 1).seq;
+				
+				if(m_umiTags && pRead->r1->umi != ""){
+					unsigned int umiPos = 1;
+					
+					for(unsigned int i = 0; i < length(addBarcode); ++i){
+						if(addBarcode[i] == 'N' && length(pRead->r1->umi) > umiPos){
+							addBarcode[i] = pRead->r1->umi[umiPos++];
+						}
+					}
+				}
+				seqan::reverseComplement(addBarcode);
+			}
+			
+			if(m_adapRem != NORMAL2) m_a1->alignSeqRead(pRead->r2, true, alBundle[1], cycle[1], idxAl[1], alMode, trimEnd, addBarcode);
+			else                     m_a2->alignSeqRead(pRead->r2, true, alBundle[1], cycle[1], idxAl[1], alMode, trimEnd, addBarcode);
 		}
 	}
 	
