@@ -1044,7 +1044,9 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 				o.relaxRegion = true;
 			}
 			
-			if(isSet(parser, "adapter-add-barcode")){
+			if(isSet(parser, "adapter-add-barcode") && o.isPaired && o.a_end == RIGHT && o.rcMode != RCON &&
+				o.barDetect != BARCODE_READ && o.barDetect != BOFF && o.b_end == LTAIL){
+				
 				*out << "adapter-add-barcode:   on" << endl;
 				o.addBarcodeAdapter = true;
 			}
