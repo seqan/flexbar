@@ -103,7 +103,7 @@ To remove adapter sequences from single-end reads, specify a file with adapters 
 
 For paired-end libraries, specify both files with paired reads and a fasta file with adapters for removal. Given adapters are trimmed in right mode per default. It is recommended to activate the pair overlap detection in case of standard paired reads. This increases the sensitivity by removing very short parts of adapters if an overlap is detected for a pair.
 
-	flexbar -r r1.fq -p r2.fq -a adapters.fa -ap ON
+	flexbar -r r1.fq -p r2.fq -a a1.fa -a2 a2.fa -ap ON
 
 #### Adapter removal presets
 
