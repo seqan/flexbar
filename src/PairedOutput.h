@@ -26,6 +26,7 @@ private:
 	const flexbar::RunType        m_runType;
 	const flexbar::BarcodeDetect  m_barDetect;
 	const flexbar::QualTrimType   m_qtrim;
+	const flexbar::AdapterTrimmed m_aTrimmed;
 	
 	typedef SeqOutput<TSeqStr, TString>      TSeqOutput;
 	typedef SeqOutputFiles<TSeqStr, TString> TOutFiles;
@@ -50,6 +51,7 @@ public:
 		m_qtrimThresh(o.qtrimThresh),
 		m_qtrimWinSize(o.qtrimWinSize),
 		m_qtrimPostRm(o.qtrimPostRm),
+		m_aTrimmed(o.aTrimmed),
 		m_isPaired(o.isPaired),
 		m_writeUnassigned(o.writeUnassigned),
 		m_writeSingleReads(o.writeSingleReads),
@@ -253,11 +255,13 @@ public:
 							if(qualTrim(pRead->r1, m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
 						}
 						
-						if(length(pRead->r1->seq) >= m_minLength){
-							
-							m_outMap[pRead->barID].f1->writeRead(pRead->r1);
-						}
+						if(length(pRead->r1->seq) >= m_minLength) l1ok = true;
 						else m_outMap[pRead->barID].m_nShort_1++;
+						
+						if     (m_aTrimmed == ATOFF  &&  (pRead->r1->rmAdapter ||   pRead->r1->rmAdapterRC)) l1ok = false;
+						else if(m_aTrimmed == ATONLY && ! pRead->r1->rmAdapter && ! pRead->r1->rmAdapterRC)  l1ok = false;
+						
+						if(l1ok) m_outMap[pRead->barID].f1->writeRead(pRead->r1);
 					}
 				}
 				break;
@@ -286,6 +290,15 @@ public:
 						
 						if(length(pRead->r1->seq) >= m_minLength) l1ok = true;
 						if(length(pRead->r2->seq) >= m_minLength) l2ok = true;
+						
+						if(! l1ok) m_outMap[outIdx].m_nShort_1++;
+						if(! l2ok) m_outMap[outIdx].m_nShort_2++;
+						
+						if     (m_aTrimmed == ATOFF  &&  (pRead->r1->rmAdapter ||   pRead->r1->rmAdapterRC)) l1ok = false;
+						else if(m_aTrimmed == ATONLY && ! pRead->r1->rmAdapter && ! pRead->r1->rmAdapterRC)  l1ok = false;
+						
+						if     (m_aTrimmed == ATOFF  &&  (pRead->r2->rmAdapter ||   pRead->r2->rmAdapterRC)) l2ok = false;
+						else if(m_aTrimmed == ATONLY && ! pRead->r2->rmAdapter && ! pRead->r2->rmAdapterRC)  l2ok = false;
 						
 						if(l1ok && l2ok){
 							m_outMap[outIdx].f1->writeRead(pRead->r1);
@@ -325,9 +338,6 @@ public:
 								m_outMap[outIdx].f2->writeRead(pRead->r2);
 							}
 						}
-						
-						if(! l1ok) m_outMap[outIdx].m_nShort_1++;
-						if(! l2ok) m_outMap[outIdx].m_nShort_2++;
 					}
 				}
 			}
