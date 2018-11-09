@@ -44,6 +44,7 @@ struct Options{
 	flexbar::RevCompMode     rcMode;
 	flexbar::PairOverlap     poMode;
 	flexbar::AdapterPreset   aPreset;
+	flexbar::AdapterTrimmed  aTrimmed;
 	
 	tbb::concurrent_vector<flexbar::TBar> barcodes, adapters, barcodes2, adapters2;
 	
@@ -115,6 +116,7 @@ struct Options{
 		arc_end   = RIGHT;
 		b_end     = LTAIL;
 		aPreset   = APOFF;
+		aTrimmed  = ATON;
     }
 };
 
@@ -216,6 +218,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("ac", "adapter-revcomp", "Include reverse complements of adapters.", ARG::STRING));
 	addOption(parser, ArgParseOption("ad", "adapter-revcomp-end", "Use different trim-end for reverse complements of adapters.", ARG::STRING));
 	addOption(parser, ArgParseOption("ab", "adapter-add-barcode", "Add reverse complement of detected barcode to adapters."));
+	addOption(parser, ArgParseOption("ak", "adapter-trimmed-out", "Modify that trimmed reads are kept.", ARG::STRING));
 	addOption(parser, ArgParseOption("ar", "adapter-read-set", "Consider only single read set for adapters.", ARG::STRING));
 	addOption(parser, ArgParseOption("ay", "adapter-cycles", "Number of adapter removal cycles.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("am", "adapter-match", "Alignment match score.", ARG::INTEGER));
@@ -290,6 +293,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "adapter-revcomp");
 	setAdvanced(parser, "adapter-revcomp-end");
 	setAdvanced(parser, "adapter-add-barcode");
+	setAdvanced(parser, "adapter-trimmed-out");
 	setAdvanced(parser, "adapter-read-set");
 	setAdvanced(parser, "adapter-cycles");
 	setAdvanced(parser, "adapter-match");
@@ -362,6 +366,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	setValidValues(parser, "adapter-read-set", "1 2");
 	setValidValues(parser, "adapter-revcomp", "ON ONLY");
+	setValidValues(parser, "adapter-trimmed-out", "OFF ONLY");
 	setValidValues(parser, "adapter-pair-overlap", "ON SHORT ONLY");
 	setValidValues(parser, "adapter-preset", "TruSeq SmallRNA Methyl Ribo Nextera NexteraMP");
 	
@@ -1049,6 +1054,15 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 				
 				*out << "adapter-add-barcode:   on" << endl;
 				o.addBarcodeAdapter = true;
+			}
+			
+			if(isSet(parser, "adapter-trimmed-out")){
+				string a_trimmed_out;
+				getOptionValue(a_trimmed_out, parser, "adapter-trimmed-out");
+				*out << "adapter-trimmed-out:   " << a_trimmed_out << endl;
+				
+				     if(a_trimmed_out == "OFF")  o.aTrimmed = ATOFF;
+				else if(a_trimmed_out == "ONLY") o.aTrimmed = ATONLY;
 			}
 			
 			if(isSet(parser, "adapter-read-set") && o.isPaired && o.adapRm != NORMAL2){

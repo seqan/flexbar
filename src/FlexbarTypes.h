@@ -233,6 +233,12 @@ namespace flexbar{
 		AOFF
 	};
 	
+	enum AdapterTrimmed {
+		ATON,
+		ATOFF,
+		ATONLY
+	};
+	
 	enum RunType {
 		SINGLE,
 		PAIRED,
