@@ -30,7 +30,7 @@ int main(int argc, const char* argv[]){
 	using namespace seqan;
 	
 	const string version = "3.5 beta";
-	const string date    = "October 2018";
+	const string date    = "November 2018";
 	
 	ArgumentParser parser("flexbar");
 	
