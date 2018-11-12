@@ -114,6 +114,8 @@ public:
 					
 					++m_modified;
 					
+					seqRead2.poRemoval = true;
+					
 					if(m_writeTag) append(seqRead2.id, "_Flexbar_removal_PO");
 				}
 			}
@@ -131,6 +133,8 @@ public:
 					erase(seqRead.qual, rCutPos, readLength);
 					
 					++m_modified;
+					
+					seqRead.poRemoval = true;
 					
 					if(m_writeTag) append(seqRead.id, "_Flexbar_removal_PO");
 				}

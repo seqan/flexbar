@@ -241,7 +241,7 @@ public:
 		
 		using namespace flexbar;
 		
-		bool l1ok = false, l2ok = false;
+		bool r1ok = false, r2ok = false;
 		
 		switch(m_runType){
 			
@@ -255,13 +255,13 @@ public:
 							if(qualTrim(pRead->r1, m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
 						}
 						
-						if(length(pRead->r1->seq) >= m_minLength) l1ok = true;
+						if(length(pRead->r1->seq) >= m_minLength) r1ok = true;
 						else m_outMap[pRead->barID].m_nShort_1++;
 						
-						if     (m_aTrimmed == ATOFF  &&  (pRead->r1->rmAdapter ||   pRead->r1->rmAdapterRC)) l1ok = false;
-						else if(m_aTrimmed == ATONLY && ! pRead->r1->rmAdapter && ! pRead->r1->rmAdapterRC)  l1ok = false;
+						if     (m_aTrimmed == ATOFF  &&  (pRead->r1->rmAdapter ||   pRead->r1->rmAdapterRC)) r1ok = false;
+						else if(m_aTrimmed == ATONLY && ! pRead->r1->rmAdapter && ! pRead->r1->rmAdapterRC)  r1ok = false;
 						
-						if(l1ok) m_outMap[pRead->barID].f1->writeRead(pRead->r1);
+						if(r1ok) m_outMap[pRead->barID].f1->writeRead(pRead->r1);
 					}
 				}
 				break;
@@ -288,23 +288,23 @@ public:
 							if(qualTrim(pRead->r2, m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
 						}
 						
-						if(length(pRead->r1->seq) >= m_minLength) l1ok = true;
-						if(length(pRead->r2->seq) >= m_minLength) l2ok = true;
+						if(length(pRead->r1->seq) >= m_minLength) r1ok = true;
+						if(length(pRead->r2->seq) >= m_minLength) r2ok = true;
 						
-						if(! l1ok) m_outMap[outIdx].m_nShort_1++;
-						if(! l2ok) m_outMap[outIdx].m_nShort_2++;
+						if(! r1ok) m_outMap[outIdx].m_nShort_1++;
+						if(! r2ok) m_outMap[outIdx].m_nShort_2++;
 						
-						if     (m_aTrimmed == ATOFF  &&  (pRead->r1->rmAdapter ||   pRead->r1->rmAdapterRC)) l1ok = false;
-						else if(m_aTrimmed == ATONLY && ! pRead->r1->rmAdapter && ! pRead->r1->rmAdapterRC)  l1ok = false;
+						if     (m_aTrimmed == ATOFF  &&  (pRead->r1->rmAdapter ||   pRead->r1->rmAdapterRC ||   pRead->r1->poRemoval)) r1ok = false;
+						else if(m_aTrimmed == ATONLY && ! pRead->r1->rmAdapter && ! pRead->r1->rmAdapterRC && ! pRead->r1->poRemoval)  r1ok = false;
 						
-						if     (m_aTrimmed == ATOFF  &&  (pRead->r2->rmAdapter ||   pRead->r2->rmAdapterRC)) l2ok = false;
-						else if(m_aTrimmed == ATONLY && ! pRead->r2->rmAdapter && ! pRead->r2->rmAdapterRC)  l2ok = false;
+						if     (m_aTrimmed == ATOFF  &&  (pRead->r2->rmAdapter ||   pRead->r2->rmAdapterRC ||   pRead->r2->poRemoval)) r2ok = false;
+						else if(m_aTrimmed == ATONLY && ! pRead->r2->rmAdapter && ! pRead->r2->rmAdapterRC && ! pRead->r2->poRemoval)  r2ok = false;
 						
-						if(l1ok && l2ok){
+						if(r1ok && r2ok){
 							m_outMap[outIdx].f1->writeRead(pRead->r1);
 							m_outMap[outIdx].f2->writeRead(pRead->r2);
 						}
-						else if(l1ok && ! l2ok){
+						else if(r1ok && ! r2ok){
 							m_nSingleReads++;
 							
 							if(m_writeSingleReads){
@@ -321,7 +321,7 @@ public:
 								m_outMap[outIdx].f2->writeRead(pRead->r2);
 							}
 						}
-						else if(! l1ok && l2ok){
+						else if(! r1ok && r2ok){
 							m_nSingleReads++;
 							
 							if(m_writeSingleReads){

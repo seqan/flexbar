@@ -11,14 +11,15 @@ class SeqRead {
 	TSeqStr seq;
 	TString id, qual, umi;
 	
-	bool rmAdapter, rmAdapterRC, pairOverlap;
+	bool rmAdapter, rmAdapterRC, pairOverlap, poRemoval;
 	
 	SeqRead(TSeqStr& sequence, TString& seqID) :
 		seq(sequence),
 		id(seqID),
 		rmAdapter(false),
 		rmAdapterRC(false),
-		pairOverlap(false){
+		pairOverlap(false),
+		poRemoval(false){
 	}
 	
 	SeqRead(TSeqStr& sequence, TString& seqID, TString& quality) :
@@ -27,7 +28,8 @@ class SeqRead {
 		qual(quality),
 		rmAdapter(false),
 		rmAdapterRC(false),
-		pairOverlap(false){
+		pairOverlap(false),
+		poRemoval(false){
 	}
 };
 
