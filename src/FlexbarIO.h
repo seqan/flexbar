@@ -295,8 +295,7 @@ void checkInputType(const std::string path, flexbar::FileFormat &format, const b
 		try{
 			if(! atEnd(seqFileIn)){
 				
-				FSeqStr seq;
-				FString id, qual;
+				FString id, seq, qual;
 				
 				readRecord(id, seq, qual, seqFileIn);
 				
