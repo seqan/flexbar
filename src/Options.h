@@ -23,7 +23,7 @@ struct Options{
 	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, umiTags, logStdout;
 	bool switch2Fasta, writeUnassigned, writeSingleReads, writeSingleReadsP, writeLengthDist;
 	bool useStdin, useStdout, relaxRegion, useRcTrimEnd, qtrimPostRm, addBarcodeAdapter;
-	bool interleavedInput, htrimAdapterRm, htrimMaxFirstOnly;
+	bool interleavedInput, iupacInput, htrimAdapterRm, htrimMaxFirstOnly;
 	
 	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len, p_min_overlap;
 	int qtrimThresh, qtrimWinSize, a_overhang, htrimMinLength, htrimMinLength2, htrimMaxLength;
@@ -81,6 +81,7 @@ struct Options{
 		logStdout         = false;
 		umiTags           = false;
 		interleavedInput  = false;
+		iupacInput        = false;
 		useStdin          = false;
 		useStdout         = false;
 		relaxRegion       = false;
@@ -187,6 +188,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("r", "reads", "Fasta/q file or stdin (-) with reads that may contain barcodes.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("p", "reads2", "Second input file of paired reads, gz and bz2 files supported.", ARG::INPUT_FILE));
 	addOption(parser, ArgParseOption("i", "interleaved", "Interleaved format for first input set with paired reads."));
+	addOption(parser, ArgParseOption("I", "iupac", "Accept iupac symbols in reads and convert to N if not ATCG."));
 	
 	addSection(parser, "Barcode detection");
 	addOption(parser, ArgParseOption("b",  "barcodes", "Fasta file with barcodes for demultiplexing, may contain N.", ARG::INPUT_FILE));
@@ -315,6 +317,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "bundle");
 	setAdvanced(parser, "bundles");
 	setAdvanced(parser, "interleaved");
+	setAdvanced(parser, "iupac");
 	setAdvanced(parser, "length-dist");
 	setAdvanced(parser, "single-reads");
 	setAdvanced(parser, "single-reads-paired");
@@ -619,6 +622,11 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 			cerr << "\n" << "First and second reads file do not have same format.\n" << endl;
 			exit(1);
 		}
+	}
+	
+	if(isSet(parser, "iupac")){
+		*out << "Iupac reads:           on" << endl;
+		o.iupacInput = true;
 	}
 	
 	
