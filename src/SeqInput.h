@@ -86,59 +86,8 @@ public:
 						reserve(quals, nReads);
 						readRecords(ids, seqs, quals, seqFileIn, nReads);
 					}
-					
-					for(unsigned int i = 0; i < length(ids); ++i){
-						
-						TString &id  =  ids[i];
-						TSeqStr &seq = seqs[i];
-						
-						if(length(id) < 1){
-							cerr << "\nERROR: Input read without name.\n" << endl;
-							close(seqFileIn);
-							exit(1);
-						}
-						if(length(seq) < 1){
-							cerr << "\nERROR: Input read without sequence.\n" << endl;
-							close(seqFileIn);
-							exit(1);
-						}
-						
-						m_nrChars += length(seq);
-						
-						appendValue(uncalled, isUncalledSequence(seq));
-						
-						if(m_preProcess){
-							
-							if(m_preTrimBegin > 0 && length(seq) > 1){
-							
-								int idx = m_preTrimBegin;
-								if(idx >= length(seq)) idx = length(seq) - 1;
-							
-								erase(seq, 0, idx);
-							
-								if(m_format == FASTQ)
-								erase(quals[i], 0, idx);
-							}
-							
-							if(m_preTrimEnd > 0 && length(seq) > 1){
-								
-								int idx = m_preTrimEnd;
-								if(idx >= length(seq)) idx = length(seq) - 1;
-								
-								seq = prefix(seq, length(seq) - idx);
-								
-								if(m_format == FASTQ)
-								quals[i] = prefix(quals[i], length(quals[i]) - idx);
-							}
-							
-							if(m_qtrim != QOFF && ! m_qtrimPostRm){
-								if(qualTrim(seq, quals[i], m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
-							}
-						}
-					}
 				}
 				else{
-					
 					seqan::StringSet<seqan::IupacString> seqsIupac;
 					
 					reserve(seqsIupac, nReads);
@@ -151,57 +100,57 @@ public:
 						readRecords(ids, seqsIupac, quals, seqFileIn, nReads);
 					}
 					
-					for(unsigned int i = 0; i < length(ids); ++i){
-						
-						TString &id             = ids[i];
-						seqan::IupacString &seq = seqsIupac[i];
-						
-						if(length(id) < 1){
-							cerr << "\nERROR: Input read without name.\n" << endl;
-							close(seqFileIn);
-							exit(1);
-						}
-						if(length(seq) < 1){
-							cerr << "\nERROR: Input read without sequence.\n" << endl;
-							close(seqFileIn);
-							exit(1);
-						}
-						
-						m_nrChars += length(seq);
-						
-						appendValue(uncalled, isUncalledSequence(seq));
-						
-						if(m_preProcess){
-							
-							if(m_preTrimBegin > 0 && length(seq) > 1){
-								
-								int idx = m_preTrimBegin;
-								if(idx >= length(seq)) idx = length(seq) - 1;
-								
-								erase(seq, 0, idx);
-								
-								if(m_format == FASTQ)
-								erase(quals[i], 0, idx);
-							}
-							
-							if(m_preTrimEnd > 0 && length(seq) > 1){
-								
-								int idx = m_preTrimEnd;
-								if(idx >= length(seq)) idx = length(seq) - 1;
-								
-								seq = prefix(seq, length(seq) - idx);
-								
-								if(m_format == FASTQ)
-								quals[i] = prefix(quals[i], length(quals[i]) - idx);
-							}
-							
-							if(m_qtrim != QOFF && ! m_qtrimPostRm){
-								if(qualTrim(seq, quals[i], m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
-							}
-						}
+					seqs = seqsIupac;
+				}
+				
+				for(unsigned int i = 0; i < length(ids); ++i){
+					
+					TString &id  =  ids[i];
+					TSeqStr &seq = seqs[i];
+					
+					if(length(id) < 1){
+						cerr << "\nERROR: Input read without name.\n" << endl;
+						close(seqFileIn);
+						exit(1);
+					}
+					if(length(seq) < 1){
+						cerr << "\nERROR: Input read without sequence.\n" << endl;
+						close(seqFileIn);
+						exit(1);
 					}
 					
-					seqs = seqsIupac;
+					m_nrChars += length(seq);
+					
+					appendValue(uncalled, isUncalledSequence(seq));
+					
+					if(m_preProcess){
+						
+						if(m_preTrimBegin > 0 && length(seq) > 1){
+							
+							int idx = m_preTrimBegin;
+							if(idx >= length(seq)) idx = length(seq) - 1;
+							
+							erase(seq, 0, idx);
+							
+							if(m_format == FASTQ)
+							erase(quals[i], 0, idx);
+						}
+						
+						if(m_preTrimEnd > 0 && length(seq) > 1){
+							
+							int idx = m_preTrimEnd;
+							if(idx >= length(seq)) idx = length(seq) - 1;
+							
+							seq = prefix(seq, length(seq) - idx);
+							
+							if(m_format == FASTQ)
+							quals[i] = prefix(quals[i], length(quals[i]) - idx);
+						}
+						
+						if(m_qtrim != QOFF && ! m_qtrimPostRm){
+							if(qualTrim(seq, quals[i], m_qtrim, m_qtrimThresh, m_qtrimWinSize)) ++m_nLowPhred;
+						}
+					}
 				}
 				
 				m_nrReads += length(ids);
@@ -225,25 +174,6 @@ public:
 		using namespace seqan;
 		
 		typename Iterator<TSeqStr>::Type it, itEnd;
-		
-		it    = begin(seq);
-		itEnd = end(seq);
-		int n = 0;
-		
-		while(it != itEnd){
-			 if(*it == 'N') n++;
-			 ++it;
-		}
-		return(n > m_maxUncalled);
-	}
-	
-	
-	// returns TRUE if read contains too many uncalled bases
-	bool isUncalledSequence(seqan::IupacString &seq){
-		
-		using namespace seqan;
-		
-		typename Iterator<IupacString>::Type it, itEnd;
 		
 		it    = begin(seq);
 		itEnd = end(seq);
