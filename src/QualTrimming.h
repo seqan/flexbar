@@ -43,10 +43,10 @@ unsigned qualTrimming(const TString& qual, unsigned const _cutoff, Window const 
 	
 	unsigned window = spec.size;
 	unsigned avg = 0, i = 0;
-
-	// Work with absolute cutoff in window to avoid divisions
+	
+	// Absolute cutoff in window to avoid divisions
 	unsigned cutoff = _cutoff * window;
-
+	
 	// Calculate average quality of initial window
 	for (i = 0; i < window; ++i){
 		avg += getQuality(qual, i);
@@ -57,9 +57,15 @@ unsigned qualTrimming(const TString& qual, unsigned const _cutoff, Window const 
 		
 		// Take care only not to go over the end of the sequence. Shorten window near the end
 		avg -= getQuality(qual, i);
-		avg += i + window < length(qual) ? getQuality(qual, i + window) : 0;
+		
+		if(i + window < length(qual)){
+			avg += getQuality(qual, i + window);
+		}
+		else{
+			cutoff = _cutoff * ((length(qual) - 1) - i);
+		}
 	}
-	return i;   // i holds start of first window that turned bad
+	return i;   // holds start of first window that turned bad
 }
 
 
