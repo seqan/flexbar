@@ -1,14 +1,14 @@
 
-<!-- Flexbar tool definition for Galaxy, version 3.4.2 -->
+<!-- Flexbar tool definition for Galaxy, version 3.5.0 -->
 <!-- Author: Johannes Roehr -->
 
 
-<tool id="flexbar" name="Flexbar" version="3.4.2">
+<tool id="flexbar" name="Flexbar" version="3.5.0">
 	
 	<description>- flexible barcode and adapter removal</description>
     
 	<requirements>
-        <requirement type="package" version="3.4.0">flexbar</requirement>
+        <requirement type="package" version="3.5.0">flexbar</requirement>
     </requirements>
 	
 	<version_command>flexbar --versions</version_command>
