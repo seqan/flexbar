@@ -38,20 +38,20 @@ To get the latest version and best performance consider to build Flexbar from so
 Make sure that `cmake` is available, as well as development and runtime files of the TBB library 4.0 or later (Intel Threading Building Blocks). For example on Debian systems, install the packages `libtbb-dev` and `libtbb2`. Furthermore, the SeqAn library and a compiler that supports C++14 is required:
 
 * Get SeqAn library version 2.4.0 [here](https://github.com/seqan/seqan/releases/download/seqan-v2.4.0/seqan-library-2.4.0.tar.xz)
-* Download Flexbar 3.4.0 source code [release](https://github.com/seqan/flexbar/releases)
+* Download Flexbar 3.5.0 source code [release](https://github.com/seqan/flexbar/releases)
 
 Decompress both files:
 
-	tar xzf flexbar-3.4.0.tar.gz
+	tar xzf flexbar-3.5.0.tar.gz
 	tar xJf seqan-library-2.4.0.tar.xz
 
 Move SeqAn include folder to Flexbar:
 
-	mv seqan-library-2.4.0/include flexbar-3.4.0
+	mv seqan-library-2.4.0/include flexbar-3.5.0
 
 Use these commands for building:
 
-	cd flexbar-3.4.0
+	cd flexbar-3.5.0
 	cmake .
 	make
 
@@ -65,12 +65,12 @@ For execution of provided Flexbar binaries, the corresponding TBB library has to
 #### Linux
 Adjust lib search path to include the absolute path of the Flexbar directory containing the lib file libtbb.so.2 for the current terminal session, or permanently in shell startup scripts:
 
-	export LD_LIBRARY_PATH=/YourPath/flexbar-3.4.0-linux:$LD_LIBRARY_PATH
+	export LD_LIBRARY_PATH=/YourPath/flexbar-3.5.0-linux:$LD_LIBRARY_PATH
 
 #### Mac OS
 It applies the same as for Linux. Make the file libtbb.dylib available by setting the lib search path:
 
-	export DYLD_LIBRARY_PATH=/YourPath/flexbar-3.4.0-macos:$DYLD_LIBRARY_PATH
+	export DYLD_LIBRARY_PATH=/YourPath/flexbar-3.5.0-macos:$DYLD_LIBRARY_PATH
 
 
 ### Program usage
