@@ -15,6 +15,7 @@
 #include <tbb/pipeline.h>
 #include <tbb/task_scheduler_init.h>
 #include <tbb/concurrent_vector.h>
+#include <tbb/mutex.h>
 
 #include <seqan/basic.h>
 #include <seqan/sequence.h>
