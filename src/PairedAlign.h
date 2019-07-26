@@ -89,7 +89,7 @@ public:
 		m_p  = new TSeqAlignPair(o, o.p_min_overlap, o.a_errorRate, o.a_match, o.a_mismatch, o.a_gapCost);
 		
 		if(m_log == flexbar::TAB)
-		*out << "ReadTag\tQueryTag\tQueryStart\tQueryEnd\tOverlapLength\tMismatches\tIndels\tAllowedErrors" << std::endl;
+		*out << "ReadTag\tQueryTag\tQueryStart\tQueryEnd\tOverlapLength\tMismatches\tIndels\tAllowedErrors\tScore" << std::endl;
 	}
 	
 	

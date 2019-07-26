@@ -22,7 +22,7 @@ struct Options{
 	
 	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, umiTags, logStdout;
 	bool switch2Fasta, writeUnassigned, writeSingleReads, writeSingleReadsP, writeLengthDist;
-	bool useStdin, useStdout, relaxRegion, useRcTrimEnd, qtrimPostRm, addBarcodeAdapter;
+	bool useStdin, useStdout, logEverything, relaxRegion, useRcTrimEnd, qtrimPostRm, addBarcodeAdapter;
 	bool interleavedInput, iupacInput, htrimAdapterRm, htrimMaxFirstOnly;
 	
 	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len, p_min_overlap;
@@ -84,6 +84,7 @@ struct Options{
 		iupacInput        = false;
 		useStdin          = false;
 		useStdout         = false;
+		logEverything     = false;
 		relaxRegion       = false;
 		useRcTrimEnd      = false;
 		addBarcodeAdapter = false;
@@ -271,6 +272,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	
 	addSection(parser, "Logging and tagging");
 	addOption(parser, ArgParseOption("l", "align-log", "Print chosen read alignments.", ARG::STRING));
+	addOption(parser, ArgParseOption("alt", "alternative", "Print all valid alignments between query and read. Additonally mark best alignment with b and log difference between best and second best alignment if it exists"));
 	addOption(parser, ArgParseOption("o", "stdout-log", "Write statistics to stdout instead of target log file."));
 	addOption(parser, ArgParseOption("O", "output-log", "Output file for logging instead of target prefix usage.", ARG::OUTPUT_FILE));
 	addOption(parser, ArgParseOption("g", "removal-tags", "Tag reads that are subject to adapter or barcode removal."));
@@ -863,6 +865,9 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		else if(o.logAlignStr == "MOD") o.logAlign = MOD;
 	}
 	
+	if(isSet(parser, "alternative")) o.logEverything = true;
+
+
 	if(isSet(parser, "zip-output")){
 		getOptionValue(o.outCompression, parser, "zip-output");
 		
