@@ -3,6 +3,7 @@
 #ifndef FLEXBAR_SEQALIGN_H
 #define FLEXBAR_SEQALIGN_H
 
+tbb::mutex ouputMutex;
 
 template <typename TSeqStr, typename TString, class TAlgorithm>
 class SeqAlign {
@@ -305,7 +306,9 @@ public:
 			  << "read seq  " << seqRead.seq << "\n\n" << endl;
 		}
 		
+		ouputMutex.lock();
 		*m_out << s.str();
+		ouputMutex.unlock();
 		
 		return ++qIndex;
 	}
