@@ -3,6 +3,7 @@
 #ifndef FLEXBAR_SEQALIGNPAIR_H
 #define FLEXBAR_SEQALIGNPAIR_H
 
+tbb::mutex ouputMutex;
 
 template <typename TSeqStr, typename TString, class TAlgorithm>
 class SeqAlignPair {
@@ -183,7 +184,9 @@ public:
 			  << "read2 id  " << seqRead2.id << "\n\n" << endl;
 		}
 		
+		ouputMutex.lock();
 		*m_out << s.str();
+		ouputMutex.unlock();
 		
 		return;
 	}
