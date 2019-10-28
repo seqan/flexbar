@@ -2,7 +2,7 @@
    
    Flexbar - flexible barcode and adapter removal
    
-   Version 3.5.0
+   Version 3.6.0
    
    BSD 3-Clause License
    
@@ -29,8 +29,8 @@ int main(int argc, const char* argv[]){
 	using namespace std;
 	using namespace seqan;
 	
-	const string version = "3.5.0";
-	const string date    = "May 2019";
+	const string version = "3.6.0 beta";
+	const string date    = "October 2019";
 	
 	ArgumentParser parser("flexbar");
 	
