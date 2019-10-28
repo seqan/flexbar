@@ -23,7 +23,7 @@ struct Options{
 	bool isPaired, useAdapterFile, useNumberTag, useRemovalTag, umiTags, logStdout;
 	bool switch2Fasta, writeUnassigned, writeSingleReads, writeSingleReadsP, writeLengthDist;
 	bool useStdin, useStdout, relaxRegion, useRcTrimEnd, qtrimPostRm, addBarcodeAdapter;
-	bool interleavedInput, iupacInput, htrimAdapterRm, htrimMaxFirstOnly;
+	bool interleavedInput, iupacInput, htrimAdapterRm, htrimMaxFirstOnly, writeBarReads;
 	
 	int cutLen_begin, cutLen_end, cutLen_read, a_tail_len, b_tail_len, p_min_overlap;
 	int qtrimThresh, qtrimWinSize, a_overhang, htrimMinLength, htrimMinLength2, htrimMaxLength;
@@ -73,6 +73,7 @@ struct Options{
 		useAdapterFile    = false;
 		useNumberTag      = false;
 		useRemovalTag     = false;
+		writeBarReads     = false;
 		writeUnassigned   = false;
 		writeSingleReads  = false;
 		writeSingleReadsP = false;
@@ -199,6 +200,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("bt", "barcode-trim-end", "Type of detection, see section trim-end modes.", ARG::STRING));
 	addOption(parser, ArgParseOption("bn", "barcode-tail-length", "Region size in tail trim-end modes. Default: barcode length.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("bk", "barcode-keep", "Keep barcodes within reads instead of removal."));
+	addOption(parser, ArgParseOption("bx", "barcode-reads-out", "Generate output file with separate barcode reads."));
 	addOption(parser, ArgParseOption("bu", "barcode-unassigned", "Include unassigned reads in output generation."));
 	addOption(parser, ArgParseOption("bm", "barcode-match", "Alignment match score.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("bi", "barcode-mismatch", "Alignment mismatch score.", ARG::INTEGER));
@@ -283,6 +285,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	setAdvanced(parser, "barcodes2");
 	setAdvanced(parser, "barcode-tail-length");
 	setAdvanced(parser, "barcode-keep");
+	setAdvanced(parser, "barcode-reads-out");
 	setAdvanced(parser, "barcode-unassigned");
 	setAdvanced(parser, "barcode-match");
 	setAdvanced(parser, "barcode-mismatch");
@@ -956,6 +959,10 @@ void loadOptions(Options &o, seqan::ArgumentParser &parser){
 		}
 		
 		if(isSet(parser, "barcode-unassigned")) o.writeUnassigned = true;
+		
+		if(o.barDetect == BARCODE_READ){
+			if(isSet(parser, "barcode-reads-out")) o.writeBarReads = true;
+		}
 		
 		getOptionValue(o.b_match,    parser, "barcode-match");
 		getOptionValue(o.b_mismatch, parser, "barcode-mismatch");
