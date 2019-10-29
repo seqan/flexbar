@@ -16,7 +16,7 @@ private:
 	int m_mapsize;
 	const int m_minLength, m_qtrimThresh, m_qtrimWinSize;
 	const bool m_isPaired, m_writeUnassigned, m_writeSingleReads, m_writeSingleReadsP;
-	const bool m_twoBarcodes, m_qtrimPostRm;
+	const bool m_twoBarcodes, m_qtrimPostRm, m_writeBarReads;
 	
 	tbb::atomic<unsigned long> m_nSingleReads, m_nLowPhred;
 	
@@ -54,6 +54,7 @@ public:
 		m_aTrimmed(o.aTrimmed),
 		m_isPaired(o.isPaired),
 		m_writeUnassigned(o.writeUnassigned),
+		m_writeBarReads(o.writeBarReads),
 		m_writeSingleReads(o.writeSingleReads),
 		m_writeSingleReadsP(o.writeSingleReadsP),
 		m_twoBarcodes(o.barDetect == flexbar::WITHIN_READ_REMOVAL2 || o.barDetect == flexbar::WITHIN_READ2),
@@ -104,21 +105,31 @@ public:
 					b2 << barcode2;
 					
 					string s = m_target + "_barcode_" + b1.str();
-					TSeqOutput *of1 = new TSeqOutput(s, barcode, false, o);
+					TSeqOutput *of1 = new TSeqOutput(s, barcode, false, o, false);
 					
 					s = m_target + "_barcode_" + b2.str();
-					TSeqOutput *of2 = new TSeqOutput(s, barcode, false, o);
+					TSeqOutput *of2 = new TSeqOutput(s, barcode, false, o, false);
 					
 					TOutFiles& f = m_outMap[i + 1];
 					f.f1 = of1;
 					f.f2 = of2;
 					
+					if(m_writeBarReads){
+						stringstream br;
+						br << barcode;
+						
+						string s = m_target + "_barcode_" + br.str() + "_br";
+						TSeqOutput *ofb = new TSeqOutput(s, "", true, o, true);
+						
+						f.fb = ofb;
+					}
+					
 					if(m_writeSingleReads){
 						s = m_target + "_barcode_" + b1.str() + "_single";
-						TSeqOutput *osingle1 = new TSeqOutput(s, "", true, o);
+						TSeqOutput *osingle1 = new TSeqOutput(s, "", true, o, false);
 						
 						s = m_target + "_barcode_" + b2.str() + "_single";
-						TSeqOutput *osingle2 = new TSeqOutput(s, "", true, o);
+						TSeqOutput *osingle2 = new TSeqOutput(s, "", true, o, false);
 						
 						f.single1 = osingle1;
 						f.single2 = osingle2;
@@ -127,10 +138,10 @@ public:
 				
 				if(m_writeUnassigned){
 					string s = m_target + "_barcode_unassigned_1";
-					TSeqOutput *of1 = new TSeqOutput(s, "unassigned", false, o);
+					TSeqOutput *of1 = new TSeqOutput(s, "unassigned", false, o, false);
 					
 					s = m_target + "_barcode_unassigned_2";
-					TSeqOutput *of2 = new TSeqOutput(s, "unassigned", false, o);
+					TSeqOutput *of2 = new TSeqOutput(s, "unassigned", false, o, false);
 					
 					TOutFiles& f = m_outMap[0];
 					f.f1 = of1;
@@ -138,10 +149,10 @@ public:
 					
 					if(m_writeSingleReads){
 						s = m_target + "_barcode_unassigned_1_single";
-						TSeqOutput *osingle1 = new TSeqOutput(s, "", true, o);
+						TSeqOutput *osingle1 = new TSeqOutput(s, "", true, o, false);
 						
 						s = m_target + "_barcode_unassigned_2_single";
-						TSeqOutput *osingle2 = new TSeqOutput(s, "", true, o);
+						TSeqOutput *osingle2 = new TSeqOutput(s, "", true, o, false);
 						
 						f.single1 = osingle1;
 						f.single2 = osingle2;
@@ -159,13 +170,13 @@ public:
 				
 				if(o.outReadsFile != "") s = o.outReadsFile;
 				
-				TSeqOutput *of1 = new TSeqOutput(s, "", false, o);
+				TSeqOutput *of1 = new TSeqOutput(s, "", false, o, false);
 				
 				s = m_target + "_2";
 				
 				if(o.outReadsFile2 != "") s = o.outReadsFile2;
 				
-				TSeqOutput *of2 = new TSeqOutput(s, "", false, o);
+				TSeqOutput *of2 = new TSeqOutput(s, "", false, o, false);
 				
 				TOutFiles& f = m_outMap[0];
 				f.f1 = of1;
@@ -173,10 +184,10 @@ public:
 				
 				if(m_writeSingleReads){
 					s = m_target + "_1_single";
-					TSeqOutput *osingle1 = new TSeqOutput(s, "", true, o);
+					TSeqOutput *osingle1 = new TSeqOutput(s, "", true, o, false);
 					
 					s = m_target + "_2_single";
-					TSeqOutput *osingle2 = new TSeqOutput(s, "", true, o);
+					TSeqOutput *osingle2 = new TSeqOutput(s, "", true, o, false);
 					
 					f.single1 = osingle1;
 					f.single2 = osingle2;
@@ -193,7 +204,7 @@ public:
 				
 				if(o.outReadsFile != "") s = o.outReadsFile;
 				
-				TSeqOutput *of1 = new TSeqOutput(s, "", false, o);
+				TSeqOutput *of1 = new TSeqOutput(s, "", false, o, false);
 				
 				TOutFiles& f = m_outMap[0];
 				f.f1 = of1;
@@ -214,15 +225,22 @@ public:
 					b << barcode;
 					
 					string s = m_target + "_barcode_" + b.str();
-					TSeqOutput *of1 = new TSeqOutput(s, barcode, false, o);
+					TSeqOutput *of1 = new TSeqOutput(s, barcode, false, o, false);
 					
 					TOutFiles& f = m_outMap[i + 1];
 					f.f1 = of1;
+					
+					if(m_writeBarReads){
+						string s = m_target + "_barcode_" + b.str() + "_br";
+						TSeqOutput *ofb = new TSeqOutput(s, "", true, o, true);
+						
+						f.fb = ofb;
+					}
 				}
 				
 				if(m_writeUnassigned){
 					string s = m_target + "_barcode_unassigned";
-					TSeqOutput *of1 = new TSeqOutput(s, "unassigned", false, o);
+					TSeqOutput *of1 = new TSeqOutput(s, "unassigned", false, o, false);
 					
 					TOutFiles& f = m_outMap[0];
 					f.f1 = of1;
@@ -261,7 +279,11 @@ public:
 						if     (m_aTrimmed == ATOFF  &&  (pRead->r1->rmAdapter ||   pRead->r1->rmAdapterRC)) r1ok = false;
 						else if(m_aTrimmed == ATONLY && ! pRead->r1->rmAdapter && ! pRead->r1->rmAdapterRC)  r1ok = false;
 						
-						if(r1ok) m_outMap[pRead->barID].f1->writeRead(pRead->r1);
+						if(r1ok){
+							m_outMap[pRead->barID].f1->writeRead(pRead->r1);
+							
+							if(m_writeBarReads) m_outMap[pRead->barID].fb->writeRead(pRead->b);
+						}
 					}
 				}
 				break;
@@ -303,6 +325,8 @@ public:
 						if(r1ok && r2ok){
 							m_outMap[outIdx].f1->writeRead(pRead->r1);
 							m_outMap[outIdx].f2->writeRead(pRead->r2);
+							
+							if(m_writeBarReads) m_outMap[outIdx].fb->writeRead(pRead->b);
 						}
 						else if(r1ok && ! r2ok){
 							m_nSingleReads++;
@@ -319,6 +343,8 @@ public:
 								
 								m_outMap[outIdx].f1->writeRead(pRead->r1);
 								m_outMap[outIdx].f2->writeRead(pRead->r2);
+								
+								if(m_writeBarReads) m_outMap[outIdx].fb->writeRead(pRead->b);
 							}
 						}
 						else if(! r1ok && r2ok){
@@ -336,6 +362,8 @@ public:
 								
 								m_outMap[outIdx].f1->writeRead(pRead->r1);
 								m_outMap[outIdx].f2->writeRead(pRead->r2);
+								
+								if(m_writeBarReads) m_outMap[outIdx].fb->writeRead(pRead->b);
 							}
 						}
 					}

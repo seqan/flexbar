@@ -200,7 +200,7 @@ void defineOptions(seqan::ArgumentParser &parser, const std::string version, con
 	addOption(parser, ArgParseOption("bt", "barcode-trim-end", "Type of detection, see section trim-end modes.", ARG::STRING));
 	addOption(parser, ArgParseOption("bn", "barcode-tail-length", "Region size in tail trim-end modes. Default: barcode length.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("bk", "barcode-keep", "Keep barcodes within reads instead of removal."));
-	addOption(parser, ArgParseOption("bx", "barcode-reads-out", "Generate output file with separate barcode reads."));
+	addOption(parser, ArgParseOption("bx", "barcode-reads-out", "Generate output files with separate barcode reads."));
 	addOption(parser, ArgParseOption("bu", "barcode-unassigned", "Include unassigned reads in output generation."));
 	addOption(parser, ArgParseOption("bm", "barcode-match", "Alignment match score.", ARG::INTEGER));
 	addOption(parser, ArgParseOption("bi", "barcode-mismatch", "Alignment mismatch score.", ARG::INTEGER));

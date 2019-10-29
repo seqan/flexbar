@@ -15,7 +15,8 @@ private:
 	const TString m_tagStr;
 	const flexbar::FileFormat m_format;
 	const flexbar::CompressionType m_cmprsType;
-	const bool m_switch2Fasta, m_writeLenDist, m_useStdout;
+	
+	const bool m_switch2Fasta, m_writeLenDist, m_useStdout, m_isBarRead;
 	const unsigned int m_minLength, m_cutLen_read;
 	
 	tbb::atomic<unsigned long> m_countGood, m_countGoodChars;
@@ -23,13 +24,14 @@ private:
 	
 public:
 	
-	SeqOutput(const std::string &filePath, const TString tagStr, const bool alwaysFile, const Options &o) :
+	SeqOutput(const std::string &filePath, const TString tagStr, const bool alwaysFile, const Options &o, const bool isBarRead) :
 		m_format(o.format),
 		m_switch2Fasta(o.switch2Fasta),
 		m_tagStr(tagStr),
 		m_minLength(o.min_readLen),
 		m_cutLen_read(o.cutLen_read),
 		m_writeLenDist(o.writeLengthDist),
+		m_isBarRead(isBarRead),
 		m_useStdout(o.useStdout && ! alwaysFile),
 		m_cmprsType(o.cmprsType),
 		m_countGood(0),
@@ -151,7 +153,7 @@ public:
 			
 			unsigned int readLength = length(seqRead->seq);
 			
-			if(m_cutLen_read > 1 && m_cutLen_read >= m_minLength && m_cutLen_read < readLength){
+			if(m_cutLen_read > 1 && m_cutLen_read >= m_minLength && m_cutLen_read < readLength && ! m_isBarRead){
 				
 				seqRead->seq = prefix(seqRead->seq, m_cutLen_read);
 				
@@ -161,16 +163,18 @@ public:
 				readLength = m_cutLen_read;
 			}
 			
-			m_countGoodChars += readLength;
+			if(! m_isBarRead){
+				m_countGoodChars += readLength;
 			
-			++m_countGood;
+				++m_countGood;
 			
-			// store read length distribution
+				// store read length distribution
 			
-			if(m_writeLenDist && readLength <= MAX_READLENGTH)
-				m_lengthDist.at(readLength)++;
-			else if(m_writeLenDist)
-				cerr << "\nCompile Flexbar with larger max read length to get correct length dist.\n" << endl;
+				if(m_writeLenDist && readLength <= MAX_READLENGTH)
+					m_lengthDist.at(readLength)++;
+				else if(m_writeLenDist)
+					cerr << "\nCompile Flexbar with larger max read length to get correct length dist.\n" << endl;
+			}
 			
 			writeSeqRead(*seqRead);
 		}

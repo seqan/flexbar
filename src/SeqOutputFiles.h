@@ -13,12 +13,13 @@ public:
 	
 	typedef SeqOutput<TSeqStr, TString> TSeqOutput;
 	
-	TSeqOutput *f1, *f2, *single1, *single2;
+	TSeqOutput *f1, *f2, *fb, *single1, *single2;
 	tbb::atomic<unsigned long> m_nShort_1, m_nShort_2;
 	
 	SeqOutputFiles() :
 		f1(0),
 		f2(0),
+		fb(0),
 		single1(0),
 		single2(0),
 		m_nShort_1(0),
@@ -28,6 +29,7 @@ public:
 	virtual ~SeqOutputFiles(){
     	delete f1;
     	delete f2;
+    	delete fb;
     	delete single1;
     	delete single2;
 	};
