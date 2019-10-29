@@ -147,6 +147,13 @@ public:
 					f.f1 = of1;
 					f.f2 = of2;
 					
+					if(m_writeBarReads){
+						string s = m_target + "_barcode_unassigned_br";
+						TSeqOutput *ofb = new TSeqOutput(s, "", true, o, true);
+						
+						f.fb = ofb;
+					}
+					
 					if(m_writeSingleReads){
 						s = m_target + "_barcode_unassigned_1_single";
 						TSeqOutput *osingle1 = new TSeqOutput(s, "", true, o, false);
@@ -244,6 +251,13 @@ public:
 					
 					TOutFiles& f = m_outMap[0];
 					f.f1 = of1;
+					
+					if(m_writeBarReads){
+						string s = m_target + "_barcode_unassigned_br";
+						TSeqOutput *ofb = new TSeqOutput(s, "", true, o, true);
+						
+						f.fb = ofb;
+					}
 				}
 			}
 		}
