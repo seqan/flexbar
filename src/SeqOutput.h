@@ -18,8 +18,8 @@ private:
 	const bool m_switch2Fasta, m_writeLenDist, m_useStdout;
 	const unsigned int m_minLength, m_cutLen_read;
 	
-	tbb::atomic<unsigned long> m_countGood, m_countGoodChars;
-	tbb::concurrent_vector<unsigned long> m_lengthDist;
+	std::atomic<unsigned long> m_countGood, m_countGoodChars;
+	oneapi::tbb::concurrent_vector<unsigned long> m_lengthDist;
 	
 public:
 	
@@ -48,7 +48,7 @@ public:
 		}
 		m_filePath += o.outCompression;
 		
-		m_lengthDist = tbb::concurrent_vector<unsigned long>(MAX_READLENGTH + 1, 0);
+		m_lengthDist = oneapi::tbb::concurrent_vector<unsigned long>(MAX_READLENGTH + 1, 0);
 		
 		if(m_useStdout){
 			

@@ -7,7 +7,7 @@
 
 
 template <typename TSeqStr, typename TString>
-class PairedInput : public tbb::filter {
+class PairedInput {
 
 private:
 	
@@ -15,14 +15,13 @@ private:
 	const bool m_isPaired, m_useBarRead, m_useNumberTag, m_interleaved;
 	const unsigned int m_bundleSize;
 	
-	tbb::atomic<unsigned long> m_uncalled, m_uncalledPairs, m_tagCounter, m_nBundles;
+    mutable FlexbarAtomic<unsigned long> m_uncalled, m_uncalledPairs, m_tagCounter, m_nBundles;
 	SeqInput<TSeqStr, TString> *m_f1, *m_f2, *m_b;
 	
 public:
 	
 	PairedInput(const Options &o) :
 		
-		filter(serial_in_order),
 		m_format(o.format),
 		m_useNumberTag(o.useNumberTag),
 		m_interleaved(o.interleavedInput),
@@ -55,7 +54,7 @@ public:
 	}
 	
 	
-	void* loadPairedReadBundle(){
+	void* loadPairedReadBundle() const{
 		
 		using namespace std;
 		using namespace flexbar;
@@ -207,8 +206,7 @@ public:
 	
 	
 	// tbb filter operator
-	void* operator()(void*){
-		
+    flexbar::TPairedReadBundle* operator()(oneapi::tbb::flow_control& fc) const {
 		using namespace flexbar;
 		
 		TPairedReadBundle *prBundle = NULL;

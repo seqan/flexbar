@@ -9,7 +9,7 @@
 
 
 template <typename TSeqStr, typename TString>
-class PairedAlign : public tbb::filter {
+class PairedAlign {
 
 private:
 	
@@ -31,9 +31,9 @@ private:
 	const flexbar::TrimEnd        m_aTrimEnd, m_arcTrimEnd, m_bTrimEnd;
 	const flexbar::PairOverlap    m_poMode;
 	
-	tbb::atomic<unsigned long> m_unassigned;
-	tbb::concurrent_vector<flexbar::TBar> *m_adapters, *m_adapters2;
-	tbb::concurrent_vector<flexbar::TBar> *m_barcodes, *m_barcodes2;
+    mutable FlexbarAtomic<unsigned long> m_unassigned;
+	oneapi::tbb::concurrent_vector<flexbar::TBar> *m_adapters, *m_adapters2;
+	oneapi::tbb::concurrent_vector<flexbar::TBar> *m_barcodes, *m_barcodes2;
 	
 	typedef SeqAlign<TSeqStr, TString, SeqAlignAlgo<TSeqStr> > TSeqAlign;
 	TSeqAlign *m_a1, *m_b1, *m_a2, *m_b2;
@@ -47,7 +47,6 @@ public:
 	
 	PairedAlign(Options &o) :
 		
-		filter(parallel),
 		m_format(o.format),
 		m_log(o.logAlign),
 		m_runType(o.runType),
@@ -102,7 +101,7 @@ public:
 	};
 	
 	
-	void alignPairedReadToBarcodes(flexbar::TPairedRead* pRead, flexbar::TAlignBundle &alBundle, std::vector<flexbar::ComputeCycle> &cycle, std::vector<unsigned int> &idxAl, const flexbar::AlignmentMode &alMode){
+	void alignPairedReadToBarcodes(flexbar::TPairedRead* pRead, flexbar::TAlignBundle &alBundle, std::vector<flexbar::ComputeCycle> &cycle, std::vector<unsigned int> &idxAl, const flexbar::AlignmentMode &alMode) const {
 		
 		using namespace flexbar;
 		
@@ -122,7 +121,7 @@ public:
 	}
 	
 	
-	void alignPairedReadToAdapters(flexbar::TPairedRead* pRead, flexbar::TAlignBundle &alBundle, std::vector<flexbar::ComputeCycle> &cycle, std::vector<unsigned int> &idxAl, const flexbar::AlignmentMode &alMode, const flexbar::TrimEnd trimEnd){
+	void alignPairedReadToAdapters(flexbar::TPairedRead* pRead, flexbar::TAlignBundle &alBundle, std::vector<flexbar::ComputeCycle> &cycle, std::vector<unsigned int> &idxAl, const flexbar::AlignmentMode &alMode, const flexbar::TrimEnd trimEnd) const {
 		
 		using namespace flexbar;
 		
@@ -173,7 +172,7 @@ public:
 	}
 	
 	
-	void trimLeftHPS(flexbar::TSeqRead* seqRead){
+	void trimLeftHPS(flexbar::TSeqRead* seqRead) const{
 		
 		using namespace std;
 		using namespace flexbar;
@@ -223,7 +222,7 @@ public:
 	}
 	
 	
-	void trimRightHPS(flexbar::TSeqRead* seqRead){
+	void trimRightHPS(flexbar::TSeqRead* seqRead) const{
 		
 		using namespace std;
 		using namespace flexbar;
@@ -275,13 +274,11 @@ public:
 	
 	
 	// tbb filter operator
-	void* operator()(void* item){
+    flexbar::TPairedReadBundle* operator()(flexbar::TPairedReadBundle* prBundle) const{
 		
 		using namespace flexbar;
 		
-		if(item != NULL){
-			
-			TPairedReadBundle *prBundle = static_cast<TPairedReadBundle* >(item);
+		if(prBundle != NULL){
 			
 			if(m_umiTags){
 				for(unsigned int i = 0; i < prBundle->size(); ++i){

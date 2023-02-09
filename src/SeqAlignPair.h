@@ -20,8 +20,8 @@ private:
 	const float m_errorRate;
 	const unsigned int m_bundleSize;
 	
-	tbb::atomic<unsigned long> m_nPreShortReads, m_overlaps, m_modified;
-	tbb::concurrent_vector<unsigned long> m_overlapLengths;
+	std::atomic<unsigned long> m_nPreShortReads, m_overlaps, m_modified;
+	oneapi::tbb::concurrent_vector<unsigned long> m_overlapLengths;
 	
 	std::ostream *m_out;
 	TAlgorithm m_algo;
@@ -45,7 +45,7 @@ public:
 			m_modified(0),
 			m_algo(TAlgorithm(o, match, mismatch, gapCost, true)){
 		
-		m_overlapLengths = tbb::concurrent_vector<unsigned long>(flexbar::MAX_READLENGTH + 1, 0);
+		m_overlapLengths = oneapi::tbb::concurrent_vector<unsigned long>(flexbar::MAX_READLENGTH + 1, 0);
 	};
 	
 	

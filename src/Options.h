@@ -46,7 +46,7 @@ struct Options{
 	flexbar::AdapterPreset   aPreset;
 	flexbar::AdapterTrimmed  aTrimmed;
 	
-	tbb::concurrent_vector<flexbar::TBar> barcodes, adapters, barcodes2, adapters2;
+	oneapi::tbb::concurrent_vector<flexbar::TBar> barcodes, adapters, barcodes2, adapters2;
 	
 	std::ostream *out;
 	std::fstream fstrmOut;
