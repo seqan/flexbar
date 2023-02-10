@@ -221,9 +221,14 @@ public:
 				
 				prBundle = static_cast< TPairedReadBundle* >(loadPairedReadBundle());
 				
-				if(prBundle == NULL) return prBundle;
+				if(prBundle == NULL){
+                    fc.stop();
+                    return prBundle;
+                }
 			}
-		}
+		} else {
+            fc.stop();
+        }
 		
 		return prBundle;
 	}

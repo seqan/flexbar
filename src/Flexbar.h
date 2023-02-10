@@ -243,13 +243,16 @@ void startProcessing(Options &o){
             oneapi::tbb::global_control::max_allowed_parallelism, o.nThreads);
     oneapi::tbb::parallel_pipeline(o.nThreads,
                                    oneapi::tbb::make_filter<void, TPairedReadBundle *>(
-                                           oneapi::tbb::filter_mode::serial_in_order, inputFilter)
+                                           oneapi::tbb::filter_mode::serial_in_order,
+                                           [&inputFilter](auto &fc) { return inputFilter(fc); })
                                    &
                                    oneapi::tbb::make_filter<TPairedReadBundle *, TPairedReadBundle *>(
-                                           oneapi::tbb::filter_mode::parallel, alignFilter)
+                                           oneapi::tbb::filter_mode::parallel,
+                                           [&alignFilter](TPairedReadBundle *tprb) { return alignFilter(tprb); })
                                    &
                                    oneapi::tbb::make_filter<TPairedReadBundle *, void>(
-                                           oneapi::tbb::filter_mode::serial_in_order, outputFilter)
+                                           oneapi::tbb::filter_mode::serial_in_order,
+                                           [&outputFilter](TPairedReadBundle *tprb) { return outputFilter(tprb); })
     );
 	if(o.logAlign == TAB) *out << "\n";
 	*out << "done.\n" << endl;
