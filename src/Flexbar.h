@@ -12,10 +12,9 @@
 #include <iostream>
 #include <vector>
 
-#include <tbb/pipeline.h>
-#include <tbb/task_scheduler_init.h>
-#include <tbb/concurrent_vector.h>
-#include <tbb/mutex.h>
+#include <oneapi/tbb/parallel_pipeline.h>
+#include <oneapi/tbb/global_control.h>
+#include <oneapi/tbb/concurrent_vector.h>
 
 #include <seqan/basic.h>
 #include <seqan/sequence.h>
@@ -240,14 +239,21 @@ void startProcessing(Options &o){
 	PairedAlign<TSeqStr, TString>  alignFilter(o);
 	PairedOutput<TSeqStr, TString> outputFilter(o);
 	
-	tbb::task_scheduler_init init_serial(o.nThreads);
-	tbb::pipeline pipe;
-	
-	pipe.add_filter(inputFilter);
-	pipe.add_filter(alignFilter);
-	pipe.add_filter(outputFilter);
-	pipe.run(o.nThreads);
-	
+    oneapi::tbb::global_control control(
+            oneapi::tbb::global_control::max_allowed_parallelism, o.nThreads);
+    oneapi::tbb::parallel_pipeline(o.nThreads,
+                                   oneapi::tbb::make_filter<void, TPairedReadBundle *>(
+                                           oneapi::tbb::filter_mode::serial_in_order,
+                                           [&inputFilter](auto &fc) { return inputFilter(fc); })
+                                   &
+                                   oneapi::tbb::make_filter<TPairedReadBundle *, TPairedReadBundle *>(
+                                           oneapi::tbb::filter_mode::parallel,
+                                           [&alignFilter](TPairedReadBundle *tprb) { return alignFilter(tprb); })
+                                   &
+                                   oneapi::tbb::make_filter<TPairedReadBundle *, void>(
+                                           oneapi::tbb::filter_mode::serial_in_order,
+                                           [&outputFilter](TPairedReadBundle *tprb) { return outputFilter(tprb); })
+    );
 	if(o.logAlign == TAB) *out << "\n";
 	*out << "done.\n" << endl;
 	

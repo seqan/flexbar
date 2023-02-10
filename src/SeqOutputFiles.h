@@ -14,7 +14,7 @@ public:
 	typedef SeqOutput<TSeqStr, TString> TSeqOutput;
 	
 	TSeqOutput *f1, *f2, *single1, *single2;
-	tbb::atomic<unsigned long> m_nShort_1, m_nShort_2;
+	std::atomic<unsigned long> m_nShort_1, m_nShort_2;
 	
 	SeqOutputFiles() :
 		f1(0),

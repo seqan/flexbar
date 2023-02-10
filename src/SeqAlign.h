@@ -3,7 +3,7 @@
 #ifndef FLEXBAR_SEQALIGN_H
 #define FLEXBAR_SEQALIGN_H
 
-tbb::mutex ouputMutex;
+std::mutex ouputMutex;
 
 template <typename TSeqStr, typename TString, class TAlgorithm>
 class SeqAlign {
@@ -21,16 +21,16 @@ private:
 	const float m_errorRate;
 	const unsigned int m_bundleSize;
 	
-	tbb::atomic<unsigned long> m_nPreShortReads, m_modified;
-	tbb::concurrent_vector<flexbar::TBar> *m_queries;
-	tbb::concurrent_vector<unsigned long> m_rmOverlaps;
+	std::atomic<unsigned long> m_nPreShortReads, m_modified;
+	oneapi::tbb::concurrent_vector<flexbar::TBar> *m_queries;
+	oneapi::tbb::concurrent_vector<unsigned long> m_rmOverlaps;
 	
 	std::ostream *m_out;
 	TAlgorithm m_algo;
 	
 public:
 	
-	SeqAlign(tbb::concurrent_vector<flexbar::TBar> *queries, const Options &o, int minOverlap, float errorRate, const int tailLength, const int match, const int mismatch, const int gapCost, const bool isBarcoding):
+	SeqAlign(oneapi::tbb::concurrent_vector<flexbar::TBar> *queries, const Options &o, int minOverlap, float errorRate, const int tailLength, const int match, const int mismatch, const int gapCost, const bool isBarcoding):
 			
 			m_minOverlap(minOverlap),
 			m_errorRate(errorRate),
@@ -51,7 +51,7 @@ public:
 			m_algo(TAlgorithm(o, match, mismatch, gapCost, ! isBarcoding)){
 		
 		m_queries    = queries;
-		m_rmOverlaps = tbb::concurrent_vector<unsigned long>(flexbar::MAX_READLENGTH + 1, 0);
+		m_rmOverlaps = oneapi::tbb::concurrent_vector<unsigned long>(flexbar::MAX_READLENGTH + 1, 0);
 	};
 	
 	

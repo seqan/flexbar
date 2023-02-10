@@ -32,9 +32,10 @@ else()
 endif()
 
 add_executable( flexbar Flexbar.cpp )
-target_link_libraries( flexbar tbb -lpthread )
+target_link_libraries( flexbar -lpthread )
 
-
+find_package(TBB CONFIG REQUIRED)
+target_link_libraries(flexbar TBB::tbb)
 find_package( ZLIB )
 if( ZLIB_FOUND )
     include_directories( ${ZLIB_INCLUDE_DIRS} )
@@ -52,10 +53,5 @@ if( BZIP2_FOUND )
 else()
 	message( STATUS "Build will not support bzip2." )
 endif()
-
-# find_package( TBB REQUIRED )
-# if( NOT TBB_FOUND )
-# 	message( FATAL_ERROR "TBB library not found." )
-# endif()
 
 set( SEQAN_CTD_EXECUTABLES ${SEQAN_CTD_EXECUTABLES} flexbar CACHE INTERNAL "" )

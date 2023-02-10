@@ -9,7 +9,7 @@
 
 
 template <typename TSeqStr, typename TString>
-class PairedOutput : public tbb::filter {
+class PairedOutput {
 
 private:
 	
@@ -18,8 +18,8 @@ private:
 	const bool m_isPaired, m_writeUnassigned, m_writeSingleReads, m_writeSingleReadsP;
 	const bool m_twoBarcodes, m_qtrimPostRm;
 	
-	tbb::atomic<unsigned long> m_nSingleReads, m_nLowPhred;
-	
+    mutable std::atomic<unsigned long> m_nSingleReads, m_nLowPhred;
+
 	const std::string m_target;
 	
 	const flexbar::FileFormat     m_format;
@@ -34,14 +34,13 @@ private:
 	TOutFiles *m_outMap;
 	std::ostream *out;
 	
-	tbb::concurrent_vector<flexbar::TBar> *m_adapters,  *m_barcodes;
-	tbb::concurrent_vector<flexbar::TBar> *m_adapters2, *m_barcodes2;
+	oneapi::tbb::concurrent_vector<flexbar::TBar> *m_adapters,  *m_barcodes;
+	oneapi::tbb::concurrent_vector<flexbar::TBar> *m_adapters2, *m_barcodes2;
 	
 public:
 	
 	PairedOutput(Options &o) :
 		
-		filter(serial_in_order),
 		m_target(o.targetName),
 		m_format(o.format),
 		m_runType(o.runType),
@@ -57,6 +56,8 @@ public:
 		m_writeSingleReads(o.writeSingleReads),
 		m_writeSingleReadsP(o.writeSingleReadsP),
 		m_twoBarcodes(o.barDetect == flexbar::WITHIN_READ_REMOVAL2 || o.barDetect == flexbar::WITHIN_READ2),
+        m_nSingleReads(0),
+        m_nLowPhred(0),
 		out(o.out){
 		
 		using namespace std;
@@ -68,9 +69,7 @@ public:
 		m_adapters2 = &o.adapters2;
 		
 		m_mapsize      = 0;
-		m_nSingleReads = 0;
-		m_nLowPhred    = 0;
-		
+
 		switch(m_runType){
 			
 			case PAIRED_BARCODED:{
@@ -237,7 +236,7 @@ public:
 	};
 	
 	
-	void writePairedRead(flexbar::TPairedRead* pRead){
+	void writePairedRead(flexbar::TPairedRead* pRead) const{
 		
 		using namespace flexbar;
 		
@@ -346,13 +345,11 @@ public:
 	
 	
 	// tbb filter operator
-	void* operator()(void* item){
+	void operator()(flexbar::TPairedReadBundle* prBundle) const{
 		
 		using namespace flexbar;
 		
-		if(item != NULL){
-			
-			TPairedReadBundle *prBundle = static_cast< TPairedReadBundle* >(item);
+		if(prBundle != NULL){
 			
 			for(unsigned int i = 0; i < prBundle->size(); ++i){
 				
@@ -361,8 +358,6 @@ public:
 			}
 			delete prBundle;
 		}
-		
-		return NULL;
 	}
 	
 	
@@ -457,7 +452,7 @@ public:
 		
 		using namespace std;
 		
-		tbb::concurrent_vector<flexbar::TBar> *adapters;
+		oneapi::tbb::concurrent_vector<flexbar::TBar> *adapters;
 		const unsigned int maxSpaceLen = 20;
 		
 		int startLen = 8;

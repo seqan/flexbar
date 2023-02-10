@@ -10,7 +10,7 @@ class LoadFasta {
 private:
 	
 	std::ostream *out;
-	tbb::concurrent_vector<flexbar::TBar> bars;
+	oneapi::tbb::concurrent_vector<flexbar::TBar> bars;
 	
 	const bool m_isAdapter;
 	const flexbar::RevCompMode m_rcMode;
@@ -94,12 +94,12 @@ public:
 	};
 	
 	
-	tbb::concurrent_vector<flexbar::TBar> getBars(){
+	oneapi::tbb::concurrent_vector<flexbar::TBar> getBars(){
 		return bars;
 	}
 	
 	
-	void setBars(tbb::concurrent_vector<flexbar::TBar> &newBars){
+	void setBars(oneapi::tbb::concurrent_vector<flexbar::TBar> &newBars){
 		bars = newBars;
 	}
 	

@@ -10,7 +10,7 @@ class LoadAdapters {
 private:
 	
 	std::ostream *out;
-	tbb::concurrent_vector<flexbar::TBar> adapters;
+	oneapi::tbb::concurrent_vector<flexbar::TBar> adapters;
 	
 	flexbar::Adapters a;
 	
@@ -134,7 +134,7 @@ public:
 	};
 	
 	
-	tbb::concurrent_vector<flexbar::TBar> getAdapters(){
+	oneapi::tbb::concurrent_vector<flexbar::TBar> getAdapters(){
 		return adapters;
 	}
 	

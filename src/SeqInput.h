@@ -18,7 +18,7 @@ private:
 	
 	const bool m_preProcess, m_useStdin, m_qtrimPostRm, m_iupacInput;
 	const int m_maxUncalled, m_preTrimBegin, m_preTrimEnd, m_qtrimThresh, m_qtrimWinSize;
-	tbb::atomic<unsigned long> m_nrReads, m_nrChars, m_nLowPhred;
+	std::atomic<unsigned long> m_nrReads, m_nrChars, m_nLowPhred;
 	
 public:
 	

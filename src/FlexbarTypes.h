@@ -3,6 +3,20 @@
 #ifndef FLEXBAR_FLEXBARTYPES_H
 #define FLEXBAR_FLEXBARTYPES_H
 
+#include <atomic>
+
+// A simple wrapper around std::atomic<T> with a copy-constructor
+// This is a drop-in replacement for the previously used tbb::atomic (which is copyable),
+// to avoid having to add copy-constructors to classes that used it
+template<typename T>
+struct FlexbarAtomic : public std::atomic<T> {
+    FlexbarAtomic() = default;
+    explicit constexpr FlexbarAtomic(T t) : std::atomic<T>(t) {}
+    constexpr FlexbarAtomic(const FlexbarAtomic<T>& other) :
+            FlexbarAtomic(other.load(std::memory_order_acquire))
+    {}
+};
+
 
 template <typename TSeqStr, typename TString>
 class SeqRead {
@@ -125,8 +139,8 @@ namespace flexbar{
 		FString id;
 		FSeqStr seq;
 		bool rcAdapter;
-		
-		tbb::atomic<unsigned long> rmOverlap, rmFull;
+
+        FlexbarAtomic<unsigned long> rmOverlap, rmFull;
 		
 		TBar() :
 			rmOverlap(0),
