@@ -18,7 +18,7 @@ private:
 	const bool m_isPaired, m_writeUnassigned, m_writeSingleReads, m_writeSingleReadsP;
 	const bool m_twoBarcodes, m_qtrimPostRm;
 	
-    mutable FlexbarAtomic<unsigned long> m_nSingleReads, m_nLowPhred;
+    mutable std::atomic<unsigned long> m_nSingleReads, m_nLowPhred;
 
 	const std::string m_target;
 	

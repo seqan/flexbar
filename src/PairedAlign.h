@@ -31,7 +31,7 @@ private:
 	const flexbar::TrimEnd        m_aTrimEnd, m_arcTrimEnd, m_bTrimEnd;
 	const flexbar::PairOverlap    m_poMode;
 	
-    mutable FlexbarAtomic<unsigned long> m_unassigned;
+    mutable std::atomic<unsigned long> m_unassigned;
 	oneapi::tbb::concurrent_vector<flexbar::TBar> *m_adapters, *m_adapters2;
 	oneapi::tbb::concurrent_vector<flexbar::TBar> *m_barcodes, *m_barcodes2;
 	

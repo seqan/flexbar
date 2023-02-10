@@ -15,7 +15,7 @@ private:
 	const bool m_isPaired, m_useBarRead, m_useNumberTag, m_interleaved;
 	const unsigned int m_bundleSize;
 	
-    mutable FlexbarAtomic<unsigned long> m_uncalled, m_uncalledPairs, m_tagCounter, m_nBundles;
+    mutable std::atomic<unsigned long> m_uncalled, m_uncalledPairs, m_tagCounter, m_nBundles;
 	SeqInput<TSeqStr, TString> *m_f1, *m_f2, *m_b;
 	
 public:

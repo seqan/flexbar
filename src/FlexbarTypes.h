@@ -139,7 +139,7 @@ namespace flexbar{
 		FString id;
 		FSeqStr seq;
 		bool rcAdapter;
-		
+
         FlexbarAtomic<unsigned long> rmOverlap, rmFull;
 		
 		TBar() :
