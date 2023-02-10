@@ -32,6 +32,7 @@ else()
 endif()
 
 add_executable( flexbar Flexbar.cpp )
+target_link_libraries( flexbar -lpthread )
 
 find_package(TBB CONFIG REQUIRED)
 target_link_libraries(flexbar TBB::tbb)
